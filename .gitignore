@@ -1,0 +1,49 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+*.iws
+*.ipr
+bin/
+out/
+.gradle/
+build/
+.DS_Store
+
+# React
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+.cache/
+.env
+.env.local
+.env.*.local
+.parcel-cache
+.parcel-cache/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Dependencies
+package-lock.json
+yarn.lock

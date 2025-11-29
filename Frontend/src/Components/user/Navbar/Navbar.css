@@ -37,11 +37,11 @@
 
 .searchbar input {
     width: 400px;
-    padding: 7px 5px;
+    padding: 5px 25px;
     border-radius: 20px;
-    background-color: #ccc;
+    background-color: #ffffff;
     color: black;
-    border: 1px solid #ccc;
+    border: 1px solid #ffffff;
 }
 
 .nav-right {

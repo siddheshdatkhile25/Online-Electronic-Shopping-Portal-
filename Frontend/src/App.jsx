@@ -9,7 +9,9 @@ function App() {
 
   return (
     <>
-      <Navbar/>
+      {/* <Navbar/> */}
+      <Route path="/product/" element={<ProductDetails />} />
+      
     </>
   )
 }

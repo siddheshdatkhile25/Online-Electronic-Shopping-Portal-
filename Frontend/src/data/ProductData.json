@@ -1,0 +1,128 @@
+{
+  "phones": [
+    {
+      "id": 1,
+      "name": "Apple iPhone 16",
+      "storage": "128 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone1.1.avif",
+        "/src/assets/Images/Products/Phone/phone1.2.avif",
+        "/src/assets/Images/Products/Phone/phone1.3.avif",
+        "/src/assets/Images/Products/Phone/phone1.4.avif"
+      ],
+      "price": 64200,
+      "mrp": 70900,
+      "discount": "8% OFF",
+      "rating": 4,
+      "ratingCount": 143
+    },
+    {
+      "id": 2,
+      "name": "POCO C71",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 2.1.avif",
+        "/src/assets/Images/Products/Phone/phone 2.2.avif",
+        "/src/assets/Images/Products/Phone/phone 2.3.avif",
+        "/src/assets/Images/Products/Phone/phone 2.4.avif"
+      ],
+      "price": 6499,
+      "mrp": 8999,
+      "discount": "28% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    },
+    {
+      "id": 3,
+      "name": "Realme Narzo 80 Lite",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Gold",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 3.avif",
+        "/src/assets/Images/Products/Phone/phone3_2.avif",
+        "/src/assets/Images/Products/Phone/phone3_3.avif",
+        "/src/assets/Images/Products/Phone/phone3_4.avif"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 85
+    },
+    {
+      "id": 4,
+      "name": "Apple iPhone Air",
+      "storage": "256 GB",
+      "color": "Sky Blue",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 4.avif",
+        "/src/assets/Images/Products/Phone/phone4_2.avif",
+        "/src/assets/Images/Products/Phone/phone4_3.avif",
+        "/src/assets/Images/Products/Phone/phone4_4.avif"
+      ],
+      "price": 109990,
+      "mrp": 119900,
+      "discount": "8% OFF",
+      "rating": 5,
+      "ratingCount": 112
+    },
+    {
+      "id": 5,
+      "name": "Realme Narzo 80 Lite",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 5.avif",
+        "/src/assets/Images/Products/Phone/phone5_2.avif",
+        "/src/assets/Images/Products/Phone/phone5_3.avif",
+        "/src/assets/Images/Products/Phone/phone5_4.avif"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    },
+    {
+      "id": 6,
+      "name": "Realme Narzo 80 Lite",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 6.avif",
+        "/src/assets/Images/Products/Phone/phone6_2.avif",
+        "/src/assets/Images/Products/Phone/phone6_3.avif",
+        "/src/assets/Images/Products/Phone/phone6_4.avif"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    },
+    {
+      "id": 7,
+      "name": "Realme Narzo 80 Lite",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 9.avif",
+        "/src/assets/Images/Products/Phone/phone9_2.avif",
+        "/src/assets/Images/Products/Phone/phone9_3.avif",
+        "/src/assets/Images/Products/Phone/phone9_4.avif"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    }
+  ]
+}

@@ -5,9 +5,12 @@ import './App.css'
 import Navbar from './Components/user/Navbar/Navbar'
 import { Route, Routes } from 'react-router-dom'
 import LandingPage from './Pages/user/LandingPage/LandingPage'
+import SectionPage from './Pages/user/SectionPage/SectionPage'
 import Home from './Pages/user/Home/Home'
+
 import ProductDetails from './pages/user/Product/ProductDetails'
 import Cart from './pages/user/Cart/Cart'
+import Login from './Pages/user/Login/Login'
 
 
 function App() {
@@ -17,12 +20,21 @@ function App() {
     <div>
       <Routes>
         <Route
+          path='/login'
+          element={<Login/>}
+        />
+        <Route
           path='/'
           element={<Home/>}
         >
           <Route
             path='/'
             element = {<LandingPage/>}
+          />
+
+          <Route
+            path='/product-listing/:categoryName'
+            element = {<SectionPage/>}
           />
 
           <Route

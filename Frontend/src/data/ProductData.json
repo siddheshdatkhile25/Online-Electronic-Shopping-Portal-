@@ -162,14 +162,14 @@
     },
     {
       "id": 7,
-      "name": "Realme Narzo 80 Lite",
+      "name": "OnePlus 11R",
       "category": "phones",
       "description": "Affordable and stylish smartphone equipped with a smooth display, AI cameras, and long battery backup.",
       "storage": "64 GB",
       "ram": "4 GB",
       "color": "Black",
       "images": [
-        "/src/assets/Images/Products/Phone/phone9.avif",
+        "/src/assets/Images/Products/Phone/phone 9.avif",
         "/src/assets/Images/Products/Phone/phone9_2.avif",
         "/src/assets/Images/Products/Phone/phone9_3.avif",
         "/src/assets/Images/Products/Phone/phone9_4.avif"
@@ -181,8 +181,8 @@
         "High Performance Processor",
         "Stylish Premium Design"
       ],
-      "price": 7299,
-      "mrp": 8999,
+      "price": 45299,
+      "mrp": 40999,
       "discount": "19% OFF",
       "rating": 4,
       "ratingCount": 56

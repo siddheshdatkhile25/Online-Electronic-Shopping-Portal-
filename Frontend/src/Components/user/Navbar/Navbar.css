@@ -73,3 +73,88 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+/* ===========================
+   TABLETS (≤ 768px)
+=========================== */
+@media (max-width: 768px) {
+
+  .nav-menu {
+    display: none; /* Hide menu links on tablet */
+  }
+
+  .searchbar input {
+    width: 220px;
+  }
+
+  .nav-right {
+    gap: 12px;
+  }
+
+  .nav-icons img {
+    width: 24px;
+  }
+
+  .login-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+
+/* ===========================
+   MOBILE DEVICES (≤ 480px)
+=========================== */
+@media (max-width: 480px) {
+
+  .navbar {
+    padding: 8px;
+  }
+
+  .container-fluid {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Logo + menu row */
+  .nav-left {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  /* Hide desktop menu */
+  .nav-menu {
+    display: none;
+  }
+
+  /* Center searchbar full width */
+  .nav-center {
+    width: 100%;
+    order: 3;
+    justify-content: center;
+  }
+
+  .searchbar input {
+    width: 100%;
+    max-width: 320px;
+    padding: 6px 14px;
+  }
+
+  /* Right icons row */
+  .nav-right {
+    width: 100%;
+    justify-content: space-between;
+    order: 2;
+  }
+
+  .nav-icons img {
+    width: 22px;
+  }
+
+  .login-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+

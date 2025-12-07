@@ -3,54 +3,63 @@
     "id": 1,
     "src": "/src/assets/Images/Carousal-images/earbuds.avif",
     "alt": "Earbuds",
-    "title": "Earbuds"
+    "title": "Earbuds",
+    "slug": "earbuds"
   },
   {
     "id": 2,
     "src": "/src/assets/Images/Carousal-images/Fryer.avif",
-    "alt": "Fryer",
-    "title": "Fryer"
+    "alt": "Air Fryer",
+    "title": "Fryer",
+    "slug": "fryer"
   },
   {
     "id": 3,
     "src": "/src/assets/Images/Carousal-images/Phone.avif",
-    "alt": "iPhone",
-    "title": "iPhone"
+    "alt": "Smartphone",
+    "title": "Phone",
+    "slug": "phones"
   },
   {
     "id": 4,
     "src": "/src/assets/Images/Carousal-images/laptop.avif",
     "alt": "Laptop",
-    "title": "Laptop"
+    "title": "Laptop",
+    "slug": "laptops"
   },
   {
     "id": 5,
     "src": "/src/assets/Images/Carousal-images/watch.avif",
-    "alt": "Phone",
-    "title": "Phone"
+    "alt": "Smart Watch",
+    "title": "Watch",
+    "slug": "watches"
   },
   {
     "id": 6,
     "src": "/src/assets/Images/Carousal-images/machine.avif",
     "alt": "Power Bank",
-    "title": "Power Bank"
+    "title": "Power Bank",
+    "slug": "power-banks"
   },
   {
     "id": 7,
     "src": "/src/assets/Images/Carousal-images/refegirator.avif",
     "alt": "Refrigerator",
-    "title": "Refrigerator"
+    "title": "Refrigerator",
+    "slug": "refrigerators"
   },
   {
     "id": 8,
     "src": "/src/assets/Images/Carousal-images/Tab.avif",
-    "alt": "Tab",
-    "title": "Tab"
+    "alt": "Tablet",
+    "title": "Tablet",
+    "slug": "tablets"
   },
   {
     "id": 9,
     "src": "/src/assets/Images/Carousal-images/TV.avif",
-    "alt": "TV",
-    "title": "TV"
+    "alt": "Television",
+    "title": "TV",
+    "slug": "tvs"
   }
 ]

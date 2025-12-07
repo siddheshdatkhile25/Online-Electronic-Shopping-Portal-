@@ -14,29 +14,59 @@
 
 .pd-image-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 420px 120px;
+  grid-template-rows: repeat(3, 120px);
   gap: 18px;
+  align-items: start;
 }
 
 .pd-main-img {
-  grid-column: span 1;
-  grid-row: span 2;
+  grid-row: span 3;
+  width: 420px;
+  height: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .pd-main-img img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: white;
-  border-radius: 4px;
+  object-fit: cover;
 }
 
+
 .pd-small-img {
-  width: 100%;
-  height: 160px;
-  background: #d6d6d6;
-  border-radius: 4px;
+  width: 120px;
+  height: 120px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform .2s;
 }
+
+.pd-small-img:hover {
+  transform: scale(1.05);
+}
+
+.pd-small-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.active-thumb {
+  border: 2px solid black;
+  transform: scale(1.05);
+}
+
 
 /* Right Section */
 .pd-right {

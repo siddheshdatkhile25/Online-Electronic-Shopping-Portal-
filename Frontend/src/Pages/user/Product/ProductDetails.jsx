@@ -1,12 +1,16 @@
 import { useParams } from "react-router-dom";
 import products from "../../../data/demoProducts.json";
 import "./productDetails.css";
+import { useState } from "react";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const product = products.find((p) => p.id === parseInt(id));
 
   if (!product) return <h2>Product not found</h2>;
+
+  // clickable main image
+  const [mainImg, setMainImg] = useState(product.images[0]);
 
   const addToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -19,14 +23,22 @@ export default function ProductDetails() {
     <div className="pd-container">
       <div className="pd-left">
         <div className="pd-image-grid">
+
+          {/* MAIN IMAGE (CHANGES WHEN CLICKING THUMBNAIL) */}
           <div className="pd-main-img">
-            <img src={product.img} alt={product.name} />
+            <img src={mainImg} alt={product.name} />
           </div>
 
-          {/* 3 placeholder images — later you can replace */}
-          <div className="pd-small-img"></div>
-          <div className="pd-small-img"></div>
-          <div className="pd-small-img"></div>
+          {/* THUMBNAILS */}
+          {product.images.map((img, index) => (
+            <div
+              key={index}
+              className={`pd-small-img ${mainImg === img ? "active-thumb" : ""}`}
+              onClick={() => setMainImg(img)}
+            >
+              <img src={img} alt="thumbnail" />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -37,12 +49,8 @@ export default function ProductDetails() {
           MRP <strong>₹{product.price.toLocaleString()}</strong>
         </p>
 
-        <p className="pd-desc">
-          Revamp your style with the latest designer trends or achieve a
-          perfectly curated wardrobe thanks to our line-up of timeless pieces.
-        </p>
+        <p className="pd-desc">{product.description}</p>
 
-        {/* Colors */}
         <div className="pd-section-title">Color</div>
         <div className="pd-color-options">
           <div className="pd-color pd-col-1"></div>

@@ -5,6 +5,7 @@ import Carousal from '../../../Components/user/Carousal/Carousal'
 import products from '../../../data/ProductData.json'
 
 const { phones } = products
+const { tablets } = products
 
 
 function LandingPage() {
@@ -43,6 +44,7 @@ function LandingPage() {
                 </div>
 
                 <Carousal title="Great Deals on iPhone Series " products={phones} />
+                <Carousal title="Great Deals on Tablets Series " products={tablets} />
             </div>
 
         </div>

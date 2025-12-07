@@ -5,11 +5,12 @@ import './Carousal.css'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const navigate = useNavigate();
+
 
 
 const Carousal = ({ title, products }) => {
 
+  const navigate = useNavigate();
   return (
     <div className="container">
       <div className="productCarousal">

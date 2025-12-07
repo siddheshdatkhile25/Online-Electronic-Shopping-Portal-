@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "Apple iPhone 16",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "The Apple iPhone 16 delivers powerful performance with the A18 chip, stunning Super Retina XDR display, and an advanced dual-camera system designed for both casual and professional use.",
       "storage": "128 GB",
       "color": "Black",
@@ -29,7 +29,7 @@
     {
       "id": 2,
       "name": "POCO C71",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "POCO C71 offers strong performance on a budget with a large battery, vibrant display, and AI-powered camera for everyday use.",
       "storage": "64 GB",
       "ram": "4 GB",
@@ -56,7 +56,7 @@
     {
       "id": 3,
       "name": "Realme Narzo 80 Lite",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "A stylish and powerful device offering a smooth 90Hz display, huge battery, and AI camera system — perfect for students and budget users.",
       "storage": "64 GB",
       "ram": "4 GB",
@@ -83,7 +83,7 @@
     {
       "id": 4,
       "name": "Apple iPhone Air",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "The iPhone Air brings flagship performance with an A18 Pro chip, ProMotion display, advanced cameras, and lightweight titanium design.",
       "storage": "256 GB",
       "color": "Sky Blue",
@@ -109,7 +109,7 @@
     {
       "id": 5,
       "name": "Realme Narzo 80 Lite",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "Narzo 80 Lite delivers smooth performance, a massive battery, and stylish looks — all at an affordable price point.",
       "storage": "64 GB",
       "ram": "4 GB",
@@ -136,7 +136,7 @@
     {
       "id": 6,
       "name": "Realme Narzo 80 Lite",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "A reliable, long-lasting smartphone offering smooth visuals, large battery, and a slim modern design.",
       "storage": "64 GB",
       "ram": "4 GB",
@@ -163,7 +163,7 @@
     {
       "id": 7,
       "name": "Realme Narzo 80 Lite",
-      "category": "Smartphone",
+      "category": "phones",
       "description": "Affordable and stylish smartphone equipped with a smooth display, AI cameras, and long battery backup.",
       "storage": "64 GB",
       "ram": "4 GB",
@@ -193,7 +193,7 @@
     {
       "id": 1,
       "name": "Apple iPad",
-      "category": "Tablet",
+      "category": "tablets",
       "description": "The Apple iPad provides smooth performance with the A15 chip, stunning display, and advanced camera — ideal for learning, entertainment, and productivity.",
       "storage": "128 GB",
       "color": "Silver",
@@ -219,7 +219,7 @@
     {
       "id": 2,
       "name": "OnePlus Pad",
-      "category": "Tablet",
+      "category": "tablets",
       "description": "OnePlus Pad delivers premium visuals with a 144Hz screen, massive battery, and powerful performance for gaming and productivity.",
       "storage": "128 GB",
       "color": "Halo Green",
@@ -245,7 +245,7 @@
     {
       "id": 3,
       "name": "Samsung Galaxy Tab S10",
-      "category": "Tablet",
+      "category": "tablets",
       "description": "The Samsung Galaxy Tab S10 brings flagship-grade performance with AMOLED display, S-Pen support, and a premium design.",
       "storage": "256 GB",
       "color": "Graphite",
@@ -271,7 +271,7 @@
     {
       "id": 4,
       "name": "Lenovo Tab Plus",
-      "category": "Tablet",
+      "category": "tablets",
       "description": "A perfect budget tablet with a 2K display, Dolby Atmos speakers, and all-day battery — ideal for entertainment & study.",
       "storage": "128 GB",
       "color": "Dark Grey",

@@ -4,9 +4,9 @@ import imgicons from '../../../data/carouselImages.json'
 import Carousal from '../../../Components/user/Carousal/Carousal'
 import products from '../../../data/ProductData.json'
 
+
 const { phones } = products
 const { tablets } = products
-
 
 function LandingPage() {
 
@@ -28,7 +28,7 @@ function LandingPage() {
 
                 </div>
 
-                <div className="category-carousel=">
+                <div className="category-carousel">
                     <div className="category-bar">
                         {imgicons.slice(0, 9).map((icon, index) => (
                             <div key={index} className='category'>
@@ -42,9 +42,20 @@ function LandingPage() {
                         ))}
                     </div>
                 </div>
+                
 
-                <Carousal title="Great Deals on iPhone Series " products={phones} />
-                <Carousal title="Great Deals on Tablets Series " products={tablets} />
+
+                {Object.entries(products).map(([categoryName , productList]) =>(
+                <Carousal 
+                key={categoryName}
+                title="Great Deals on iPhone Series " 
+                products={productList} />
+                ))}
+                {/* <Carousal 
+                key={categoryName}
+                title="Great Deals on iPhone Series " 
+                products={productList} /> */}
+                {/* <Carousal title="Great Deals on Tablets Series " products={tablets} /> */}
             </div>
 
         </div>

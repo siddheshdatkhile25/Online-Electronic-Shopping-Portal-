@@ -62,9 +62,19 @@ export default function ProductDetails() {
           <div className="pd-color pd-col-2"></div>
         </div>
 
-        <a className="pd-size-guide" href="#">
-          Size & Fit Guide
-        </a>
+        {/* Features Code */}
+        {product.features && (
+          <div className="pd-features">
+            <p className="pd-section-title">Key Features:</p>
+
+            <ul>
+              {product.features.map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
 
         <div className="pd-quantity-box">
           <span>Quantity</span>

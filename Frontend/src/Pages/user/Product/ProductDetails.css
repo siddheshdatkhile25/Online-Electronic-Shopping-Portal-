@@ -1,193 +1,148 @@
-/* Product Details Main Container */
+/* MAIN CONTAINER */
 .pd-container {
   display: flex;
   gap: 50px;
-  padding: 40px 60px;
-  background: #f1f4f8;
-  min-height: 90vh;
+  padding: 50px 80px;
+  background: #fafafa;
+  min-height: 100vh;
 }
 
-/* ---------------- LEFT SECTION ---------------- */
+/* LEFT SIDE */
 .pd-left {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  width: 45%;
 }
 
-/* BIG IMAGE */
 .pd-main-img {
-  width: 440px;
-  height: 440px;
-  border-radius: 14px;
-  overflow: hidden;
+  width: 100%;
+  height: 450px;
   background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 18px;
 }
 
 .pd-main-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
 }
 
-/* SMALL IMAGES IN ONE LINE */
-.pd-small-container {
+/* THUMBNAILS */
+.pd-thumbnails {
   display: flex;
   gap: 15px;
+  margin-top: 20px;
 }
 
-.pd-small-img {
-  width: 95px;
-  height: 95px;
-  background: #eee;
+.thumb {
+  width: 90px;
+  height: 90px;
+  background: white;
   border-radius: 10px;
-  overflow: hidden;
+  padding: 8px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform .2s;
+  border: 2px solid transparent;
+  transition: 0.3s;
 }
 
-.pd-small-img img {
+.thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.pd-small-img:hover {
-  transform: scale(1.05);
+.thumb:hover {
+  transform: scale(1.07);
 }
 
-.active-thumb {
-  border: 2px solid black;
-  transform: scale(1.05);
+.thumb.active {
+  border-color: black;
+  transform: scale(1.1);
 }
 
-
-/* ---------------- RIGHT SECTION ---------------- */
+/* RIGHT SIDE */
 .pd-right {
-  flex: 1;
+  width: 55%;
   padding-right: 40px;
 }
 
 .pd-title {
-  font-size: 28px;
-  margin-bottom: 10px;
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
 .pd-price {
-  font-size: 20px;
-  margin: 12px 0;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-.pd-desc {
-  width: 80%;
-  margin: 20px 0;
-  line-height: 1.5rem;
+.mrp {
+  display: block;
+  font-size: 15px;
+  color: #666;
+  font-weight: 400;
 }
 
-/* Colors */
-.pd-section-title {
-  margin-top: 20px;
+.discount {
+  color: #e63946;
   font-weight: bold;
 }
 
-.pd-color-options {
-  display: flex;
-  gap: 12px;
-  margin: 8px 0 20px;
-}
-
-.pd-color {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid black;
-  cursor: pointer;
-}
-
-.pd-col-1 {
-  background: #fae3d7;
-}
-
-.pd-col-2 {
-  background: #000;
-}
-
-/* Size Guide */
-.pd-size-guide {
-  color: #333;
-  text-decoration: underline;
-  margin-bottom: 25px;
-  display: inline-block;
-}
-
-/* Quantity Area */
-.pd-quantity-box {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: 25px 0;
-}
-
-.pd-qty-buttons {
-  display: flex;
-  align-items: center;
-  border: 1px solid #222;
-  padding: 5px 10px;
-  gap: 15px;
-}
-
-.pd-qty-buttons button {
-  border: none;
-  background: transparent;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* Add to Cart Button */
-.pd-cart-btn {
-  width: 250px;
-  padding: 12px;
-  background: #000;
-  color: white;
-  border: none;
+/* DESCRIPTION */
+.pd-desc {
   font-size: 16px;
-  cursor: pointer;
-  margin: 20px 0;
+  line-height: 24px;
+  color: #444;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
-.pd-footer-text {
+/* FEATURES */
+.pd-features h3 {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.pd-features ul {
+  padding-left: 20px;
+}
+
+.pd-features li {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 15px;
+}
+
+/* ADD TO CART BUTTON */
+.pd-btn {
+  background: black;
+  color: white;
+  padding: 14px 26px;
+  font-size: 17px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s ease;
+}
+
+.pd-btn:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+/* FOOTER TEXT */
+.pd-footer {
+  margin-top: 15px;
+  font-size: 14px;
   color: gray;
 }
 
-.pd-footer-text a {
+.pd-footer a {
   color: black;
   text-decoration: underline;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .pd-container {
-    flex-direction: column;
-    padding: 20px;
-  }
-  
-  .pd-main-img {
-    width: 100%;
-    height: auto;
-  }
-
-  .pd-small-container {
-    flex-wrap: wrap;
-  }
-
-  .pd-right {
-    padding-right: 0;
-  }
 }

@@ -1,12 +1,15 @@
 import { useParams } from "react-router-dom";
 import products from "../../../data/demoProducts.json";
 import "./productDetails.css";
+import { useState } from "react";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const product = products.find((p) => p.id === parseInt(id));
 
   if (!product) return <h2>Product not found</h2>;
+
+  const [mainImg, setMainImg] = useState(product.images[0]);
 
   const addToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -17,19 +20,33 @@ export default function ProductDetails() {
 
   return (
     <div className="pd-container">
+
+      {/* LEFT SIDE START */}
       <div className="pd-left">
-        <div className="pd-image-grid">
-          <div className="pd-main-img">
-            <img src={product.img} alt={product.name} />
-          </div>
 
-          {/* 3 placeholder images — later you can replace */}
-          <div className="pd-small-img"></div>
-          <div className="pd-small-img"></div>
-          <div className="pd-small-img"></div>
+        {/* BIG IMAGE */}
+        <div className="pd-main-img">
+          <img src={mainImg} alt={product.name} />
         </div>
-      </div>
 
+        {/* SMALL IMAGES IN ONE ROW */}
+        <div className="pd-small-container">
+          {product.images.map((img, index) => (
+            <div
+              key={index}
+              className={`pd-small-img ${mainImg === img ? "active-thumb" : ""}`}
+              onClick={() => setMainImg(img)}
+            >
+              <img src={img} alt="thumbnail" />
+            </div>
+          ))}
+        </div>
+
+      </div>
+      {/* LEFT SIDE END */}
+
+
+      {/* RIGHT SIDE START */}
       <div className="pd-right">
         <h2 className="pd-title">{product.name}</h2>
 
@@ -37,12 +54,8 @@ export default function ProductDetails() {
           MRP <strong>₹{product.price.toLocaleString()}</strong>
         </p>
 
-        <p className="pd-desc">
-          Revamp your style with the latest designer trends or achieve a
-          perfectly curated wardrobe thanks to our line-up of timeless pieces.
-        </p>
+        <p className="pd-desc">{product.description}</p>
 
-        {/* Colors */}
         <div className="pd-section-title">Color</div>
         <div className="pd-color-options">
           <div className="pd-color pd-col-1"></div>
@@ -70,6 +83,8 @@ export default function ProductDetails() {
           Free standard shipping • <a href="#">Free Returns</a>
         </p>
       </div>
+      {/* RIGHT SIDE END */}
+
     </div>
   );
 }

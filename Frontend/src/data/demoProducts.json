@@ -1,17 +1,22 @@
 [
   {
-    "id": 1,
-    "name": "Apple iPhone 12 128 GB, Black",
-    "price": 54900,
-    "img": "../assets/Images/img2.jpg",
-    "description": "Premium 128GB model with A14 Bionic chip and dual-camera system.",
-    "category": "Mobile"
+  "id": 1,
+  "name": "Apple iPhone 12 128 GB, Black",
+  "price": 54900,
+  "images": [
+    "/images/img1.avif",
+    "/images/img2.avif",
+    "/images/img3.avif",
+    "/images/img4.avif"
+  ],
+  "description": "Premium 128GB model with A14 Bionic chip, dual camera system, and super rating XDR display",
+  "category": "Mobile"
   },
   {
     "id": 2,
     "name": "Samsung Galaxy S21",
     "price": 69999,
-    "img": "../assets/Images/img2.jpg",
+    "img": "/images/img1.png",
     "description": "Pro-grade camera, 120Hz AMOLED display, 8GB RAM.",
     "category": "Mobile"
   }

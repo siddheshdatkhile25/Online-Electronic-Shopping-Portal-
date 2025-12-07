@@ -3,13 +3,13 @@
     {
       "id": 1,
       "name": "Apple iPhone 16",
-      "category": "Smartphone",
+      "category": "smartphone",
       "description": "The Apple iPhone 16 delivers powerful performance with the A18 chip, stunning Super Retina XDR display, and an advanced dual-camera system designed for both casual and professional use.",
       "storage": "128 GB",
       "color": "Black",
       "images": [
         "/src/assets/Images/Products/Phone/phone1.1.avif",
-        "/src/assets/Images/Products/Phone/phone1.2.avif",
+        "/src/assets/Images/Products/Phone/phone1.2.jpg",
         "/src/assets/Images/Products/Phone/phone1.3.avif",
         "/src/assets/Images/Products/Phone/phone1.4.avif"
       ],

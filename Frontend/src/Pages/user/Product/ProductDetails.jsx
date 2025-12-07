@@ -1,13 +1,39 @@
 import { useParams } from "react-router-dom";
-import products from "../../../data/demoProducts.json";
+import productsData from "../../../data/ProductData.json";
 import "./productDetails.css";
 import { useState } from "react";
 
 export default function ProductDetails() {
-  const { id } = useParams();
-  const product = products.find((p) => p.id === parseInt(id));
+  const { category, id } = useParams();
 
-  if (!product) return <h2>Product not found</h2>;
+  // URL category (example: smartphone, tablet)
+  const selectedCategory = category.toLowerCase();
+
+  // Build categoryMap after normalizing Keys
+  // "phones" → "phone"
+  // "tablets" → "tablet"
+  const categoryMap = {};
+
+  Object.keys(productsData).forEach((key) => {
+    const normalized = key.toLowerCase().replace(/s$/, ""); // remove trailing 's'
+    categoryMap[normalized] = productsData[key];
+  });
+
+  // Now categoryMap keys = phone, tablet
+  // URL categories MUST be these names too
+
+  const categoryProducts = categoryMap[selectedCategory];
+
+  if (!categoryProducts) {
+    return <h2>Category not found</h2>;
+  }
+
+  // Find product only inside selected category
+  const product = categoryProducts.find((p) => p.id === Number(id));
+
+  if (!product) {
+    return <h2>Product not found</h2>;
+  }
 
   const [mainImg, setMainImg] = useState(product.images[0]);
 
@@ -20,16 +46,12 @@ export default function ProductDetails() {
 
   return (
     <div className="pd-container">
-
-      {/* LEFT SIDE START */}
+      {/* LEFT SIDE */}
       <div className="pd-left">
-
-        {/* BIG IMAGE */}
         <div className="pd-main-img">
           <img src={mainImg} alt={product.name} />
         </div>
 
-        {/* SMALL IMAGES IN ONE ROW */}
         <div className="pd-small-container">
           {product.images.map((img, index) => (
             <div
@@ -41,12 +63,9 @@ export default function ProductDetails() {
             </div>
           ))}
         </div>
-
       </div>
-      {/* LEFT SIDE END */}
 
-
-      {/* RIGHT SIDE START */}
+      {/* RIGHT SIDE */}
       <div className="pd-right">
         <h2 className="pd-title">{product.name}</h2>
 
@@ -56,34 +75,16 @@ export default function ProductDetails() {
 
         <p className="pd-desc">{product.description}</p>
 
-        <div className="pd-section-title">Color</div>
-        <div className="pd-color-options">
-          <div className="pd-color pd-col-1"></div>
-          <div className="pd-color pd-col-2"></div>
-        </div>
-
-        {/* Features Code */}
         {product.features && (
           <div className="pd-features">
             <p className="pd-section-title">Key Features:</p>
-
             <ul>
-              {product.features.map((feature, index) => (
-                <li key={index}>{feature}</li>
+              {product.features.map((f, i) => (
+                <li key={i}>{f}</li>
               ))}
             </ul>
           </div>
         )}
-
-
-        <div className="pd-quantity-box">
-          <span>Quantity</span>
-          <div className="pd-qty-buttons">
-            <button>-</button>
-            <span>1</span>
-            <button>+</button>
-          </div>
-        </div>
 
         <button className="pd-cart-btn" onClick={addToCart}>
           Add to Cart
@@ -93,8 +94,6 @@ export default function ProductDetails() {
           Free standard shipping • <a href="#">Free Returns</a>
         </p>
       </div>
-      {/* RIGHT SIDE END */}
-
     </div>
   );
 }

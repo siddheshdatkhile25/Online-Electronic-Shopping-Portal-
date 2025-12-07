@@ -5,7 +5,7 @@ import './Carousal.css'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const navigate = useNavigate();
+// const navigate = useNavigate();
 
 
 const Carousal = ({ title, products }) => {
@@ -18,7 +18,7 @@ const Carousal = ({ title, products }) => {
         <div className="card-container">
             {products.map((item, index) => (
               <div key={index} className="card"
-              onClick={() => navigate(`/product/${item.category}/${item.id}`)}
+              // onClick={() => navigate(`/product/${item.category}/${item.id}`)}
               >
                 <div className="image">
                   <img src={item.images[0]} alt={item.name} />

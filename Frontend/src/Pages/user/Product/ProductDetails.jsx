@@ -9,7 +9,6 @@ export default function ProductDetails() {
 
   if (!product) return <h2>Product not found</h2>;
 
-  // clickable main image
   const [mainImg, setMainImg] = useState(product.images[0]);
 
   const addToCart = () => {
@@ -21,15 +20,17 @@ export default function ProductDetails() {
 
   return (
     <div className="pd-container">
+
+      {/* LEFT SIDE START */}
       <div className="pd-left">
-        <div className="pd-image-grid">
 
-          {/* MAIN IMAGE (CHANGES WHEN CLICKING THUMBNAIL) */}
-          <div className="pd-main-img">
-            <img src={mainImg} alt={product.name} />
-          </div>
+        {/* BIG IMAGE */}
+        <div className="pd-main-img">
+          <img src={mainImg} alt={product.name} />
+        </div>
 
-          {/* THUMBNAILS */}
+        {/* SMALL IMAGES IN ONE ROW */}
+        <div className="pd-small-container">
           {product.images.map((img, index) => (
             <div
               key={index}
@@ -40,8 +41,12 @@ export default function ProductDetails() {
             </div>
           ))}
         </div>
-      </div>
 
+      </div>
+      {/* LEFT SIDE END */}
+
+
+      {/* RIGHT SIDE START */}
       <div className="pd-right">
         <h2 className="pd-title">{product.name}</h2>
 
@@ -78,6 +83,8 @@ export default function ProductDetails() {
           Free standard shipping • <a href="#">Free Returns</a>
         </p>
       </div>
+      {/* RIGHT SIDE END */}
+
     </div>
   );
 }

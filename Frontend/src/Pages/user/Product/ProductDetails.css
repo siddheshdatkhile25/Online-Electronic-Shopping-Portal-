@@ -7,29 +7,25 @@
   min-height: 90vh;
 }
 
-/* Left Section */
+/* ---------------- LEFT SECTION ---------------- */
 .pd-left {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.pd-image-grid {
-  display: grid;
-  grid-template-columns: 420px 120px;
-  grid-template-rows: repeat(3, 120px);
-  gap: 18px;
-  align-items: start;
-}
-
+/* BIG IMAGE */
 .pd-main-img {
-  grid-row: span 3;
-  width: 420px;
-  height: 380px;
+  width: 440px;
+  height: 440px;
   border-radius: 14px;
   overflow: hidden;
   background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 18px;
 }
 
 .pd-main-img img {
@@ -38,10 +34,15 @@
   object-fit: cover;
 }
 
+/* SMALL IMAGES IN ONE LINE */
+.pd-small-container {
+  display: flex;
+  gap: 15px;
+}
 
 .pd-small-img {
-  width: 120px;
-  height: 120px;
+  width: 95px;
+  height: 95px;
   background: #eee;
   border-radius: 10px;
   overflow: hidden;
@@ -52,14 +53,14 @@
   transition: transform .2s;
 }
 
-.pd-small-img:hover {
-  transform: scale(1.05);
-}
-
 .pd-small-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.pd-small-img:hover {
+  transform: scale(1.05);
 }
 
 .active-thumb {
@@ -68,7 +69,7 @@
 }
 
 
-/* Right Section */
+/* ---------------- RIGHT SECTION ---------------- */
 .pd-right {
   flex: 1;
   padding-right: 40px;
@@ -175,6 +176,15 @@
   .pd-container {
     flex-direction: column;
     padding: 20px;
+  }
+  
+  .pd-main-img {
+    width: 100%;
+    height: auto;
+  }
+
+  .pd-small-container {
+    flex-wrap: wrap;
   }
 
   .pd-right {

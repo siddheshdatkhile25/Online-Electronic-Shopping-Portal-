@@ -26,7 +26,9 @@ function AdminNavbar() {
              <li className="nav-item">
              <Link className="nav-link active" aria-current="page" to='/admin/view-product'>Stock</Link>
             </li>
-            <li>Orders</li>
+             <li className="nav-item">
+             <Link className="nav-link active" aria-current="page" to='/admin/view-orders'>Orders</Link>
+            </li>
           </ul>
         </div>
 

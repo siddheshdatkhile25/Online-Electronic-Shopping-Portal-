@@ -41,7 +41,7 @@ const AddProduct = () => {
           <input type="file" className="form-control" />
         </div>
 
-        <button type="submit" className="btn btn-primary w-100">
+        <button type="submit" className="btn btn-dark w-100">
           Add Product
         </button>
       </form>

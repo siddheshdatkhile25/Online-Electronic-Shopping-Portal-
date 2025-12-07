@@ -9,6 +9,9 @@ import AddCategory from './Pages/admin/AddCategory/AddCategory'
 import AdminHome from './Pages/admin/AdminDashboard/AdminHome'
 import ManageProduct from './Pages/admin/ManageProduct/ManageProduct'
 import EditProduct from './Pages/admin/EditProduct/EditProduct'
+import CustomerOrders from './Pages/admin/CustomerOrders/CustomerOrders'
+import { ToastContainer } from 'react-toastify'
+import ApplyDiscount from './Pages/admin/ApplyDiscount/ApplyDiscount'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -36,9 +39,14 @@ function App() {
             <Route 
             path='edit-product/:id'
             element={<EditProduct/>}/>
+            <Route 
+            path='apply-discount/:id'
+            element={<ApplyDiscount/>}/>
+            <Route path='view-orders'
+            element={<CustomerOrders/>}/>
            </Route>
        </Routes>
-     
+     <ToastContainer/>
     </div>
   )
 }

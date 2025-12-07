@@ -17,7 +17,8 @@ const AddCategory = () => {
           <input type="file" className="form-control" />
         </div>
 
-        <button className="btn btn-primary w-100">Add Category</button>
+       <button className="btn btn-dark w-100">Add Category</button>
+
       </form>
 
     </div>

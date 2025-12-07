@@ -1,0 +1,64 @@
+
+.productCarousal{
+    width: 100%;
+    margin-top: 20px 0;
+}
+
+.productCarousal h2{
+    margin-left: 10px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+
+.card-container{
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px;
+    gap: 20px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.card-container::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+
+.card{
+    min-width: 150px;
+    height: 300px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.card img{
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.card .data{
+    width: 100%;
+}
+
+.card .data .productname{
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-align: center;
+}
+.card .data .price{
+    font-size: 16px;
+    color: #515151;
+}

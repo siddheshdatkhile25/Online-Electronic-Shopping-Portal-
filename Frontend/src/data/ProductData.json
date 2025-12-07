@@ -1,0 +1,298 @@
+{
+  "phones": [
+    {
+      "id": 1,
+      "name": "Apple iPhone 16",
+      "category": "Smartphone",
+      "description": "The Apple iPhone 16 delivers powerful performance with the A18 chip, stunning Super Retina XDR display, and an advanced dual-camera system designed for both casual and professional use.",
+      "storage": "128 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone1.1.avif",
+        "/src/assets/Images/Products/Phone/phone1.2.avif",
+        "/src/assets/Images/Products/Phone/phone1.3.avif",
+        "/src/assets/Images/Products/Phone/phone1.4.avif"
+      ],
+      "features": [
+        "A18 Bionic Chip",
+        "6.1-inch Super Retina XDR Display",
+        "Advanced Dual Camera System",
+        "All-day Battery Life",
+        "Face ID Unlock"
+      ],
+      "price": 64200,
+      "mrp": 70900,
+      "discount": "8% OFF",
+      "rating": 4,
+      "ratingCount": 143
+    },
+    {
+      "id": 2,
+      "name": "POCO C71",
+      "category": "Smartphone",
+      "description": "POCO C71 offers strong performance on a budget with a large battery, vibrant display, and AI-powered camera for everyday use.",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 2.1.avif",
+        "/src/assets/Images/Products/Phone/phone 2.2.avif",
+        "/src/assets/Images/Products/Phone/phone 2.3.avif",
+        "/src/assets/Images/Products/Phone/phone 2.4.avif"
+      ],
+      "features": [
+        "6.74-inch HD+ Display",
+        "5000mAh Long-lasting Battery",
+        "13MP AI Camera",
+        "MediaTek Helio Processor",
+        "Side Fingerprint Unlock"
+      ],
+      "price": 6499,
+      "mrp": 8999,
+      "discount": "28% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    },
+    {
+      "id": 3,
+      "name": "Realme Narzo 80 Lite",
+      "category": "Smartphone",
+      "description": "A stylish and powerful device offering a smooth 90Hz display, huge battery, and AI camera system — perfect for students and budget users.",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Gold",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 3.avif",
+        "/src/assets/Images/Products/Phone/phone3_2.avif",
+        "/src/assets/Images/Products/Phone/phone3_3.avif",
+        "/src/assets/Images/Products/Phone/phone3_4.avif"
+      ],
+      "features": [
+        "90Hz Smooth Display",
+        "5000mAh Massive Battery",
+        "Ultra-Slim Design",
+        "50MP AI Dual Camera",
+        "Fast Face Unlock"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 85
+    },
+    {
+      "id": 4,
+      "name": "Apple iPhone Air",
+      "category": "Smartphone",
+      "description": "The iPhone Air brings flagship performance with an A18 Pro chip, ProMotion display, advanced cameras, and lightweight titanium design.",
+      "storage": "256 GB",
+      "color": "Sky Blue",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 4.avif",
+        "/src/assets/Images/Products/Phone/phone4_2.avif",
+        "/src/assets/Images/Products/Phone/phone4_3.avif",
+        "/src/assets/Images/Products/Phone/phone4_4.avif"
+      ],
+      "features": [
+        "A18 Pro Chip",
+        "Titanium Body",
+        "6.7-inch ProMotion Display",
+        "48MP Pro Camera",
+        "MagSafe Wireless Charging"
+      ],
+      "price": 109990,
+      "mrp": 119900,
+      "discount": "8% OFF",
+      "rating": 5,
+      "ratingCount": 112
+    },
+    {
+      "id": 5,
+      "name": "Realme Narzo 80 Lite",
+      "category": "Smartphone",
+      "description": "Narzo 80 Lite delivers smooth performance, a massive battery, and stylish looks — all at an affordable price point.",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 5.avif",
+        "/src/assets/Images/Products/Phone/phone5_2.avif",
+        "/src/assets/Images/Products/Phone/phone5_3.avif",
+        "/src/assets/Images/Products/Phone/phone5_4.avif"
+      ],
+      "features": [
+        "90Hz Display",
+        "5000mAh Battery",
+        "AI Camera",
+        "Dynamic RAM Expansion",
+        "Fast Charging Support"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    },
+    {
+      "id": 6,
+      "name": "Realme Narzo 80 Lite",
+      "category": "Smartphone",
+      "description": "A reliable, long-lasting smartphone offering smooth visuals, large battery, and a slim modern design.",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone 6.avif",
+        "/src/assets/Images/Products/Phone/phone6_2.avif",
+        "/src/assets/Images/Products/Phone/phone6_3.avif",
+        "/src/assets/Images/Products/Phone/phone6_4.avif"
+      ],
+      "features": [
+        "Ultra Power Saver Mode",
+        "6.5-inch Display",
+        "AI Camera System",
+        "Face Unlock",
+        "Long-lasting Battery"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    },
+    {
+      "id": 7,
+      "name": "Realme Narzo 80 Lite",
+      "category": "Smartphone",
+      "description": "Affordable and stylish smartphone equipped with a smooth display, AI cameras, and long battery backup.",
+      "storage": "64 GB",
+      "ram": "4 GB",
+      "color": "Black",
+      "images": [
+        "/src/assets/Images/Products/Phone/phone9.avif",
+        "/src/assets/Images/Products/Phone/phone9_2.avif",
+        "/src/assets/Images/Products/Phone/phone9_3.avif",
+        "/src/assets/Images/Products/Phone/phone9_4.avif"
+      ],
+      "features": [
+        "6.5-inch Smooth Display",
+        "AI Selfie Camera",
+        "5000mAh Battery",
+        "High Performance Processor",
+        "Stylish Premium Design"
+      ],
+      "price": 7299,
+      "mrp": 8999,
+      "discount": "19% OFF",
+      "rating": 4,
+      "ratingCount": 56
+    }
+  ],
+
+  "tablets": [
+    {
+      "id": 1,
+      "name": "Apple iPad",
+      "category": "Tablet",
+      "description": "The Apple iPad provides smooth performance with the A15 chip, stunning display, and advanced camera — ideal for learning, entertainment, and productivity.",
+      "storage": "128 GB",
+      "color": "Silver",
+      "images": [
+        "/src/assets/Images/Products/tablets/ipad 1_1.jpg",
+        "/src/assets/Images/Products/tablets/ipad 1_2.jpg",
+        "/src/assets/Images/Products/tablets/ipad 1_3.jpg",
+        "/src/assets/Images/Products/tablets/ipad 1_4.jpg"
+      ],
+      "features": [
+        "A15 Bionic Chip",
+        "10.2-inch Retina Display",
+        "12MP Ultra Wide Camera",
+        "Apple Pencil Support",
+        "Stereo Speakers"
+      ],
+      "price": 29999,
+      "mrp": 34999,
+      "discount": "14% OFF",
+      "rating": 5,
+      "ratingCount": 240
+    },
+    {
+      "id": 2,
+      "name": "OnePlus Pad",
+      "category": "Tablet",
+      "description": "OnePlus Pad delivers premium visuals with a 144Hz screen, massive battery, and powerful performance for gaming and productivity.",
+      "storage": "128 GB",
+      "color": "Halo Green",
+      "images": [
+        "/src/assets/Images/Products/tablets/oneplus pad 1_1.jpg",
+        "/src/assets/Images/Products/tablets/oneplus pad 1_2.jpg",
+        "/src/assets/Images/Products/tablets/oneplus pad 1_3.jpg",
+        "/src/assets/Images/Products/tablets/oneplus pad 1_4.jpg"
+      ],
+      "features": [
+        "144Hz Display",
+        "MediaTek Dimensity Processor",
+        "9510mAh Battery",
+        "Dolby Vision & Atmos",
+        "Fast Charging"
+      ],
+      "price": 35999,
+      "mrp": 39999,
+      "discount": "10% OFF",
+      "rating": 4,
+      "ratingCount": 180
+    },
+    {
+      "id": 3,
+      "name": "Samsung Galaxy Tab S10",
+      "category": "Tablet",
+      "description": "The Samsung Galaxy Tab S10 brings flagship-grade performance with AMOLED display, S-Pen support, and a premium design.",
+      "storage": "256 GB",
+      "color": "Graphite",
+      "images": [
+        "/src/assets/Images/Products/tablets/samsung pad 1_1.jpg",
+        "/src/assets/Images/Products/tablets/samsung pad 1_2.jpg",
+        "/src/assets/Images/Products/tablets/samsung pad 1_3.jpg",
+        "/src/assets/Images/Products/tablets/samsung pad 1_4.jpg"
+      ],
+      "features": [
+        "Dynamic AMOLED 2X",
+        "S-Pen Support",
+        "Snapdragon Flagship Processor",
+        "Quad Speakers by AKG",
+        "Fast Charging Type-C"
+      ],
+      "price": 76999,
+      "mrp": 82999,
+      "discount": "7% OFF",
+      "rating": 5,
+      "ratingCount": 320
+    },
+    {
+      "id": 4,
+      "name": "Lenovo Tab Plus",
+      "category": "Tablet",
+      "description": "A perfect budget tablet with a 2K display, Dolby Atmos speakers, and all-day battery — ideal for entertainment & study.",
+      "storage": "128 GB",
+      "color": "Dark Grey",
+      "images": [
+        "/src/assets/Images/Products/tablets/lenovo pad 1_1.jpg",
+        "/src/assets/Images/Products/tablets/lenovo pad 1_2.jpg",
+        "/src/assets/Images/Products/tablets/lenovo pad 1_3.jpg",
+        "/src/assets/Images/Products/tablets/lenovo pad 1_4.jpg"
+      ],
+      "features": [
+        "11.5-inch 2K Display",
+        "7600mAh Battery",
+        "Dolby Atmos Quad Speakers",
+        "Lightweight Design",
+        "8MP HD Camera"
+      ],
+      "price": 18999,
+      "mrp": 24999,
+      "discount": "24% OFF",
+      "rating": 4,
+      "ratingCount": 150
+    }
+  ]
+}

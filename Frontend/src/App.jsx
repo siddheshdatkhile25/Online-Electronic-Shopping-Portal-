@@ -24,7 +24,7 @@ function App() {
           />
 
           <Route
-            path='/product/:id'
+            path='/product/:category/:id'
             element = {<ProductDetails/>}
           />
 

@@ -8,6 +8,7 @@ import LandingPage from './Pages/user/LandingPage/LandingPage'
 import Home from './Pages/user/Home/Home'
 import ProductDetails from './pages/user/Product/ProductDetails'
 import Cart from './pages/user/Cart/Cart'
+import { ToastContainer } from "react-toastify";
 
 
 function App() {
@@ -15,6 +16,12 @@ function App() {
 
   return (
     <div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={2000}
+        theme="colored"
+      />
+      
       <Routes>
         <Route
           path='/'

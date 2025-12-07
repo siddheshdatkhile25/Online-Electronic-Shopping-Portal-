@@ -1,46 +1,73 @@
 import "./cart.css";
-import products from "../../../data/demoProducts.json";
+import productsData from "../../../data/ProductData.json";
+import { useEffect, useState } from "react";
 
 export default function Cart() {
+  const [cartProducts, setCartProducts] = useState([]);
 
-  // Cart items will come from JSON
-  const cart = products;
+  useEffect(() => {
+    // Get stored items (category + id)
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // Subtotal calculation
-  const subtotal = cart.reduce((total, item) => total + item.price, 0);
+    // Normalize categories from JSON
+    const categoryMap = {};
+    Object.keys(productsData).forEach((key) => {
+      const normalized = key.toLowerCase().replace(/s$/, "");
+      categoryMap[normalized] = productsData[key];
+    });
+
+    // Convert stored cart IDs → full product objects
+    const fullProducts = storedCart
+      .map((item) => {
+        const normalizedCat = item.category.toLowerCase().replace(/s$/, "");
+        const productList = categoryMap[normalizedCat];
+
+        if (!productList) return null;
+
+        return productList.find((p) => p.id === item.id) || null;
+      })
+      .filter(Boolean); // remove null values
+
+    setCartProducts(fullProducts);
+  }, []);
+
+  // Subtotal
+  const subtotal = cartProducts.reduce((sum, item) => sum + item.price, 0);
 
   return (
     <div className="cart-wrapper">
-
+      
       {/* LEFT SIDE */}
       <div className="cart-left">
         <h1>Your cart</h1>
         <p className="small-gray">Not ready to checkout? Continue Shopping</p>
 
         <div className="cart-items-box">
-          {cart.map((item) => (
-            <div className="cart-item" key={item.id}>
-              
-              <img 
-                src={item.images?.[0] || "/images/placeholder.png"} 
-                alt={item.name} 
-              />
+          {cartProducts.length === 0 ? (
+            <p>Your cart is empty</p>
+          ) : (
+            cartProducts.map((item) => (
+              <div className="cart-item" key={item.id}>
+                <img
+                  src={item.images[0]}
+                  alt={item.name}
+                />
 
-              <div className="item-info">
-                <h3 className="item-name">{item.name}</h3>
-                <p className="item-size">Size: 6.2</p>
-                <p className="item-qty">Quantity: 1</p>
-                <p className="item-price">₹{item.price.toLocaleString()}</p>
+                <div className="item-info">
+                  <h3 className="item-name">{item.name}</h3>
+                  <p className="item-size">Category: {item.category}</p>
+                  <p className="item-price">₹{item.price.toLocaleString()}</p>
+                </div>
+
+                <button className="remove-item">
+                  Remove
+                </button>
               </div>
-
-              <button className="remove-item">
-                Remove
-              </button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        {/* ORDER INFO */}
+        {/* INFO */}
         <div className="info-section">
           <h2>Order Information</h2>
 
@@ -67,11 +94,6 @@ export default function Cart() {
       <div className="cart-right">
         <h2>Order Summary</h2>
 
-        <input
-          className="coupon-input"
-          placeholder="Enter coupon code here"
-        />
-
         <div className="summary-line">
           <span>Subtotal</span>
           <strong>₹{subtotal.toLocaleString()}</strong>
@@ -79,7 +101,7 @@ export default function Cart() {
 
         <div className="summary-line">
           <span>Shipping</span>
-          <p className="small-gray">Calculated at the next step</p>
+          <p className="small-gray">Calculated at next step</p>
         </div>
 
         <div className="summary-line total-line">

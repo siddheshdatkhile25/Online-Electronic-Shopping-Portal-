@@ -1,46 +1,63 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import productsData from "../../../data/ProductData.json";
 import "./productDetails.css";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function ProductDetails() {
   const { category, id } = useParams();
+  const navigate = useNavigate();
 
-  // Normalize URL category just like JSON category keys
+  // Normalize URL category (phones → phone)
   const selectedCategory = category.toLowerCase().replace(/s$/, "");
 
-  // Normalize productData category names
+  // Normalize JSON categories
   const categoryMap = {};
   Object.keys(productsData).forEach((key) => {
-    const normalized = key.toLowerCase().replace(/s$/, ""); 
+    const normalized = key.toLowerCase().replace(/s$/, "");
     categoryMap[normalized] = productsData[key];
   });
 
-  // Get products of the selected category
   const categoryProducts = categoryMap[selectedCategory];
+  if (!categoryProducts) return <h2>Category not found</h2>;
 
-  if (!categoryProducts) {
-    return <h2>Category not found</h2>;
-  }
-
-  // Find product by ID
   const product = categoryProducts.find((p) => p.id === Number(id));
-
-  if (!product) {
-    return <h2>Product not found</h2>;
-  }
+  if (!product) return <h2>Product not found</h2>;
 
   const [mainImg, setMainImg] = useState(product.images[0]);
 
   const addToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    cart.push(product);
+
+    const normalizedCategory = category.toLowerCase().replace(/s$/, "");
+
+    const alreadyExists = cart.some(
+      (item) =>
+        item.id === Number(id) &&
+        item.category.toLowerCase().replace(/s$/, "") === normalizedCategory
+    );
+
+    if (alreadyExists) {
+      toast.info("Product already in cart!");
+      navigate("/cart");
+      return;
+    }
+
+    const cartItem = {
+      category: category,
+      id: Number(id),
+    };
+
+    cart.push(cartItem);
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Added to cart!");
+
+    toast.success("Added to cart!");
+    navigate("/cart");
   };
 
   return (
     <div className="pd-container">
+
       {/* LEFT SIDE */}
       <div className="pd-left">
         <div className="pd-main-img">
@@ -81,6 +98,7 @@ export default function ProductDetails() {
           </div>
         )}
 
+        {/* Add to Cart Button */}
         <button className="pd-cart-btn" onClick={addToCart}>
           Add to Cart
         </button>
@@ -89,6 +107,7 @@ export default function ProductDetails() {
           Free standard shipping • <a href="#">Free Returns</a>
         </p>
       </div>
+
     </div>
   );
 }

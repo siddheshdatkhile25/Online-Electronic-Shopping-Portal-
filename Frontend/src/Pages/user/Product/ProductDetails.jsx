@@ -6,29 +6,24 @@ import { useState } from "react";
 export default function ProductDetails() {
   const { category, id } = useParams();
 
-  // URL category (example: smartphone, tablet)
-  const selectedCategory = category.toLowerCase();
+  // Normalize URL category just like JSON category keys
+  const selectedCategory = category.toLowerCase().replace(/s$/, "");
 
-  // Build categoryMap after normalizing Keys
-  // "phones" → "phone"
-  // "tablets" → "tablet"
+  // Normalize productData category names
   const categoryMap = {};
-
   Object.keys(productsData).forEach((key) => {
-    const normalized = key.toLowerCase().replace(/s$/, ""); // remove trailing 's'
+    const normalized = key.toLowerCase().replace(/s$/, ""); 
     categoryMap[normalized] = productsData[key];
   });
 
-  // Now categoryMap keys = phone, tablet
-  // URL categories MUST be these names too
-
+  // Get products of the selected category
   const categoryProducts = categoryMap[selectedCategory];
 
   if (!categoryProducts) {
     return <h2>Category not found</h2>;
   }
 
-  // Find product only inside selected category
+  // Find product by ID
   const product = categoryProducts.find((p) => p.id === Number(id));
 
   if (!product) {

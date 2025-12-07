@@ -7,7 +7,8 @@ import Navbar from './Components/user/Navbar/Navbar'
 import AddProduct from './Pages/admin/AddProduct/AddProduct'
 import AddCategory from './Pages/admin/AddCategory/AddCategory'
 import AdminHome from './Pages/admin/AdminDashboard/AdminHome'
-
+import ManageProduct from './Pages/admin/ManageProduct/ManageProduct'
+import EditProduct from './Pages/admin/EditProduct/EditProduct'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -29,6 +30,12 @@ function App() {
             path='add-product'
             element={<AddProduct/>}
             />
+            <Route 
+            path='view-product'
+            element={<ManageProduct/>}/>
+            <Route 
+            path='edit-product/:id'
+            element={<EditProduct/>}/>
            </Route>
        </Routes>
      

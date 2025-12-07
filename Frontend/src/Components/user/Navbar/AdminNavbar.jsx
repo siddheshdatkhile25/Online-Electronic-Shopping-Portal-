@@ -20,10 +20,12 @@ function AdminNavbar() {
             <li className="nav-item">
              <Link className="nav-link active" aria-current="page" to='/admin/add-category'>Add Category</Link>
             </li>
-            <li class="nav-item">
+            <li className="nav-item">
              <Link className="nav-link active" aria-current="page" to='/admin/add-product'>Add Product</Link>
             </li>
-            <li>Stock</li>
+             <li className="nav-item">
+             <Link className="nav-link active" aria-current="page" to='/admin/view-product'>Stock</Link>
+            </li>
             <li>Orders</li>
           </ul>
         </div>

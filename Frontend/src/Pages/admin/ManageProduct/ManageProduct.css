@@ -1,0 +1,174 @@
+.product-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 30px 20px;
+}
+
+.page-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #0d6efd;
+}
+
+/* Filter Section */
+.filter-section {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.filter-select {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.stats-box {
+  margin-left: auto;
+}
+
+.stats-text {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Table Container */
+.table-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.custom-table thead tr {
+  background: #0d6efd;
+  color: white;
+}
+
+.custom-table th,
+.custom-table td {
+  vertical-align: middle !important;
+  font-size: 14px;
+  padding: 14px 10px;
+}
+
+.product-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.price-green {
+  color: #198754;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #0d6efd;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #0b5ed7;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #bb2d3b;
+}
+
+.btn-discount {
+  background: #ffc107;
+  color: #000;
+}
+
+.btn-discount:hover {
+  background: #e0a800;
+}
+
+.custom-table tbody tr:hover {
+  background: #eef4ff;
+  transition: 0.2s;
+}
+
+.no-data {
+  padding: 40px;
+  text-align: center;
+  color: #999;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .stats-box {
+    margin-left: 0;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}

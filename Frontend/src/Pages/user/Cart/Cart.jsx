@@ -1,43 +1,96 @@
 import "./cart.css";
-import products from "../../../data/demoProducts.json";
+import productsData from "../../../data/ProductData.json";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
+  const [cartProducts, setCartProducts] = useState([]);
+  const navigate = useNavigate();
 
-  // Cart items will come from JSON
-  const cart = products;
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // Subtotal calculation
-  const subtotal = cart.reduce((total, item) => total + item.price, 0);
+    const categoryMap = {};
+    Object.keys(productsData).forEach((key) => {
+      const normalized = key.toLowerCase().replace(/s$/, "");
+      categoryMap[normalized] = productsData[key];
+    });
+
+    const fullProducts = storedCart
+      .map((item) => {
+        const cat = item.category.toLowerCase().replace(/s$/, "");
+        const productList = categoryMap[cat];
+        return productList ? productList.find((p) => p.id === item.id) : null;
+      })
+      .filter(Boolean);
+
+    setCartProducts(fullProducts);
+  }, []);
+
+  const removeItem = (id, category) => {
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const updated = storedCart.filter(
+      (item) =>
+        !(
+          item.id === id &&
+          item.category.toLowerCase().replace(/s$/, "") ===
+            category.toLowerCase().replace(/s$/, "")
+        )
+    );
+
+    localStorage.setItem("cart", JSON.stringify(updated));
+
+    setCartProducts((prev) =>
+      prev.filter(
+        (item) =>
+          !(
+            item.id === id &&
+            item.category.toLowerCase().replace(/s$/, "") ===
+              category.toLowerCase().replace(/s$/, "")
+          )
+      )
+    );
+  };
+
+  const subtotal = cartProducts.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <div className="cart-wrapper">
+    <div className="cart-container">
 
       {/* LEFT SIDE */}
       <div className="cart-left">
-        <h1>Your cart</h1>
-        <p className="small-gray">Not ready to checkout? Continue Shopping</p>
+        <h1 className="cart-title">Your Cart</h1>
+        <p className="gray">Not ready to checkout? Continue shopping</p>
 
-        <div className="cart-items-box">
-          {cart.map((item) => (
-            <div className="cart-item" key={item.id}>
-              
-              <img 
-                src={item.images?.[0] || "/images/placeholder.png"} 
-                alt={item.name} 
-              />
-
-              <div className="item-info">
-                <h3 className="item-name">{item.name}</h3>
-                <p className="item-size">Size: 6.2</p>
-                <p className="item-qty">Quantity: 1</p>
-                <p className="item-price">₹{item.price.toLocaleString()}</p>
-              </div>
-
-              <button className="remove-item">
-                Remove
-              </button>
+        <div className="cart-list">
+          {cartProducts.length === 0 ? (
+            <div className="empty-box">
+              <p>Your cart is empty</p>
+              <button className="shop-btn">Start Shopping</button>
             </div>
-          ))}
+          ) : (
+            cartProducts.map((item) => (
+              <div key={item.id} className="cart-card">
+
+                <img src={item.images[0]} alt={item.name} className="cart-img" />
+
+                <div className="cart-details">
+                  <h3>{item.name}</h3>
+                  <p className="gray-small">Category: {item.category}</p>
+                  <p className="price">₹{item.price.toLocaleString()}</p>
+                </div>
+
+                <button
+                  className="remove-btn"
+                  onClick={() => removeItem(item.id, item.category)}
+                >
+                  Remove
+                </button>
+
+              </div>
+            ))
+          )}
         </div>
 
         {/* ORDER INFO */}
@@ -49,13 +102,14 @@ export default function Cart() {
             <span>−</span>
           </div>
           <p className="info-desc">
-            This is our example return policy which is everything you need to know about our returns.
+            Learn everything about our simple, customer-friendly returns.
           </p>
 
           <div className="info-row">
             <span>Shipping Options</span>
             <span>+</span>
           </div>
+
           <div className="info-row">
             <span>Payment Options</span>
             <span>+</span>
@@ -67,28 +121,29 @@ export default function Cart() {
       <div className="cart-right">
         <h2>Order Summary</h2>
 
-        <input
-          className="coupon-input"
-          placeholder="Enter coupon code here"
-        />
+        <div className="summary-box">
 
-        <div className="summary-line">
-          <span>Subtotal</span>
-          <strong>₹{subtotal.toLocaleString()}</strong>
+          <div className="summary-line">
+            <span>Subtotal</span>
+            <strong>₹{subtotal.toLocaleString()}</strong>
+          </div>
+
+          <div className="summary-line">
+            <span>Shipping</span>
+            <span className="gray-small">Calculated at next step</span>
+          </div>
+
+          <div className="summary-line total">
+            <span>Total</span>
+            <strong>₹{subtotal.toLocaleString()}</strong>
+          </div>
         </div>
 
-        <div className="summary-line">
-          <span>Shipping</span>
-          <p className="small-gray">Calculated at the next step</p>
-        </div>
-
-        <div className="summary-line total-line">
-          <span>Total</span>
-          <strong>₹{subtotal.toLocaleString()}</strong>
-        </div>
-
-        <button className="checkout-btn">
-          Continue to checkout
+        <button
+          className="checkout-btn"
+          onClick={() => navigate("/checkout")}
+        >
+          Continue to Checkout
         </button>
       </div>
     </div>

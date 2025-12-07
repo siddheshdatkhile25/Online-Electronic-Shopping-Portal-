@@ -10,7 +10,14 @@ import Home from './Pages/user/Home/Home'
 
 import ProductDetails from './pages/user/Product/ProductDetails'
 import Cart from './pages/user/Cart/Cart'
-import Login from './Pages/user/Login/Login'
+
+
+import { ToastContainer } from "react-toastify";
+import Checkout from './pages/user/Checkout/Checkout'
+import AddAddress from './pages/user/AddAddress/AddAddress'
+import Payment from './pages/user/Payment/Payment'
+
+
 
 
 function App() {
@@ -18,6 +25,12 @@ function App() {
 
   return (
     <div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={2000}
+        theme="colored"
+      />
+
       <Routes>
         <Route
           path='/login'
@@ -45,6 +58,21 @@ function App() {
           <Route
             path = '/cart'
             element = {<Cart/>}
+          />
+
+          <Route
+            path= '/checkout'
+            element={<Checkout/>}
+          />
+
+          <Route 
+            path="/add-address" 
+            element={<AddAddress />} 
+          />
+
+          <Route
+            path="/Payment"
+            element={<Payment/>}
           />
 
         </Route>

@@ -22,20 +22,24 @@
   },
 
   {
-    "id": 2,
-    "name": "Samsung Galaxy S21",
-    "price": 69999,
-    "images": [
-      "/images/img1.png"
-    ],
-    "description": "Pro-grade camera, 120Hz AMOLED display, 8GB RAM.",
-    "features": [
-      "120Hz AMOLED Display",
-      "64MP Triple Camera",
-      "8GB RAM Performance",
-      "5G Support",
-      "4000mAh Fast Charging Battery"
-    ],
-    "category": "Mobile"
+  "id": 2,
+  "name": "Samsung Galaxy S25",
+  "price": 69999,
+  "images": [
+    "/images/s25_1.avif",
+    "/images/s25_2.avif",
+    "/images/s25_3.avif",
+    "/images/s25_4.avif"   
+  ],
+  "description": "Pro-grade camera, 120Hz AMOLED display, 8GB RAM.",
+  "features": [
+    "120Hz AMOLED Display",
+    "64MP Triple Camera",
+    "8GB RAM Performance",
+    "5G Support",
+    "4000mAh Fast Charging Battery"
+  ],
+  "category": "Mobile"
   }
+
 ]

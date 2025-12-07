@@ -7,6 +7,8 @@ import { Route, Routes } from 'react-router-dom'
 import LandingPage from './Pages/user/LandingPage/LandingPage'
 import Home from './Pages/user/Home/Home'
 import ProductDetails from './pages/user/Product/ProductDetails'
+import Cart from './pages/user/Cart/Cart'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -26,6 +28,11 @@ function App() {
           <Route
             path='/product/:id'
             element = {<ProductDetails/>}
+          />
+          
+          <Route
+            path = '/cart'
+            element = {<Cart/>}
           />
 
         </Route>

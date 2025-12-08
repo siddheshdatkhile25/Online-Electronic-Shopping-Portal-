@@ -6,12 +6,13 @@ import { Route,Routes } from 'react-router-dom'
 import Navbar from './Components/user/Navbar/Navbar'
 import AddProduct from './Pages/admin/AddProduct/AddProduct'
 import AddCategory from './Pages/admin/AddCategory/AddCategory'
-import AdminHome from './Pages/admin/AdminDashboard/AdminHome'
+import AdminHome from './Pages/admin/AdminHome/AdminHome'
 import ManageProduct from './Pages/admin/ManageProduct/ManageProduct'
 import EditProduct from './Pages/admin/EditProduct/EditProduct'
 import CustomerOrders from './Pages/admin/CustomerOrders/CustomerOrders'
 import { ToastContainer } from 'react-toastify'
 import ApplyDiscount from './Pages/admin/ApplyDiscount/ApplyDiscount'
+import AdminDashboard from './Pages/admin/AdminDashboard/AdminDashboard'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -26,6 +27,7 @@ function App() {
                   < AdminHome/>
                }
             >
+             <Route index element={<AdminDashboard />} />
              <Route
             path='add-category'
             element={<AddCategory/>}/>

@@ -8,6 +8,8 @@ import LandingPage from './Pages/user/LandingPage/LandingPage'
 import SectionPage from './Pages/user/SectionPage/SectionPage'
 import Home from './Pages/user/Home/Home'
 import Login from './Pages/user/Login/Login'
+import Register from './Pages/user/Register/Register'
+import ForgotPassword from './Pages/user/ForgotPassword/ForgotPassword'
 
 import ProductDetails from './pages/user/Product/ProductDetails'
 import Cart from './pages/user/Cart/Cart'
@@ -26,7 +28,7 @@ function App() {
 
   return (
     <div>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={2000}
         theme="colored"
@@ -35,45 +37,57 @@ function App() {
       <Routes>
         <Route
           path='/login'
-          element={<Login/>}
+          element={<Login />}
         />
         <Route
+          path='/register'
+          element={<Register />}
+        />
+
+
+
+
+        <Route
           path='/'
-          element={<Home/>}
+          element={<Home />}
         >
           <Route
+            path='/forget-password'
+            element={<ForgotPassword />}
+          />
+          <Route
             path='/'
-            element = {<LandingPage/>}
+            element={<LandingPage />}
           />
 
           <Route
             path='/product-listing/:categoryName'
-            element = {<SectionPage/>}
+            element={<SectionPage />}
           />
 
           <Route
             path='/product/:category/:id'
-            element = {<ProductDetails/>}
-          />
-          
-          <Route
-            path = '/cart'
-            element = {<Cart/>}
+            element={<ProductDetails />}
           />
 
           <Route
-            path= '/checkout'
-            element={<Checkout/>}
+            path='/cart'
+            element={<Cart />}
           />
 
-          <Route 
-            path="/add-address" 
-            element={<AddAddress />} 
+          <Route
+            path='/checkout'
+            element={<Checkout />}
+          />
+
+          <Route
+            path="/add-address"
+            element={<AddAddress />}
           />
 
           <Route
             path="/Payment"
-            element={<Payment/>}
+            element={<Payment />}
           />
 
         </Route>

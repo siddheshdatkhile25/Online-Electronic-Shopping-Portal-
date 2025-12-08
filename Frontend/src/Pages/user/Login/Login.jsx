@@ -8,7 +8,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  //const { setUser } = useAuth();
+
   const navigate = useNavigate();
 
   const onLogin = async () => {
@@ -40,7 +40,10 @@ function Login() {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="col-md-5 shadow rounded p-4 bg-white login-card">
 
-        <h3 className="text-center mb-3">Welcome Back</h3>
+
+
+        <h3 className="text-center mb-3">Welcome</h3>
+
         <p className="text-center text-muted mb-4">Login with your email</p>
 
         {/* Email */}

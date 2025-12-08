@@ -25,6 +25,7 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
+<<<<<<< HEAD
     <div>
       <ToastContainer 
         position="top-right"
@@ -79,6 +80,7 @@ function App() {
         </Route>
       </Routes>
     </div>
+
   )
 }
 

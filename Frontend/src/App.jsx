@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router-dom'
 import LandingPage from './Pages/user/LandingPage/LandingPage'
 import SectionPage from './Pages/user/SectionPage/SectionPage'
 import Home from './Pages/user/Home/Home'
+import Login from './Pages/user/Login/Login'
 
 import ProductDetails from './pages/user/Product/ProductDetails'
 import Cart from './pages/user/Cart/Cart'

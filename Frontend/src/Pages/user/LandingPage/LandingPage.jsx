@@ -30,9 +30,6 @@ function LandingPage() {
 
                 </div>
 
-                {/* =========================
-    LATEST ARRIVALS SECTION
-========================= */}
                 <div className="latest-arrivals">
 
                     <h2>Our latest arrivals</h2>
@@ -42,7 +39,7 @@ function LandingPage() {
                         You can even sync designs from your cloud storage!
                     </p>
 
-                    <button className="shop-all-btn">Shop All</button>
+                    <button className="shopNowbtn">Shop All</button>
 
                     <div className="latest-grid">
                         <div className="latest-card"></div>
@@ -62,7 +59,7 @@ function LandingPage() {
                             >
                                 <div className='category-circle'>
                                     <div className="category-image">
-                                        <img src={icon.src} alt={icon.alt} title={icon.title} />
+                                        <img src={icon.src} alt={icon.alt} title={icon.text} />
                                     </div>
                                 </div>
                                 <div>{icon.title}</div>

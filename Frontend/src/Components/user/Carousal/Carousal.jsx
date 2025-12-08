@@ -16,7 +16,7 @@ const Carousal = ({ title, products }) => {
 
         <div className="card-container">
             {products.map((item, index) => (
-              <div key={index} className="card"
+              <div key={item.id} className="card"
               onClick={() => navigate(`/product/${item.category}/${item.id}`)}
               >
                 <div className="image">

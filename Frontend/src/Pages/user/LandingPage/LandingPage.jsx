@@ -24,7 +24,12 @@ function LandingPage() {
                         Discover the latest in smart technology, From gadgets to home essentials. Top brands at unbeatable prices, Delivered to your doorstep with ease.
                     </p>
 
-                    <button className='shopNowbtn'>
+                    <button className='shopNowbtn'
+                        onClick={() => {
+                            const section = document.getElementsByClassName("category-carousel");
+                            section?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                    >
                         Shop Now
                     </button>
 
@@ -82,6 +87,62 @@ function LandingPage() {
                 products={productList} /> */}
                 {/* <Carousal title="Great Deals on Tablets Series " products={tablets} /> */}
             </div>
+
+            <hr />
+            <div className="footer-section">
+
+                <div className="footer-newsletter">
+                    <h2>Sign up for our newsletter</h2>
+                    <p>
+                        Be the first to know about our special offers, new product launches, and events
+                    </p>
+
+                    <div className="newsletter-input">
+                        <input type="email" placeholder="Email Address" />
+                        <button>Sign Up</button>
+                    </div>
+                </div>
+
+                <div className="footer-links">
+
+                    <div className="footer-col">
+                        <h4>Shop</h4>
+                        <ul>
+                            <li>Women's</li>
+                            <li>Men's</li>
+                            <li>Kids'</li>
+                            <li>Shoes</li>
+                            <li>Equipment</li>
+                            <li>By Activity</li>
+                            <li>Gift Cards</li>
+                            <li>Sale</li>
+                        </ul>
+                    </div>
+
+                    <div className="footer-col">
+                        <h4>Help</h4>
+                        <ul>
+                            <li>Help Center</li>
+                            <li>Order Status</li>
+                            <li>Size Chart</li>
+                            <li>Returns & Warranty</li>
+                            <li>Contact Us</li>
+                        </ul>
+                    </div>
+
+                    <div className="footer-col">
+                        <h4>About</h4>
+                        <ul>
+                            <li>About Us</li>
+                            <li>Responsibility</li>
+                            <li>Technology & Innovation</li>
+                            <li>Explore our stories</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
 
         </div>
     )

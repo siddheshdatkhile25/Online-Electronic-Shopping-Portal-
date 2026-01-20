@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { verifyOtp } from "../../services/users"; // create this API
-import "./OtpVerify.css";
+
+import "./Otp.css";
 
 function OtpVerify() {
   const [otp, setOtp] = useState(["", "", "", "", ""]);
@@ -98,7 +98,7 @@ function OtpVerify() {
         </div>
 
         <div className="text-center">
-          <button className="btn btn-dark px-4" onClick={onVerify}>
+          <button className="btn btn-dark px-4" onClick={()=>navigate(`/reset-password`)}>
             Verify OTP
           </button>
         </div>

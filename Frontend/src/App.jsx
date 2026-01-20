@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 
@@ -10,11 +8,15 @@ import Home from './Pages/user/Home/Home'
 import Login from './Pages/user/Login/Login'
 import Register from './Pages/user/Register/Register'
 import ForgotPassword from './Pages/user/ForgotPassword/ForgotPassword'
+import Otp from './Pages/user/Otp/Otp'
+import ResetPassword from './Pages/user/ResetPassword/ResetPassword'
+
 import ProductDetails from './pages/user/Product/ProductDetails'
 import Cart from './pages/user/Cart/Cart'
 import Checkout from './pages/user/Checkout/Checkout'
 import AddAddress from './pages/user/AddAddress/AddAddress'
 import Payment from './pages/user/Payment/Payment'
+import ContactUs from './Pages/user/ContactUs/ContactUs'
 
 import AddProduct from './Pages/admin/AddProduct/AddProduct'
 import AddCategory from './Pages/admin/AddCategory/AddCategory'
@@ -26,9 +28,9 @@ import ApplyDiscount from './Pages/admin/ApplyDiscount/ApplyDiscount'
 import AdminDashboard from './Pages/admin/AdminDashboard/AdminDashboard'
 
 import { ToastContainer } from 'react-toastify'
+import { Contact } from 'lucide-react'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <div>
@@ -39,25 +41,28 @@ function App() {
       />
 
       <Routes>
-        {/* User Authentication Routes - accessible outside the main Home layout */}
+        {/* Auth Routes */}
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/forget-password' element={<ForgotPassword />} />
+        <Route path='/otp' element={<Otp />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
 
-        {/* User Routes - nested within the Home layout (e.g., header/footer) */}
+        {/* USER ROUTES */}
         <Route path='/' element={<Home />}>
-          <Route index element={<LandingPage />} /> {/* Route for "/" */}
+          <Route index element={<LandingPage />} />
           <Route path='product-listing/:categoryName' element={<SectionPage />} />
           <Route path='product/:category/:id' element={<ProductDetails />} />
           <Route path='cart' element={<Cart />} />
           <Route path='checkout' element={<Checkout />} />
           <Route path='add-address' element={<AddAddress />} />
           <Route path='payment' element={<Payment />} />
+          <Route path='contact-us' element={<ContactUs />} />
         </Route>
 
-        {/* Admin Routes - nested within the AdminHome layout */}
+        {/* ADMIN ROUTES */}
         <Route path='/admin' element={<AdminHome />}>
-          <Route index element={<AdminDashboard />} /> 
+          <Route index element={<AdminDashboard />} />
           <Route path='add-category' element={<AddCategory />} />
           <Route path='add-product' element={<AddProduct />} />
           <Route path='view-product' element={<ManageProduct />} />

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { resetPassword } from "../../services/users"; // define this API
+import { toast } from "react-toastify"; // define this API
 import "./ResetPassword.css";
 
 function ResetPassword() {

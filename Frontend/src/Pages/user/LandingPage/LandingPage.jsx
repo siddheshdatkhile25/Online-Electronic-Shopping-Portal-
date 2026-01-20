@@ -47,7 +47,9 @@ function LandingPage() {
                     <button className="shopNowbtn">Shop All</button>
 
                     <div className="latest-grid">
-                        <div className="latest-card"></div>
+                        <div className="latest-card">
+                            {/* <img style="width: 300px;" src="/assets/Images/Banner/iphone.png" alt="iphone" loading="lazy" /> */}
+                        </div>
                         <div className="latest-card featured"></div>
                         <div className="latest-card"></div>
                     </div>

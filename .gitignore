@@ -47,3 +47,6 @@ logs/
 # Dependencies
 package-lock.json
 yarn.lock
+
+/src/main/resources/application.properties
+/.metadata/

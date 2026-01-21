@@ -1,17 +1,28 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './LandingPage.css'
-import imgicons from '../../../data/carouselImages.json'
+
+import api from '../../../api/axiosInstance'
+
 import Carousal from '../../../Components/user/Carousal/Carousal'
 import products from '../../../data/ProductData.json'
 import { useNavigate } from "react-router-dom";
 
 
-const { phones } = products
-const { tablets } = products
 
 function LandingPage() {
     const navigate = useNavigate();
+    const [categories,setCategories]=useState([]);
 
+    useEffect(()=>{
+        api.get("/admin/categories")
+        .then((res)=>{
+            setCategories(res.data);
+        })
+        .catch((err)=>{
+            console.error("error fectching categories",err);
+        });
+
+    },[]);
     return (
         <div className="container">
             <div className="main-body">
@@ -50,23 +61,29 @@ function LandingPage() {
                 </div>
 
 
-                <div className="category-carousel">
-                    <div className="category-bar">
-                        {imgicons.slice(0, 9).map((icon, index) => (
-                            <div key={index}
-                                className='category'
-                                onClick={() => navigate(`/product-listing/${icon.slug}`)}
-                            >
-                                <div className='category-circle'>
-                                    <div className="category-image">
-                                        <img src={icon.src} alt={icon.alt} title={icon.text} />
-                                    </div>
-                                </div>
-                                <div>{icon.title}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+     <div className="category-carousel">
+  <h2 className="section-title">Shop by Category</h2>
+
+  <div className="category-bar">
+    {categories.map((cat) => (
+      <div
+        key={cat.id}
+        className="category"
+        onClick={() => navigate(`/product-listing/${cat.id}`)}
+      >
+        <div className="category-circle">
+          <img
+            src={cat.imageUrl}  
+            alt={cat.name}
+          />
+        </div>
+        <div className="category-title">{cat.name}</div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
 
 
 

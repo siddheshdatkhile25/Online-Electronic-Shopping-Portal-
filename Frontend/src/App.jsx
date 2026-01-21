@@ -26,6 +26,7 @@ import ApplyDiscount from './Pages/admin/ApplyDiscount/ApplyDiscount'
 import AdminDashboard from './Pages/admin/AdminDashboard/AdminDashboard'
 
 import { ToastContainer } from 'react-toastify'
+import PaymentPage from './Pages/admin/PaymentManagement/PaymentPage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -64,6 +65,7 @@ function App() {
           <Route path='edit-product/:id' element={<EditProduct />} />
           <Route path='apply-discount/:id' element={<ApplyDiscount />} />
           <Route path='view-orders' element={<CustomerOrders />} />
+          <Route path='manage-payment' element={<PaymentPage/>}/>
         </Route>
       </Routes>
     </div>

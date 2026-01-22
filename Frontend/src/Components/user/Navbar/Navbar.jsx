@@ -41,7 +41,9 @@ function Navbar() {
         {/* RIGHT SECTION */}
         <div className="nav-right">
           <ul className="nav-icons">
-            <li><img src={shoppingCartIcon} alt="Cart" /></li>
+            <li><img src={shoppingCartIcon} alt="Cart" 
+            onClick={()=>navigate(`cart`)}
+            /></li>
             <li><img src={wishlistIcon} alt="Wishlist" /></li>
           </ul>
 

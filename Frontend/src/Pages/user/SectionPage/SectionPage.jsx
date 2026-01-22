@@ -42,7 +42,6 @@ const LatestPhones = () => {
                 </div>
             </div>
 
-            {/* ✅ PRODUCT GRID */}
             <div className="product-grid">
                 {categoryProducts.map((item) => (
                     <div className="product-box" key={item.id}>
@@ -54,7 +53,6 @@ const LatestPhones = () => {
                             MRP <span>₹{item.price.toLocaleString()}</span>
                         </p>
 
-                        {/* ✅ VIEW DETAILS BUTTON */}
                         <button
                             className="view-btn"
                             onClick={() => navigate(`/product/${item.category}/${item.id}`)}

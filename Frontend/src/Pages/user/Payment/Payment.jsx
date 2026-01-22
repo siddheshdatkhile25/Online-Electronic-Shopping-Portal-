@@ -28,49 +28,35 @@ export default function Payment() {
 
   const subtotal = cartItems.reduce((sum, p) => sum + p.price, 0);
 
-  //Razorpay
-  const payWithRazorpay = () => {
-    if (!window.Razorpay) {
-      alert("Razorpay SDK not loaded");
-      return;
-    }
-
-    const options = {
-      key: "rzp_test_123456789abcde",
-      amount: subtotal * 100,
-      currency: "INR",
-      name: "ElectroKart",
-      description: "Order Payment",
-      image: "/logo.png",
-
-      theme: { color: "#000000" },
-
-      handler: function (response) {
-        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-      },
-
-      prefill: {
-        name: "Tushar Pawar",
-        email: "tushar@example.com",
-        contact: "9999999999",
-      },
-
-      method: {
-        upi: true,
-        card: true,
-        wallet: true,
-        netbanking: true,
-      },
-
-      modal: {
-        ondismiss: function () {
-          console.log("Payment popup closed");
-        },
-      },
+  const handleConfirmPayment = () => {
+    // Save order to localStorage
+    const orderId = 'ORD-' + Date.now();
+    const order = {
+      id: orderId,
+      date: new Date().toISOString().split('T')[0],
+      status: 'Processing',
+      items: cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        quantity: 1,
+        image: item.images[0]
+      })),
+      total: subtotal
     };
 
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
+    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+    existingOrders.push(order);
+    localStorage.setItem('orders', JSON.stringify(existingOrders));
+
+    // Clear cart after successful order
+    localStorage.removeItem('cart');
+
+    alert("Payment Successful! Order placed.");
+
+    // Navigate to orders page
+    window.location.href = '/orders';
   };
 
   return (
@@ -87,13 +73,13 @@ export default function Payment() {
             <span className="active-step">Payment</span>
           </div>
 
-          {/* Razorpay + UPI Buttons */}
+          {/* Payment Buttons */}
           <div className="quick-pay">
-            <button className="razorpay-btn" onClick={payWithRazorpay}>
+            <button className="razorpay-btn" onClick={handleConfirmPayment}>
               Pay with Razorpay
             </button>
 
-            <button className="upi-btn" onClick={payWithRazorpay}>
+            <button className="upi-btn" onClick={handleConfirmPayment}>
               Pay via UPI Apps
             </button>
           </div>
@@ -125,7 +111,7 @@ export default function Payment() {
               </label>
             </div>
 
-            <button className="confirm-btn" onClick={payWithRazorpay}>
+            <button className="confirm-btn" onClick={handleConfirmPayment}>
               Confirm & Pay
             </button>
           </div>

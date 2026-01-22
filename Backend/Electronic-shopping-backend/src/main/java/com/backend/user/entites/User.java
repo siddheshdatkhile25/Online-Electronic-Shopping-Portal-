@@ -18,7 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"passwordHash", "image"})
+@ToString(exclude = {"passwordHash"})
 public class User extends BaseEntity{
 	
 	private String firstname;
@@ -28,11 +28,11 @@ public class User extends BaseEntity{
     private String phone;
     @Column(name = "user_role")
     private String userRole;
-    private Boolean isActive;
-
+    private Boolean isActive = true;
+    
     private String extra1;
     private String extra2;
-    private String extra3;
     
+    private String extra3;
     
 }

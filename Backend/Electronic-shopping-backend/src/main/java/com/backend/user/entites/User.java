@@ -32,6 +32,7 @@ public class User extends BaseEntity{
     
     private String extra1;
     private String extra2;
+    
     private String extra3;
     
 }

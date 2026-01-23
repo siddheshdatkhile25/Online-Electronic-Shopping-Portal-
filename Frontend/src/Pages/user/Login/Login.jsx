@@ -63,7 +63,9 @@ function Login() {
             <label className="form-check-label">Remember me</label>
           </div>
 
-          <button className="btn btn-link p-0">Forgot Password?</button>
+          <button className="btn btn-link p-0"
+            onClick={()=>navigate(`/forget-password`)}
+          >Forgot Password?</button>
         </div>
 
         <button className="btn btn-dark w-100 mb-3" onClick={onLogin}>

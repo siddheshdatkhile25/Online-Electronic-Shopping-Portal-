@@ -61,7 +61,6 @@ function Register() {
       }
     };
 
-    // Demo: Save user to sessionStorage (do NOT store passwords in real apps)
     sessionStorage.setItem("user", JSON.stringify(user));
     alert("Registered successfully.");
     navigate("/login");
@@ -90,7 +89,6 @@ function Register() {
           />
         </div>
 
-        {/* Email & Phone */}
         <div className="row-2">
           <input
             className="form-control"
@@ -108,7 +106,6 @@ function Register() {
           />
         </div>
 
-        {/* Address lines */}
         <div className="row-1">
           <input
             className="form-control"
@@ -139,7 +136,6 @@ function Register() {
           />
         </div>
 
-        {/* District & State selects (two-column) */}
         <div className="row-2">
           <select
             className="form-control"
@@ -160,7 +156,7 @@ function Register() {
             value={stateName}
             onChange={(e) => {
               setStateName(e.target.value);
-              setDistrict(""); // reset district when state changes
+              setDistrict(""); 
             }}
           >
             <option value="">Select State</option>

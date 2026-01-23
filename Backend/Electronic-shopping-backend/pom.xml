@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cdac</groupId>
-	<artifactId>spring_boot_backend_template</artifactId>
+	<artifactId>online-electronic-shopping-portal-backend</artifactId>
 	<version>0.0.1</version>
-	<name>spring_boot_backend_template</name>
-	<description>Template for Spring Boot based Backend REST API</description>
+	<name>Online Electronic Shopping Portal - Backend API</name>
+	<description>Backend REST API for Online Electronic Shopping Portal</description>
 	<url />
 	<licenses>
 		<license />
@@ -46,6 +46,35 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<!-- Added Spring Security-->
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- JWT API -->
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-api</artifactId>
+		    <version>0.11.5</version>
+		</dependency>
+		
+		<!-- JWT Implementation -->
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-impl</artifactId>
+		    <version>0.11.5</version>
+		    <scope>runtime</scope>
+		</dependency>
+		
+		<!-- JWT Jackson -->
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-jackson</artifactId>
+		    <version>0.11.5</version>
+		    <scope>runtime</scope>
 		</dependency>
 
 		<dependency>

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import { loginUser } from "../../../services/user";
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -8,24 +10,58 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const onLogin = () => {
+  const onLogin = async () => {
     if (!email || !password) {
       alert("Please fill all fields");
       return;
     }
 
-    const userData = {
-      email: email,
-      password: password
-    };
+    try {
+      const userData = {
+        email: email,
+        password: password
+      };
+
+      const response = await loginUser(userData);
+
+      console.log(response);
+
+      
+
+      if (response) {
+        toast.success("Login Successful");
+      } else {
+        toast.error("Invalid Credentials");
+      }
+
+      const user = {
+        firstname: response.firstname,
+        lastname: response.lastname
+      };
+
+
+      sessionStorage.setItem("role", response.userRole);
+      sessionStorage.setItem("user" , JSON.stringify(user) )
+      sessionStorage.setItem("userId", response.userId);
+
+      if (response.data.userRole == "ADMIN") {
+        navigate("/admin/dashboard");
+      } else if (response.data.userRole == "USER") {
+        navigate("/");
+      } else {
+        toast.error("Invalid role");
+      }
+
+    }catch(error){
+      toast.error(error);
+    }
+
+
+
+
 
     // Store data in sessionStorage
-    sessionStorage.setItem("user", JSON.stringify(userData));
-
-    alert("Login successful!");
-
-    // Navigate to home page
-    navigate("/");
+    //sessionStorage.setItem("user", JSON.stringify(userData));
   };
 
   return (
@@ -64,7 +100,7 @@ function Login() {
           </div>
 
           <button className="btn btn-link p-0"
-            onClick={()=>navigate(`/forget-password`)}
+            onClick={() => navigate(`/forget-password`)}
           >Forgot Password?</button>
         </div>
 

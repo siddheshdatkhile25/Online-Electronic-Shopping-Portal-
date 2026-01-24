@@ -25,7 +25,7 @@ public abstract class BaseEntity {
 	@Id //PK constraint
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	//auto ID generation - default id generation strategy - AUTO . To specify auto_increment : GenerationType.IDENTITY
-	private Integer id;
+	private Long id;
 	@CreationTimestamp
 	@Column(name="created_on")
 	private LocalDate createdOn;

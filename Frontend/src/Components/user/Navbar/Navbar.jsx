@@ -55,7 +55,10 @@ function Navbar() {
             >
               <div className="profile-circle">
                 {/* Optional: Add user initial */}
-                {JSON.parse(sessionStorage.getItem("user")).email.charAt(0).toUpperCase()}
+                {JSON.parse(sessionStorage.getItem("user"))?.firstname
+                  ?.charAt(0)
+                  .toUpperCase()}
+
               </div>
 
               {openMenu && (

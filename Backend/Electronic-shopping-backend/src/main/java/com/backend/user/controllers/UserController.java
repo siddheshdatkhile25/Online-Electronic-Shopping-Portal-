@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.common.dtos.ApiResponse;
+import com.backend.user.UserDto.ForgotPasswordRequestDTO;
 import com.backend.user.UserDto.LoginRequestDTO;
 import com.backend.user.UserDto.LoginResponseDTO;
 import com.backend.user.UserDto.RegisterUserDTO;
+import com.backend.user.UserDto.ResetPasswordDTO;
 import com.backend.user.UserDto.UpdateUserDTO;
 import com.backend.user.UserDto.UserDetailsResponseDTO;
 import com.backend.user.UserDto.UserListResponseDTO;
+import com.backend.user.UserDto.UserResponseDTO;
+import com.backend.user.UserDto.VerifyOtpDTO;
 import com.backend.user.entites.User;
 import com.backend.user.service.UserService;
 
@@ -41,10 +45,34 @@ public class UserController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<User> registerUser(@RequestBody RegisterUserDTO user){
-		User savedUser = userService.registerUser(user);
-		
-		return new ResponseEntity<>(savedUser , HttpStatus.CREATED);
+	public ResponseEntity<ApiResponse<UserResponseDTO>> registerUser(@RequestBody RegisterUserDTO user){
+		try {
+			User savedUser = userService.registerUser(user);
+			
+			UserResponseDTO responseDTO = new UserResponseDTO(
+		            savedUser.getId(),
+		            savedUser.getFirstname(),
+		            savedUser.getLastname(),
+		            savedUser.getEmail(),
+		            savedUser.getPhone()
+		    );
+			
+			ApiResponse<UserResponseDTO> response = new ApiResponse<UserResponseDTO>("Registration Successfull" , responseDTO);
+			
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		}catch(RuntimeException ex) {
+			ApiResponse<UserResponseDTO> errorResponse =
+	                new ApiResponse<>(ex.getMessage(), null);
+			
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+		}catch (Exception ex) {
+
+	        ApiResponse<UserResponseDTO> errorResponse =
+	                new ApiResponse<>("Internal server error", null);
+
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(errorResponse);
+	    }
 	}
 	
 	@PostMapping("/login")
@@ -98,6 +126,47 @@ public class UserController {
 
 	    return ResponseEntity.ok(response);
 	}
+	
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<ApiResponse<String>> forgotPassword(
+	        @Valid @RequestBody ForgotPasswordRequestDTO dto) {
+
+	    userService.forgotPassword(dto.getEmail());
+
+	    return ResponseEntity.ok(
+	            new ApiResponse<>("OTP sent to registered email", null)
+	    );
+	}
+
+	
+	@PostMapping("/verify-otp")
+	public ResponseEntity<ApiResponse<String>> verifyOtp(
+	        @RequestBody VerifyOtpDTO dto) {
+
+	    userService.verifyOtp(dto.getEmail(), dto.getOtp());
+	    return ResponseEntity.ok(
+	            new ApiResponse<>("OTP verified successfully", null)
+	    );
+	}
+	
+	@PostMapping("/reset-password")
+	public ResponseEntity<ApiResponse<String>> resetPassword(
+	        @RequestBody ResetPasswordDTO dto) {
+
+	    userService.resetPassword(dto);
+	    return ResponseEntity.ok(
+	            new ApiResponse<>("Password reset successful", null)
+	    );
+	}
+
+	
+
+	
+
+	
+	
+	
 
 	
 	

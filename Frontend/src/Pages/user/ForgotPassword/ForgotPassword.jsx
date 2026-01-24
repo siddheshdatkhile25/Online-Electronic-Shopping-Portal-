@@ -1,38 +1,50 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import './ForgotPassword.css'
+import "./ForgotPassword.css";
 
-
-function ForgotPassword() {
+const ForgotPassword = () => {
   const navigate = useNavigate();
-  
 
-return (
-  <div className="forgot-page">
-    <div className="card shadow-sm p-4 forgot-card">
-      <h4 className="mb-2">Forgot Password</h4>
-      <p className="text-muted mb-4">Enter your email to receive OTP</p>
+  return (
+    <div className="bg-page">
+      <div className="forgot-card">
+        <h3 className="forgot-title">Forgot Password</h3>
+        <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '1.5rem' }}>
+          Enter your email to receive reset instructions.
+        </p>
 
-      <div className="mb-4">
-        <label className="form-label">Email</label>
-        <input type="email" className="form-control" placeholder="Email" />
+        <form>
+          <div className="form-group">
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#374151', fontWeight: '500' }}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              className="input-field"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <button type="submit" className="submit-btn">
+            Send Reset Link
+          </button>
+
+          <button 
+            type="button" 
+            className="submit-btn" 
+            style={{ marginTop: '1rem', backgroundColor: '#1f2937' }}
+            onClick={() => navigate(`/otp`)}
+          >
+            Send OTP
+          </button>
+        </form>
+
+        <div className="login-link">
+          <a href="/login">Back to Login</a>
+        </div>
       </div>
-
-      <div className="text-center mb-4">
-        <button className="btn btn-dark px-5" onClick={() => navigate(`/otp`)}>
-          Send OTP
-        </button>
-      </div>
-
-      <p className="createaccoubt text-center text-muted mb-0">
-        Or create an <Link to="/register">account</Link>
-      </p>
     </div>
-  </div>
-);
-
-}
+  );
+};
 
 export default ForgotPassword;

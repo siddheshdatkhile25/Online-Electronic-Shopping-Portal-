@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserListResponseDTO {
 
-    private Integer id;
+    private Long id;
     private String firstname;
     private String lastname;
     private String email;

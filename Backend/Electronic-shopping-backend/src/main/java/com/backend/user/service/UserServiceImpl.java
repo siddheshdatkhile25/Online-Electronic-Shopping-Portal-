@@ -1,5 +1,7 @@
 package com.backend.user.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -7,25 +9,34 @@ import org.springframework.data.domain.Pageable;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.backend.user.Repository.PasswordResetOtpRepository;
 import com.backend.user.Repository.UserRepository;
 import com.backend.user.UserDto.LoginRequestDTO;
 import com.backend.user.UserDto.LoginResponseDTO;
 import com.backend.user.UserDto.RegisterUserDTO;
+import com.backend.user.UserDto.ResetPasswordDTO;
 import com.backend.user.UserDto.UpdateUserDTO;
+import com.backend.user.UserDto.UserAddressDTO;
 import com.backend.user.UserDto.UserDetailsResponseDTO;
 import com.backend.user.UserDto.UserListResponseDTO;
+import com.backend.user.entites.PasswordResetOtp;
 import com.backend.user.entites.User;
+import com.backend.user.entites.UserAddress;
 import com.backend.user.service.UserService;  // ✅ MUST be this
 
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
+    @Autowired
+    private final PasswordResetOtpRepository otpRepo;
 
     //@Autowired
     //private PasswordEncoder passwordEncoder;
@@ -40,16 +51,28 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setFirstname(dto.getFirstname());
         user.setLastname(dto.getLastname());
-        user.setPasswordHash(dto.getPassword());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
+        user.setPasswordHash(dto.getPassword());
+        
+        UserAddressDTO addressDTO = dto.getAddress();
+        
+        UserAddress address = new UserAddress();
+        address.setAddressLine1(addressDTO.getAddressLine1());
+        address.setAddressLine2(addressDTO.getAddressLine2());
+        address.setCity(addressDTO.getCity());
+        address.setDistrict(addressDTO.getDistrict());
+        address.setState(addressDTO.getState());
+        address.setPincode(addressDTO.getPincode());
         
         
 
         //user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
         user.setUserRole("USER");
+        user.getAddresses().add(address);
         User savedUser = userRepo.save(user); 
         return savedUser;
+        
     }
     
     @Override
@@ -66,7 +89,8 @@ public class UserServiceImpl implements UserService {
         return new LoginResponseDTO(
         		user.getId(),
                 user.getFirstname(),
-                user.getLastname()
+                user.getLastname(),
+                user.getUserRole()
         );
     }
     
@@ -131,6 +155,73 @@ public class UserServiceImpl implements UserService {
                         user.getIsActive()
                 ));
     }
+    
+    @Override
+    public void forgotPassword(String email) {
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String otp = String.valueOf(
+                (int)(Math.random() * 90000) + 10000
+        );
+
+        PasswordResetOtp resetOtp = new PasswordResetOtp();
+        resetOtp.setEmail(email);
+        resetOtp.setOtp(otp);
+        resetOtp.setExpiryTime(LocalDateTime.now().plusMinutes(10));
+        resetOtp.setUsed(false);
+
+        otpRepo.save(resetOtp);
+
+        // Simulate sending email
+        System.out.println("OTP for password reset: " + otp);
+    }
+    
+    
+    @Override
+    public void verifyOtp(String email, String otp) {
+
+        PasswordResetOtp resetOtp =
+                otpRepo.findByEmailAndOtpAndUsedFalse(email, otp)
+                .orElseThrow(() -> new RuntimeException("Invalid OTP"));
+
+        if (resetOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP expired");
+        }
+    }
+    
+    @Override
+    public void resetPassword(ResetPasswordDTO dto) {
+
+        PasswordResetOtp resetOtp =
+                otpRepo.findByEmailAndOtpAndUsedFalse(
+                        dto.getEmail(), dto.getOtp())
+                .orElseThrow(() -> new RuntimeException("Invalid OTP"));
+
+        if (resetOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP expired");
+        }
+
+        User user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPasswordHash(dto.getNewPassword()); // later encrypt
+        userRepo.save(user);
+
+        resetOtp.setUsed(true);
+        otpRepo.save(resetOtp);
+    }
+    
+    
+
+    
+    
+    
+
+    
+    
+
     
     
     

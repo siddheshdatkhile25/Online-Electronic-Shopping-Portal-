@@ -12,11 +12,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class RegisterUserDTO {
-	
-	private String firstname;
+
+    private String firstname;
     private String lastname;
-    private String password;
     private String email;
     private String phone;
+    private String password;
 
+    // Only ONE address during registration
+    private UserAddressDTO address;
 }

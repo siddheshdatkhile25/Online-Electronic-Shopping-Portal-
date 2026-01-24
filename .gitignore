@@ -48,6 +48,7 @@ logs/
 package-lock.json
 yarn.lock
 
+<<<<<<< HEAD
 
 # ===============================
 # Java / JVM
@@ -129,3 +130,7 @@ node_modules/
 # Test reports
 # ===============================
 /test-output/
+=======
+/src/main/resources/application.properties
+/.metadata/
+

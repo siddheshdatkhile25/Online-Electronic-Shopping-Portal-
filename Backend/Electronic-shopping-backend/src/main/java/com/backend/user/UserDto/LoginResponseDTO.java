@@ -7,7 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+
 public class LoginResponseDTO {
+	
+	private String token;
 	private Integer id;
     private String firstname;
     private String lastname;

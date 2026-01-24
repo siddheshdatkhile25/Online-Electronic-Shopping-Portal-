@@ -1,11 +1,11 @@
 
 .product-page {
-  background: #f8f9fa;    /* grey background */
+  background: #f8f9fa;    
   min-height: 100vh;
   padding: 30px 20px;
 }
 
-/* 🔵 Title */
+
 .page-title {
   text-align: center;
   font-weight: 700;
@@ -14,19 +14,19 @@
   color: black;
 }
 
-/* 🔵 Action/Filter Section (grey box look) */
+
 .filter-section {
   display: flex;
   gap: 15px;
   margin-bottom: 25px;
   flex-wrap: wrap;
   align-items: center;
-  background: #f8f9fa;   /* grey box */
+  background: #f8f9fa;   
   padding: 15px;
   border-radius: 8px;
 }
 
-/* Search Bar */
+
 .search-box {
   flex: 1;
   min-width: 250px;
@@ -59,7 +59,7 @@
   cursor: pointer;
 }
 
-/* Stats Box */
+
 .stats-box {
   margin-left: auto;
 }
@@ -69,15 +69,14 @@
   color: #666;
 }
 
-/* 🔵 White Table Container */
+
 .table-container {
-  background: white;    /* white box */
+  background: white;   
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Table */
 .custom-table thead tr {
   background: #0d6efd;
   color: white;
@@ -90,7 +89,7 @@
   padding: 14px 10px;
 }
 
-/* Product Image (if needed) */
+
 .product-img {
   width: 60px;
   height: 60px;
@@ -99,14 +98,14 @@
   border: 1px solid #eee;
 }
 
-/* Price Text */
+
 .price-green {
   color: #198754;
   font-weight: 600;
   font-size: 15px;
 }
 
-/* 🔵 Action Buttons */
+
 .action-box {
   display: flex;
   align-items: center;
@@ -117,7 +116,7 @@
   width: 140px;
 }
 
-/* Black Update Button */
+
 .btn {
   padding: 6px 12px;
   font-size: 12px;
@@ -137,13 +136,13 @@
   background: black;
 }
 
-/* Hover Row */
+
 .custom-table tbody tr:hover {
   background: #eef4ff;
   transition: 0.2s;
 }
 
-/* No Data Display */
+
 .no-data {
   padding: 40px;
   text-align: center;

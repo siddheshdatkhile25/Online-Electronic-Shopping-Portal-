@@ -29,6 +29,7 @@ import CustomerOrders from './Pages/admin/CustomerOrders/CustomerOrders'
 import ApplyDiscount from './Pages/admin/ApplyDiscount/ApplyDiscount'
 import AdminDashboard from './Pages/admin/AdminDashboard/AdminDashboard'
 
+
 import { ToastContainer } from 'react-toastify'
 import { Contact } from 'lucide-react'
 
@@ -53,8 +54,8 @@ function App() {
         {/* USER ROUTES */}
         <Route path='/' element={<Home />}>
           <Route index element={<LandingPage />} />
-          <Route path='product-listing/:categoryName' element={<SectionPage />} />
-          <Route path='product/:category/:id' element={<ProductDetails />} />
+          <Route path='product-listing/:categoryId' element={<SectionPage />} />
+          <Route path='product/:id' element={<ProductDetails />} />
           <Route path='cart' element={<Cart />} />
           <Route path='checkout' element={<Checkout />} />
           <Route path='add-address' element={<AddAddress />} />
@@ -73,6 +74,7 @@ function App() {
           <Route path='edit-product/:id' element={<EditProduct />} />
           <Route path='apply-discount/:id' element={<ApplyDiscount />} />
           <Route path='view-orders' element={<CustomerOrders />} />
+        
         </Route>
       </Routes>
     </div>

@@ -1,23 +1,29 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import './ForgotPassword.css'
+import React from "react";
+import "./ForgotPassword.css";
 
+const ForgotPassword = () => {
+  return (
+    <div className="bg-page d-flex justify-content-center align-items-center">
+      <div className="forgot-card card shadow-sm p-4">
+        <h3 className="text-center mb-3">Forgot Password</h3>
+        <p className="text-center text-muted mb-4">
+          Enter your email to receive reset instructions.
+        </p>
 
-function ForgotPassword() {
-  const navigate = useNavigate();
-  
+        <form>
+          <div className="mb-3">
+            <label className="form-label">Email Address</label>
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Enter your email"
+            />
+          </div>
 
-return (
-  <div className="forgot-page">
-    <div className="card shadow-sm p-4 forgot-card">
-      <h4 className="mb-2">Forgot Password</h4>
-      <p className="text-muted mb-4">Enter your email to receive OTP</p>
-
-      <div className="mb-4">
-        <label className="form-label">Email</label>
-        <input type="email" className="form-control" placeholder="Email" />
+          <button type="submit" className="btn btn-primary w-100">
+            Send Reset Link
+          </button>
+        </form>
       </div>
 
       <div className="text-center mb-4">
@@ -30,9 +36,7 @@ return (
         Or create an <Link to="/register">account</Link>
       </p>
     </div>
-  </div>
-);
-
-}
+  );
+};
 
 export default ForgotPassword;

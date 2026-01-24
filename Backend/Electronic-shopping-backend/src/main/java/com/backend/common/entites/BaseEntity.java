@@ -16,8 +16,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 //Lombok annotations
-@Getter
+
 @Setter
+@Getter
 @ToString
 //JPA annotation
 @MappedSuperclass
@@ -25,10 +26,10 @@ public abstract class BaseEntity {
 	@Id //PK constraint
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	//auto ID generation - default id generation strategy - AUTO . To specify auto_increment : GenerationType.IDENTITY
-	private Integer id;
+	private Long id;
 	@CreationTimestamp
-	@Column(name="created_on")
-	private LocalDate createdOn;
+	@Column(name="created_At")
+	private LocalDateTime createdAt;
 	@UpdateTimestamp
 	@Column(name="last_updated")
 	private LocalDateTime lastUpdated;

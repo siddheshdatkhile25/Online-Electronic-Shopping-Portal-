@@ -1,4 +1,4 @@
-package com.backend.category.service;
+package com.backend.common.service;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -29,8 +29,8 @@ public class FileUploadServiceImpl implements FileUploadService{
 	private String bucketName;
 	
 	@Override
-	public String uploadFile(MultipartFile file) throws  IOException {
-		String folder="categories";
+	public String uploadFile(MultipartFile file,String folder) {
+		try {
 		String key=folder+"/"+UUID.randomUUID()+"_"+file.getOriginalFilename();
 		PutObjectRequest request=PutObjectRequest.builder()
 				.bucket(bucketName)
@@ -46,7 +46,26 @@ public class FileUploadServiceImpl implements FileUploadService{
 		//generated public url
 		//for eg. https://electronics-category-images.s3.ap-south-1.amazonaws.com/categories/abc123_tv.png
 
+		}
+		catch (IOException e) {
+            throw new RuntimeException("Failed to upload file to S3", e);
+        }
 		
 	}
+	@Override
+	public void deleteFile(String fileUrl) {
+	    try {
+	        // Extract key directly from URL
+	        String key = fileUrl.replace("https://" + bucketName + ".s3.ap-south-1.amazonaws.com/", "");
+	        
+	        // Delete file from S3
+	        s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key).build());
+	        
+	    } catch (AwsServiceException | SdkClientException e) {
+	        throw new RuntimeException("Failed to delete file from S3", e);
+	    }
+	}
+
+
 
 }

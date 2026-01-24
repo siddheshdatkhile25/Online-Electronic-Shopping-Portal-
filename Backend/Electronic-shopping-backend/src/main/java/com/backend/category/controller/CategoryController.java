@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.category.DTO.CategoryRequest;
 import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.service.CategoryService;
+import com.backend.common.dtos.ApiResponse;
 
 @RestController
 @RequestMapping("/admin/categories")
@@ -37,8 +38,10 @@ public class CategoryController {
 		
 	}
 	@GetMapping
-	public ResponseEntity<List<CategoryResponse>> getAllCategories(){
-		List<CategoryResponse> categories=categoryService.getAllCategories();
-		return ResponseEntity.ok(categories);
-		}
+	public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories() {
+	    return ResponseEntity.ok(
+	        new ApiResponse<>("All categories", categoryService.getAllCategories())
+	    );
+	}
+
 }

@@ -26,7 +26,7 @@ public class ProductRequest {
 	
 	private Long categoryId;
 	
-	
+	private String brand;
 	//MultipartFile is used to receive image files sent via multipart/form-data
-	private List<MultipartFile> images;
+	private MultipartFile image;
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../../../api/axiosInstance"; 
 import "./EditProduct.css";
 
 const EditProduct = () => {
@@ -7,55 +8,84 @@ const EditProduct = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    title: "",
-    category: "",
+    name: "",
+    categoryId: "",
     stock: "",
-    originalPrice: "",
+    price: "",
     discount: "",
-    image: ""
+    image: null,      // for new file
+    preview: ""      
   });
 
-  useEffect(() => {
-   
-    const fetchProduct = () => {
-      // Replace with fetch product by id
-      const dummyProduct = {
-        id: id,
-        title: "Apple MacBook Pro 2023",
-        category: "Electronics",
-        stock: 10,
-        originalPrice: 145000,
-        discount: 5,
-        image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
-      };
-      
-      setFormData(dummyProduct);
-    };
+  const [categories, setCategories] = useState([]);
 
-    fetchProduct();
+  // Fetch product & categories
+  useEffect(() => {
+    //  Fetch product by id
+    api.get(`/admin/products/${id}`)
+      .then(res => {
+        const product = res.data.data;
+        setFormData({
+          name: product.name,
+          categoryId: product.categoryId,
+          stock: product.stock,
+          price: product.price,
+          discount: product.discount || 0,
+          image: null,
+          preview: product.imgUrl
+        });
+      })
+      .catch(err => console.error(err));
+
+    // Fetch all categories
+    api.get("/admin/categories")
+      .then(res => {
+        setCategories(res.data.data);
+      })
+      .catch(err => console.error(err));
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        image: file,
+        preview: URL.createObjectURL(file) 
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-   
-    
-    console.log("Updated Product:", formData);
-    alert("Product updated successfully!");
-    navigate("/admin/view-product"); 
+
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("categoryId", formData.categoryId);
+    data.append("stock", formData.stock);
+    data.append("price", formData.price);
+    data.append("discount", formData.discount);
+
+    if (formData.image) {
+      data.append("image", formData.image); 
+    }
+
+    api.put(`/admin/products/${id}`, data, {
+      headers: { "Content-Type": "multipart/form-data" }
+    })
+      .then(() => {
+        alert("Product updated successfully!");
+        navigate("/admin/view-product");
+      })
+      .catch(err => console.error(err));
   };
 
-  const handleCancel = () => {
-    navigate("/admin/view-product");
-  };
+  const handleCancel = () => navigate("/admin/view-product");
 
   return (
     <div className="edit-product-page">
@@ -63,97 +93,88 @@ const EditProduct = () => {
         <h2 className="page-title">Edit Product</h2>
 
         <div className="form-container">
-          <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Product Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Category *</label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="form-input"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Mobile Phone">Mobile Phone</option>
-                  <option value="Accessories">Accessories</option>
-                  <option value="Computers">Computers</option>
-                </select>
-              </div>
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            <div className="form-group">
+              <label>Product Title *</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Stock Quantity *</label>
-                <input
-                  type="number"
-                  name="stock"
-                  value={formData.stock}
-                  onChange={handleChange}
-                  className="form-input"
-                  min="0"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Original Price (₹) *</label>
-                <input
-                  type="number"
-                  name="originalPrice"
-                  value={formData.originalPrice}
-                  onChange={handleChange}
-                  className="form-input"
-                  min="0"
-                  required
-                />
-              </div>
+            <div className="form-group">
+              <label>Category *</label>
+              <select
+                name="categoryId"
+                value={formData.categoryId}
+                onChange={handleChange}
+                className="form-input"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Discount (%)</label>
-                <input
-                  type="number"
-                  name="discount"
-                  value={formData.discount}
-                  onChange={handleChange}
-                  className="form-input"
-                  min="0"
-                  max="100"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Image URL</label>
-                <input
-                  type="text"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
+            <div className="form-group">
+              <label>Stock Quantity *</label>
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleChange}
+                className="form-input"
+                min="0"
+                required
+              />
             </div>
 
-            {formData.image && (
+            <div className="form-group">
+              <label>Price (₹) *</label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                className="form-input"
+                min="0"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Discount (%)</label>
+              <input
+                type="number"
+                name="discount"
+                value={formData.discount}
+                onChange={handleChange}
+                className="form-input"
+                min="0"
+                max="100"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="form-input"
+              />
+            </div>
+
+            {formData.preview && (
               <div className="image-preview">
-                <label>Image Preview:</label>
-                <img src={formData.image} alt="Product Preview" />
+                <label>Preview:</label>
+                <img src={formData.preview} alt="Preview" />
               </div>
             )}
 

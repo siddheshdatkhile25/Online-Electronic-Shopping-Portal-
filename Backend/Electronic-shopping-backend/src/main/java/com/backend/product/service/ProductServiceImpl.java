@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        product.setImages(productImages);
+        //product.setImages(productImages);
 
         return productRepository.save(product);
     }
@@ -88,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public List<Product> getProductsByCategory(Long categoryId) {
-        return productRepository.findByCategory_Id(categoryId);
+        return productRepository.findByCategoryId(categoryId);
     }
 
     

@@ -1,40 +1,37 @@
 import { useParams, useNavigate } from "react-router-dom";
-import productsData from "../../../data/ProductData.json";
+import { useEffect, useState } from "react";
+import api from "../../../api/axiosInstance";
 import "./productDetails.css";
-import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function ProductDetails() {
-  const { category, id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const selectedCategory = category.toLowerCase().replace(/s$/, "");
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const categoryMap = Object.fromEntries(
-    Object.entries(productsData).map(([key, value]) => [
-      key.toLowerCase().replace(/s$/, ""),
-      value,
-    ])
-  );
+  useEffect(() => {
+    api
+      .get(`/products/id/${id}`)
+      .then((res) => {
+        setProduct(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Product not found");
+        navigate("/");
+      });
+  }, [id, navigate]);
 
-  const productList = categoryMap[selectedCategory];
-  if (!productList) return <h2>Category not found</h2>;
-
-  const product = productList.find((p) => p.id === Number(id));
+  if (loading) return <h2>Loading...</h2>;
   if (!product) return <h2>Product not found</h2>;
-
-  const [mainImg, setMainImg] = useState(product.images[0]);
 
   const addToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-    const normalizedCategory = category.toLowerCase().replace(/s$/, "");
-
-    const alreadyExists = cart.some(
-      (item) =>
-        item.id === Number(id) &&
-        item.category.toLowerCase().replace(/s$/, "") === normalizedCategory
-    );
+    const alreadyExists = cart.some((item) => item.id === product.id);
 
     if (alreadyExists) {
       toast.info("Product already in cart!");
@@ -42,10 +39,14 @@ export default function ProductDetails() {
       return;
     }
 
-    const cartItem = { category, id: Number(id) };
-    cart.push(cartItem);
-    localStorage.setItem("cart", JSON.stringify(cart));
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      imgUrl: product.imgUrl,
+    });
 
+    localStorage.setItem("cart", JSON.stringify(cart));
     toast.success("Added to cart!");
     navigate("/cart");
   };
@@ -53,58 +54,29 @@ export default function ProductDetails() {
   return (
     <div className="pd-container">
 
-      {/* LEFT SIDE (Images) */}
+      {/* LEFT */}
       <div className="pd-left">
         <div className="pd-main-img">
-          <img src={mainImg} alt={product.name} />
-        </div>
-
-        <div className="pd-thumbnails">
-          {product.images.map((img, index) => (
-            <div
-              key={index}
-              className={`thumb ${mainImg === img ? "active" : ""}`}
-              onClick={() => setMainImg(img)}
-            >
-              <img src={img} alt="thumb" />
-            </div>
-          ))}
+          <img src={product.imgUrl} alt={product.name} />
         </div>
       </div>
 
-      {/* RIGHT SIDE (Details) */}
+      {/* RIGHT */}
       <div className="pd-right">
-        
         <h1 className="pd-title">{product.name}</h1>
 
-        <p className="pd-price">
-          ₹{product.price.toLocaleString()}
-          <span className="mrp">
-            MRP: ₹{product.mrp.toLocaleString()} <span className="discount">({product.discount})</span>
-          </span>
-        </p>
+        <p className="pd-price">₹{product.price}</p>
 
         <p className="pd-desc">{product.description}</p>
 
-        {/* Features */}
-        {product.features && (
-          <div className="pd-features">
-            <h3>Key Features</h3>
-            <ul>
-              {product.features.map((f, i) => (
-                <li key={i}>{f}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <p><strong>Brand:</strong> {product.brand}</p>
 
-        {/* Add to Cart */}
         <button className="pd-btn" onClick={addToCart}>
           🛒 Add to Cart
         </button>
 
         <p className="pd-footer">
-          Free shipping • <a href="#">Free Returns</a>
+          Free shipping • <span>Free Returns</span>
         </p>
       </div>
 

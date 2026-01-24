@@ -49,12 +49,9 @@ package-lock.json
 yarn.lock
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
 /src/main/resources/application.properties
 /.metadata/
 =======
->>>>>>> c594d102a0c2811d2979c6079d06065334b6dd56
 
 # ===============================
 # Java / JVM
@@ -136,11 +133,4 @@ node_modules/
 # Test reports
 # ===============================
 /test-output/
-<<<<<<< HEAD
-=======
-/src/main/resources/application.properties
-/.metadata/
-
-=======
 >>>>>>> cd09e11d34ead9b84af757499b3fd9bfb88bac75
->>>>>>> c594d102a0c2811d2979c6079d06065334b6dd56

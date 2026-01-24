@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,7 @@ import com.backend.user.UserDto.UserListResponseDTO;
 import com.backend.user.entites.PasswordResetOtp;
 import com.backend.user.entites.User;
 import com.backend.user.entites.UserAddress;
-import com.backend.user.service.UserService;  // ✅ MUST be this
-
+import com.backend.user.service.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +38,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private final PasswordResetOtpRepository otpRepo;
 
-    //@Autowired
-    //private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public User registerUser(RegisterUserDTO dto) {
@@ -51,6 +51,9 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setFirstname(dto.getFirstname());
         user.setLastname(dto.getLastname());
+        
+        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
         user.setPasswordHash(dto.getPassword());
@@ -65,9 +68,6 @@ public class UserServiceImpl implements UserService {
         address.setState(addressDTO.getState());
         address.setPincode(addressDTO.getPincode());
         
-        
-
-        //user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
         user.setUserRole("USER");
         user.getAddresses().add(address);
         User savedUser = userRepo.save(user); 
@@ -75,24 +75,6 @@ public class UserServiceImpl implements UserService {
         
     }
     
-    @Override
-    public LoginResponseDTO login(LoginRequestDTO dto) {
-
-        User user = userRepo.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-
-        // since security is OFF, plain password comparison
-        if (!user.getPasswordHash().equals(dto.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
-        }
-
-        return new LoginResponseDTO(
-        		user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getUserRole()
-        );
-    }
     
     @Override
     public UserDetailsResponseDTO getUserById(Integer id) {

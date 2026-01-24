@@ -15,7 +15,6 @@ public interface UserService {
 
     User registerUser(RegisterUserDTO user);
     
-    LoginResponseDTO login(LoginRequestDTO dto);
     
     UserDetailsResponseDTO getUserById(Integer id);
     

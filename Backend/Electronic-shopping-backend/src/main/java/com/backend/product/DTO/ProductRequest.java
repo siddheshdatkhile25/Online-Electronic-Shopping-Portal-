@@ -2,7 +2,6 @@ package com.backend.product.DTO;
 
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +25,7 @@ public class ProductRequest {
 	
 	private Long categoryId;
 	
-	
+	private String brand;
 	//MultipartFile is used to receive image files sent via multipart/form-data
-	private List<MultipartFile> images;
+	private MultipartFile image;
 }

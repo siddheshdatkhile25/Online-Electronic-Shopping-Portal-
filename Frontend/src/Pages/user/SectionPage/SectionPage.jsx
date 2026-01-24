@@ -1,71 +1,105 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./SectionPage.css";
-import products from "../../../data/ProductData.json";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import api from "../../../api/axiosInstance";
+import { useParams, useNavigate } from "react-router-dom";
 
+const LatestProducts = () => {
+  const { categoryId } = useParams();
+  const navigate = useNavigate();
 
-const LatestPhones = () => {
-    const navigate = useNavigate();
+  const [brands, setBrands] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState("");
 
-    const { categoryName } = useParams();
+  // Fetch brands (top)
+  useEffect(() => {
+    api
+      .get(`/products/category/${categoryId}/brands`)
+      .then((res) => {
+        setBrands(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
-    const categoryProducts = products[categoryName] || [];
+  // Fetch products by category
+  useEffect(() => {
+    api
+      .get(`/products/category/${categoryId}`)
+      .then((res) => {
+        setProducts(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  }, [categoryId]);
 
+  // Filter by brand
+  const filteredProducts = selectedBrand
+    ? products.filter((p) => p.brand === selectedBrand)
+    : products;
 
-    return (
-        <div className="latest-container">
+  return (
+    <div className="latest-container">
+     
+      <div className="latest-header">
+        <h2>Products</h2>
+      </div>
 
-            <div className="latest-header">
-                <h2>{categoryName.toUpperCase()}</h2>
-            </div>
+      
+      <div className="filter-bar">
+        <div className="filter-left">
+          <h3>Top Brands</h3>
 
-            <div className="filter-bar">
-                <div className="filter-left">
-                    <h3>Top Brands</h3>
-                    <div className="brand-filters">
-                        <button className="active">iPhones</button>
-                        <button className="active">Vivo</button>
-                        <button className="active">Samsung</button>
-                        <button className="active">Redmi</button>
-                    </div>
-                </div>
+          <div className="brand-filters">
+            <button
+              className={!selectedBrand ? "active" : ""}
+              onClick={() => setSelectedBrand("")}
+            >
+              All
+            </button>
 
-                <div className="filter-right">
-                    <select>
-                        <option>Sort By: Popular</option>
-                        <option>Price: Low to High</option>
-                        <option>Price: High to Low</option>
-                        <option>Rating</option>
-                    </select>
-                    <p>Showing {categoryProducts.length} Products</p>
-                </div>
-            </div>
-
-            <div className="product-grid">
-                {categoryProducts.map((item) => (
-                    <div className="product-box" key={item.id}>
-                        <img src={item.images[0]} alt={item.name} />
-
-                        <h4>{item.name}</h4>
-
-                        <p className="price">
-                            MRP <span>₹{item.price.toLocaleString()}</span>
-                        </p>
-
-                        <button
-                            className="view-btn"
-                            onClick={() => navigate(`/product/${item.category}/${item.id}`)}
-                        >
-                            View Details
-                        </button>
-                    </div>
-                ))}
-            </div>
-
-
+            {brands.map((brand) => (
+              <button
+                key={brand}
+                className={selectedBrand === brand ? "active" : ""}
+                onClick={() => setSelectedBrand(brand)}
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
         </div>
-    );
+
+        <div className="filter-right">
+          <p>Showing {filteredProducts.length} Products</p>
+        </div>
+      </div>
+
+     
+      <div className="product-grid">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((item) => (
+            <div className="product-box" key={item.id}>
+              <img src={item.imgUrl} alt={item.name} />
+
+              <h4>{item.name}</h4>
+
+              <p className="price">
+                ₹{item.price}
+              </p>
+
+              <button
+                className="view-btn"
+                onClick={() => navigate(`/product/${item.id}`)}
+              >
+                View Details
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>No products found</p>
+        )}
+      </div>
+    </div>
+  );
 };
 
-export default LatestPhones;
+export default LatestProducts;

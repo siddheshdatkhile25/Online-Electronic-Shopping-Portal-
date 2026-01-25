@@ -56,8 +56,31 @@ public class JwtUtil {
                 .compact();
     }
 
-    // VALIDATE TOKEN
-    public Authentication validateToken(String token) {
+//    // VALIDATE TOKEN
+//    public Authentication validateToken(String token) {
+//
+//        try {
+//            Claims claims = Jwts.parserBuilder()
+//                    .setSigningKey(signingKey)
+//                    .build()
+//                    .parseClaimsJws(token)
+//                    .getBody();
+//
+//            String username = claims.getSubject();
+//            String roles = claims.get("roles", String.class);
+//
+//            List<GrantedAuthority> authorities =
+//                    AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
+//
+//            return new UsernamePasswordAuthenticationToken(
+//                    username, null, authorities);
+//
+//        } catch (JwtException e) {
+//            return null;
+//        }
+//    }
+    
+    public String extractUsername(String token) {
 
         try {
             Claims claims = Jwts.parserBuilder()
@@ -66,17 +89,11 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String username = claims.getSubject();
-            String roles = claims.get("roles", String.class);
-
-            List<GrantedAuthority> authorities =
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
-
-            return new UsernamePasswordAuthenticationToken(
-                    username, null, authorities);
+            return claims.getSubject();
 
         } catch (JwtException e) {
             return null;
         }
     }
+
 }

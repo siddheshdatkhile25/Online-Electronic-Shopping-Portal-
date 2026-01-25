@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.category.*;
 import com.backend.category.DTO.CategoryRequest;
 import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.entity.Category;

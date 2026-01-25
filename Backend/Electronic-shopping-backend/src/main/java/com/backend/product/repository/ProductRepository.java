@@ -1,6 +1,7 @@
 package com.backend.product.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      List<Product> findByCategoryId(Long categoryId);
 
 	List<Product> findByCategory_IdAndActiveTrue(Long categoryId);
+	
+	Optional<Product> findByIdAndActiveTrue(Long productId);
 
 	List<Product> findByBrandIgnoreCaseAndActiveTrue(String brand);
 	

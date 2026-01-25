@@ -70,19 +70,31 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return CustomerProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .description(product.getDescription())
+
+                // Original price
                 .price(product.getPrice())
 
-                
-                // These fields allow customers to see discount information
-                .discountPercentage(product.getDiscountPercentage())
-                .discountedPrice(product.getDiscountedPrice())
-                
+                // Discount info
+                .discountPercentage(
+                    product.getDiscountPercentage() != null
+                        ? product.getDiscountPercentage()
+                        : 0
+                )
 
+                // Final price (never null)
+                .discountedPrice(
+                    product.getDiscountedPrice() != null
+                        ? product.getDiscountedPrice()
+                        : product.getPrice()
+                )
+
+                .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
                 .imgUrl(product.getImgUrl())
-                .description(product.getDescription())
                 .build();
     }
+
 
     @Override
     public List<String> getAllActiveBrands() {

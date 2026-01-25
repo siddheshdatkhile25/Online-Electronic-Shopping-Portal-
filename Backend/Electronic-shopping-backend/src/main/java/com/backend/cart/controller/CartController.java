@@ -1,39 +1,74 @@
 package com.backend.cart.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
-import com.backend.cart.dto.AddToCartDTO;
-import com.backend.cart.entity.Cart;
+import com.backend.cart.dto.CartDTO;
 import com.backend.cart.service.CartService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api/users/cart")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 public class CartController {
 
     private final CartService cartService;
 
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
-    }
-
+    // add to cart
     @PostMapping("/add")
-    public Cart addToCart(@RequestBody AddToCartDTO dto) {
-        return cartService.addToCart(dto);
+    public ResponseEntity<CartDTO> addToCart(
+            @RequestParam Long productId,
+            @RequestParam int quantity,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        CartDTO cartDTO = cartService.addItemToCart(
+                userDetails.getUsername(),
+                productId,
+                quantity
+        );
+        return ResponseEntity.ok(cartDTO);
     }
 
+    // get user cart
     @GetMapping
-    public Cart viewCart() {
-        return cartService.viewCart();
+    public ResponseEntity<CartDTO> getCart(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        return ResponseEntity.ok(
+                cartService.getUserCart(userDetails.getUsername())
+        );
     }
 
-    @DeleteMapping("/remove/{id}")
-    public void remove(@PathVariable Long id) {
-        cartService.removeItem(id);
+    // update quantity
+    @PutMapping("/update")
+    public ResponseEntity<CartDTO> updateQuantity(
+            @RequestParam Long cartItemId,
+            @RequestParam int quantity) {
+
+        return ResponseEntity.ok(
+                cartService.updateQuantity(cartItemId, quantity)
+        );
+    }
+
+    // remove cart
+    @DeleteMapping("/remove/{cartItemId}")
+    public ResponseEntity<String> removeItem(@PathVariable Long cartItemId) {
+
+        cartService.removeItem(cartItemId);
+        return ResponseEntity.ok("Item removed from cart");
+    }
+
+    // clear cart
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clearCart(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        cartService.clearCart(userDetails.getUsername());
+        return ResponseEntity.ok("Cart cleared");
     }
 }

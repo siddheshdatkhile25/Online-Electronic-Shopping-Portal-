@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     
     
     @Override
-    public UserDetailsResponseDTO getUserById(Integer id) {
+    public UserDetailsResponseDTO getUserById(Long id) {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public UserDetailsResponseDTO updateUser(Integer id, UpdateUserDTO dto) {
+    public UserDetailsResponseDTO updateUser(Long id, UpdateUserDTO dto) {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));

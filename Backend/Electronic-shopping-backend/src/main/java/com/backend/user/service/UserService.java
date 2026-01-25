@@ -14,10 +14,9 @@ public interface UserService {
 
     public User registerUser(RegisterUserDTO user);
     
+    UserDetailsResponseDTO getUserById(Long id);
     
-    UserDetailsResponseDTO getUserById(Integer id);
-    
-    UserDetailsResponseDTO updateUser(Integer id , UpdateUserDTO dto);
+    UserDetailsResponseDTO updateUser(Long id , UpdateUserDTO dto);
     
     Page<UserListResponseDTO> getAllUsers(int page , int size);
     

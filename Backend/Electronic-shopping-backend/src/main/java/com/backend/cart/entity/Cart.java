@@ -1,9 +1,18 @@
 package com.backend.cart.entity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.backend.user.entites.User;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -30,12 +39,15 @@ public class Cart {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long cartId;
 	
-//	@OneToOne
-//	private User user;
+	@OneToOne
+	@JoinColumn(name = "user_id", nullable = false)
+    private User user;
 	
-//	 @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-//	private List<CartItem> items = new ArrayList<>();
+	@OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
 	
-	 private Double totalAmount;
+	private LocalDateTime createdAt = LocalDateTime.now();
+	
+	private Double totalAmount;
 	
 }

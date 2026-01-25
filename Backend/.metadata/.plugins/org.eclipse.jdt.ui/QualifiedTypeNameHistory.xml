@@ -1,2 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="lombok.ToString"/>
+    <fullyQualifiedTypeName name="com.backend.user.UserDto.ResetPasswordDTO"/>
+    <fullyQualifiedTypeName name="com.backend.user.UserDto.ForgotPasswordRequestDTO"/>
+    <fullyQualifiedTypeName name="com.backend.user.entites.UserAddress"/>
+    <fullyQualifiedTypeName name="com.backend.common.service.FileUploadService"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RestController"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.PostMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.http.ResponseEntity"/>
+    <fullyQualifiedTypeName name="com.backend.order.Service.OrderService"/>
+    <fullyQualifiedTypeName name="com.backend.cart.repository.CartRepository"/>
+    <fullyQualifiedTypeName name="com.backend.cart.repository.CartItemRepository"/>
+    <fullyQualifiedTypeName name="org.springframework.stereotype.Service"/>
+    <fullyQualifiedTypeName name="lombok.RequiredArgsConstructor"/>
+    <fullyQualifiedTypeName name="com.backend.order.Repository.OrderRepository"/>
+    <fullyQualifiedTypeName name="com.backend.user.Repository.UserRepository"/>
+    <fullyQualifiedTypeName name="org.apache.catalina.security.SecurityUtil"/>
+    <fullyQualifiedTypeName name="com.backend.security.CustomUserDetailsService"/>
+    <fullyQualifiedTypeName name="com.backend.cart.entity.Cart"/>
+    <fullyQualifiedTypeName name="java.util.Optional"/>
+    <fullyQualifiedTypeName name="com.backend.user.entites.User"/>
+    <fullyQualifiedTypeName name="jakarta.persistence.OneToMany"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="jakarta.persistence.CascadeType"/>
+    <fullyQualifiedTypeName name="lombok.Getter"/>
+    <fullyQualifiedTypeName name="lombok.Setter"/>
+    <fullyQualifiedTypeName name="lombok.AllArgsConstructor"/>
+    <fullyQualifiedTypeName name="com.backend.product.entity.Product"/>
+    <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="java.lang.RuntimeException"/>
+    <fullyQualifiedTypeName name="com.backend.order.entites.Orders"/>
+    <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
+    <fullyQualifiedTypeName name="com.backend.common.Enums.OrderStatus"/>
+    <fullyQualifiedTypeName name="com.backend.cart.entity.CartItem"/>
+    <fullyQualifiedTypeName name="com.backend.order.entites.OrderItem"/>
+    <fullyQualifiedTypeName name="com.backend.order.Repository.OrderItemRepository"/>
+    <fullyQualifiedTypeName name="java.math.BigDecimal"/>
+    <fullyQualifiedTypeName name="org.springframework.stereotype.Repository"/>
+    <fullyQualifiedTypeName name="org.springframework.data.jpa.repository.JpaRepository"/>
+    <fullyQualifiedTypeName name="com.backend.order.entites.Payment"/>
+    <fullyQualifiedTypeName name="com.backend.order.Repository.PaymentRepository"/>
+    <fullyQualifiedTypeName name="java.util.Map"/>
+</qualifiedTypeNameHistroy>

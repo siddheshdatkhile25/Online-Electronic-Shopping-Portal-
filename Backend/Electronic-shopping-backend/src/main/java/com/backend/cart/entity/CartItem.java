@@ -1,5 +1,7 @@
 package com.backend.cart.entity;
 
+import com.backend.product.entity.Product;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,8 +34,8 @@ public class CartItem {
 	@ManyToOne
 	private Cart cart;
 	 
-//	@ManyToOne
-//	private Product product;
+	@ManyToOne
+	private Product product;
 	 
 	 private int quantity;
 	 

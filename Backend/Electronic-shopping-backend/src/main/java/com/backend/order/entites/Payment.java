@@ -1,5 +1,7 @@
 package com.backend.order.entites;
 
+import java.math.BigDecimal;
+
 import com.backend.common.Enums.PaymentMode;
 import com.backend.common.Enums.PaymentStatus;
 import com.backend.common.entites.BaseEntity;
@@ -24,7 +26,7 @@ public class Payment extends BaseEntity {
     private Orders order;
 
     @Column(name = "amount")
-    private Float amount;
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "mode")

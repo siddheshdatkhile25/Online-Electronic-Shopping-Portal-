@@ -1,5 +1,7 @@
 package com.backend.order.entites;
 
+import java.math.BigDecimal;
+
 import com.backend.common.entites.BaseEntity;
 import com.backend.product.entity.Product;
 
@@ -31,7 +33,7 @@ public class OrderItem extends BaseEntity {
     private Integer quantity;
 
     @Column(name = "price")
-    private Float price;
+    private BigDecimal price;
 
 
 }

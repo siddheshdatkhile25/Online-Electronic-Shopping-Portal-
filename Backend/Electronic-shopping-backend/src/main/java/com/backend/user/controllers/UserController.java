@@ -117,7 +117,7 @@ public class UserController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponse<UserDetailsResponseDTO>> getUserById(
-	        @PathVariable Integer id) {
+	        @PathVariable Long id) {
 
 	    UserDetailsResponseDTO data = userService.getUserById(id);
 
@@ -129,7 +129,7 @@ public class UserController {
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponse<UserDetailsResponseDTO>> updateUser(
-	        @PathVariable Integer id,
+	        @PathVariable Long id,
 	        @Valid @RequestBody UpdateUserDTO dto) {
 
 	    UserDetailsResponseDTO data = userService.updateUser(id, dto);
@@ -187,15 +187,6 @@ public class UserController {
 	            new ApiResponse<>("Password reset successful", null)
 	    );
 	}
-
-	
-
-	
-
-	
-	
-	
-
 
 
 }

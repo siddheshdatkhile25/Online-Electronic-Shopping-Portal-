@@ -13,13 +13,15 @@ import com.backend.category.repository.CategoryRepository;
 import com.backend.common.service.FileUploadService;
 import com.backend.product.repository.ProductRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService{
 	
 	private final CategoryRepository categoryRepository;
-	private final FileUploadService fileUploadService;
+	private final FileUploadService fileUploadServices;
 
-		 this.fileUploadService = fileUploadService;
 
 
 
@@ -30,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService{
 			throw new RuntimeException("category already exists");
 		}
 		String imgUrl=null;
-		imgUrl=fileUploadService.uploadFile(request.getImage(),"categories");
+		imgUrl=fileUploadServices.uploadFile(request.getImage(),"categories");
 		 
 		Category category=new Category();
 		category.setName(request.getName());
@@ -67,8 +69,4 @@ public class CategoryServiceImpl implements CategoryService{
 				.toList();
 				
 				}
-
-
-
-
 }

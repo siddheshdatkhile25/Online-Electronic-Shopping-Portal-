@@ -12,9 +12,9 @@ import com.backend.order.entites.OrderItem;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     // Get all items of an order
-    List<OrderItem> findByOrderId(Integer orderId);
+    List<OrderItem> findByOrderId(Long orderId);
 
     // Optional: bulk delete when order is cancelled
-    void deleteByOrderId(Integer orderId);
+    void deleteByOrderId(Long orderId);
 }
 

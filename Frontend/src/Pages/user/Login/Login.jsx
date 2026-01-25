@@ -1,31 +1,49 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const onLogin = () => {
+  const onLogin = async () => {
     if (!email || !password) {
       alert("Please fill all fields");
       return;
     }
 
-    const userData = {
-      email: email,
-      password: password
-    };
+    try {
+      setLoading(true);
 
-    // Store data in sessionStorage
-    sessionStorage.setItem("user", JSON.stringify(userData));
+      const res = await axios.post("http://localhost:8080/api/users/login", {
+        email,
+        password,
+      });
 
-    alert("Login successful!");
+      // Save JWT & role
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("email", res.data.email);
 
-    // Navigate to home page
-    navigate("/");
+      alert("Login successful!");
+
+      // Role-based redirect
+      if (res.data.role === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,7 +51,9 @@ function Login() {
       <div className="col-md-5 shadow rounded p-4 bg-white login-card">
 
         <h3 className="text-center mb-3">Welcome</h3>
-        <p className="text-center text-muted mb-4">Login with your email</p>
+        <p className="text-center text-muted mb-4">
+          Login with your email
+        </p>
 
         <div className="mb-3">
           <label className="form-label">Email</label>
@@ -63,18 +83,26 @@ function Login() {
             <label className="form-check-label">Remember me</label>
           </div>
 
-          <button className="btn btn-link p-0"
-            onClick={()=>navigate(`/forget-password`)}
-          >Forgot Password?</button>
+          <button
+            className="btn btn-link p-0"
+            onClick={() => navigate("/forget-password")}
+          >
+            Forgot Password?
+          </button>
         </div>
 
-        <button className="btn btn-dark w-100 mb-3" onClick={onLogin}>
-          Login
+        <button
+          className="btn btn-dark w-100 mb-3"
+          onClick={onLogin}
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-center text-muted">
           Or create an <Link to="/register">account</Link>
         </p>
+
       </div>
     </div>
   );

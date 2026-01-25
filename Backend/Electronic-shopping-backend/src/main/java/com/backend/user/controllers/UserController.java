@@ -74,7 +74,8 @@ public class UserController {
 		                        jwt,
 		                        user.getId(),
 		                        user.getFirstname(),
-		                        user.getLastname()
+		                        user.getLastname(),
+		                        user.getUserRole()
 		                ));
 		}
 		catch(AuthenticationException e)

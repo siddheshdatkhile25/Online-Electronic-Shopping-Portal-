@@ -22,8 +22,4 @@ public interface ProductService {
 
 	void deleteProduct(Long productId);
 
-	
-		
-		
-		
 }

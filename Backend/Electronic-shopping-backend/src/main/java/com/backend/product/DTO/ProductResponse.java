@@ -16,7 +16,14 @@ public class ProductResponse {
     private Long id;
     private String name;
     private String description;
+    
+    //Original Price
     private BigDecimal price;
+    
+    // Discount fields
+    private Double discountPercentage;
+    private BigDecimal discountedPrice;
+    
     private Integer stock;
 
     private Long categoryId;

@@ -54,8 +54,11 @@ const ManageProduct = () => {
 
   // Filtered products
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === "All" || product.categoryName === filterCategory;
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      filterCategory === "All" || product.categoryName === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -118,9 +121,26 @@ const ManageProduct = () => {
                     <td>{p.name}</td>
                     <td>{p.stock || 0}</td>
                     <td>{p.categoryName}</td>
-                    <td>₹{p.price.toLocaleString()}</td>
-                    <td>{p.discount || 0}%</td>
-                    <td>₹{p.priceAfterDiscount?.toLocaleString() || p.price}</td>
+
+                    {/* Original price */}
+                    <td>
+                      {p.discountPercentage > 0 ? (
+                        <span style={{ textDecoration: "line-through", color: "gray" }}>
+                          ₹{p.price.toLocaleString()}
+                        </span>
+                      ) : (
+                        `₹${p.price.toLocaleString()}`
+                      )}
+                    </td>
+
+                    
+                    <td>{p.discountPercentage ?? 0}%</td>
+
+                    
+                    <td>
+                      ₹{(p.discountedPrice ?? p.price).toLocaleString()}
+                    </td>
+
                     <td>
                       <button onClick={() => handleEdit(p.id)} className="btn btn-edit">
                         Edit
@@ -128,7 +148,10 @@ const ManageProduct = () => {
                       <button onClick={() => handleDelete(p.id)} className="btn btn-delete">
                         Delete
                       </button>
-                      <button onClick={() => handleApplyDiscount(p.id)} className="btn btn-discount">
+                      <button
+                        onClick={() => handleApplyDiscount(p.id)}
+                        className="btn btn-discount"
+                      >
                         Discount
                       </button>
                     </td>

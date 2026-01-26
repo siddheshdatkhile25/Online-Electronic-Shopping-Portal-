@@ -65,7 +65,25 @@ export default function ProductDetails() {
       <div className="pd-right">
         <h1 className="pd-title">{product.name}</h1>
 
-        <p className="pd-price">₹{product.price}</p>
+        
+        <p className="pd-price">
+          {product.discountPercentage > 0 ? (
+            <>
+              <span style={{ textDecoration: "line-through", color: "gray", marginRight: "10px" }}>
+                ₹{product.price}
+              </span>
+              <span style={{ color: "green", fontWeight: "bold" }}>
+                ₹{product.discountedPrice}
+              </span>
+              <span style={{ marginLeft: "10px", color: "red" }}>
+                ({product.discountPercentage}% OFF)
+              </span>
+            </>
+          ) : (
+            `₹${product.price}`
+          )}
+        </p>
+
 
         <p className="pd-desc">{product.description}</p>
 

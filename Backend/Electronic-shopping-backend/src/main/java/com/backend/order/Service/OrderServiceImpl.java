@@ -49,11 +49,6 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentRepository paymentRepository;
 	private final ProductRepository productRepository;
 
-
-    
-
-   
-	
 	@Override
 	public Object placeOrder(Long userId) {
 		

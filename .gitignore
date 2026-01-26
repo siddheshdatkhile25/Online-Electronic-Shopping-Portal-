@@ -78,3 +78,6 @@ node_modules/
 # Test reports
 # ===============================
 /test-output/
+# Eclipse workspace files
+.metadata/
+

@@ -11,6 +11,7 @@ const AddProduct = () => {
     stock: "",
     brand: "",
     description: "",
+    discountPercentage: "",
     image: null,
   });
 
@@ -20,7 +21,7 @@ const AddProduct = () => {
       .get("/admin/categories")
       .then((response) => {
         // If using ApiResponse wrapper: response.data.data
-        setCategories(response.data.data || []); 
+        setCategories(response.data.data || []);
         console.log("Categories fetched:", response.data.data);
       })
       .catch((error) => {
@@ -43,11 +44,16 @@ const AddProduct = () => {
     try {
       const formData = new FormData();
       formData.append("name", product.name);
-      formData.append("categoryId", Number(product.categoryId)); // Important: convert to number
+      formData.append("categoryId", Number(product.categoryId));
       formData.append("price", product.price);
       formData.append("stock", product.stock);
       formData.append("brand", product.brand);
       formData.append("description", product.description);
+
+      // ✅ Apply ONLY discount percentage
+      if (product.discountPercentage) {
+        formData.append("discountPercentage", product.discountPercentage);
+      }
 
       if (product.image) {
         formData.append("image", product.image);
@@ -70,6 +76,7 @@ const AddProduct = () => {
         stock: "",
         brand: "",
         description: "",
+        discountPercentage: "",
         image: null,
       });
     } catch (error) {
@@ -176,6 +183,21 @@ const AddProduct = () => {
             onChange={handleChange}
             required
           ></textarea>
+        </div>
+
+        {/* Discount Percentage */}
+        <div className="mb-3">
+          <label className="form-label">Discount Percentage (%)</label>
+          <input
+            type="number"
+            name="discountPercentage"
+            className="form-control"
+            value={product.discountPercentage}
+            onChange={handleChange}
+            placeholder="e.g. 10"
+            min="0"
+            max="100"
+          />
         </div>
 
         {/* Product Image */}

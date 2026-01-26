@@ -212,9 +212,26 @@ const ManageProduct = () => {
                     <td>{p.name}</td>
                     <td>{p.stock || 0}</td>
                     <td>{p.categoryName}</td>
-                    <td>₹{p.price.toLocaleString()}</td>
-                    <td>{p.discount || 0}%</td>
-                    <td>₹{p.priceAfterDiscount?.toLocaleString() || p.price}</td>
+
+                    {/* Original price */}
+                    <td>
+                      {p.discountPercentage > 0 ? (
+                        <span style={{ textDecoration: "line-through", color: "gray" }}>
+                          ₹{p.price.toLocaleString()}
+                        </span>
+                      ) : (
+                        `₹${p.price.toLocaleString()}`
+                      )}
+                    </td>
+
+                    
+                    <td>{p.discountPercentage ?? 0}%</td>
+
+                    
+                    <td>
+                      ₹{(p.discountedPrice ?? p.price).toLocaleString()}
+                    </td>
+
                     <td>
                       <button
                         onClick={() => handleEdit(p.id)}

@@ -28,28 +28,21 @@ export default function ProductDetails() {
   if (loading) return <h2>Loading...</h2>;
   if (!product) return <h2>Product not found</h2>;
 
-  const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const alreadyExists = cart.some((item) => item.id === product.id);
-
-    if (alreadyExists) {
-      toast.info("Product already in cart!");
-      navigate("/cart");
-      return;
-    }
-
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      imgUrl: product.imgUrl,
+  const addToCart = async () => {
+  try {
+    await api.post("/api/users/cart/add", null, {
+      params: {
+        productId: product.id,
+        quantity: 1,
+      },
     });
 
-    localStorage.setItem("cart", JSON.stringify(cart));
     toast.success("Added to cart!");
     navigate("/cart");
-  };
+  } catch {
+    toast.error("Failed to add to cart");
+  }
+};
 
   return (
     <div className="pd-container">
@@ -65,7 +58,25 @@ export default function ProductDetails() {
       <div className="pd-right">
         <h1 className="pd-title">{product.name}</h1>
 
-        <p className="pd-price">₹{product.price}</p>
+        
+        <p className="pd-price">
+          {product.discountPercentage > 0 ? (
+            <>
+              <span style={{ textDecoration: "line-through", color: "gray", marginRight: "10px" }}>
+                ₹{product.price}
+              </span>
+              <span style={{ color: "green", fontWeight: "bold" }}>
+                ₹{product.discountedPrice}
+              </span>
+              <span style={{ marginLeft: "10px", color: "red" }}>
+                ({product.discountPercentage}% OFF)
+              </span>
+            </>
+          ) : (
+            `₹${product.price}`
+          )}
+        </p>
+
 
         <p className="pd-desc">{product.description}</p>
 

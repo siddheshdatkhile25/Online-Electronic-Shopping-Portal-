@@ -9,46 +9,46 @@ import com.backend.category.DTO.CategoryRequest;
 import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.entity.Category;
 import com.backend.category.repository.CategoryRepository;
+import com.backend.common.exception.DuplicateResourceException;
 import com.backend.common.service.FileUploadService;
 import com.backend.product.repository.ProductRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService{
 	
 	private final CategoryRepository categoryRepository;
-	private final FileUploadService fileUploadServices;
+	private final FileUploadService fileUploadService;
 
 
-
+	public CategoryServiceImpl(CategoryRepository categoryRepository,FileUploadService fileUploadService) {
+		
+		this.categoryRepository = categoryRepository;
+		 this.fileUploadService = fileUploadService;
+	}
 
 	@Override
 	public CategoryResponse addCategory(CategoryRequest request) {
 		
-		if(categoryRepository.existsByName(request.getName())) {
-			throw new RuntimeException("category already exists");
-		}
-		String imgUrl=null;
-		imgUrl=fileUploadServices.uploadFile(request.getImage(),"categories");
+		if (categoryRepository.existsByName(request.getName())) {
+	        throw new DuplicateResourceException("Category already exists");
+	    }
+		
+		String imgUrl = fileUploadService.uploadFile(request.getImage(), "categories");
 		 
 		Category category=new Category();
 		category.setName(request.getName());
 		category.setImageUrl(imgUrl);
+		
 		Category savedCategory =categoryRepository.save(category);
 		return convertToResponse(savedCategory);
 		
 	}
-
-
 
 	public CategoryResponse convertToResponse(Category savedCategory) {
 		CategoryResponse res=CategoryResponse.builder()
 				.id(savedCategory.getId())
 				.name(savedCategory.getName())
 				.imageUrl(savedCategory.getImageUrl())
-				.active(true)
 				.createdAt(savedCategory.getCreatedAt())
 				.build();
 		return res;
@@ -59,13 +59,12 @@ public class CategoryServiceImpl implements CategoryService{
 	@Override
 	public List<CategoryResponse> getAllCategories() {
 
-		return categoryRepository.findByActiveTrue()
+		return categoryRepository.findAll()
 		.stream()
 		.map(Category->CategoryResponse.builder()
 				.id(Category.getId())
 				.name(Category.getName())
 				.imageUrl(Category.getImageUrl())
-				.active(true)
 				.build())
 				.toList();
 				
@@ -73,11 +72,5 @@ public class CategoryServiceImpl implements CategoryService{
 
 
 
-	@Override
-	public void deleteCategory(Long id) {
-		Category category=categoryRepository.findById(id)
-		.orElseThrow(()->new RuntimeException("category not found"));
-		category.setActive(false);
-		categoryRepository.save(category);
-	}
+
 }

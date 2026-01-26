@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Login.css";
 import { loginUser } from "../../../services/user";
 import { toast } from "react-toastify";
@@ -7,6 +8,7 @@ import { toast } from "react-toastify";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -17,6 +19,7 @@ function Login() {
     }
 
     try {
+<<<<<<< HEAD
       const response = await loginUser({
         email: email,
         password: password
@@ -54,6 +57,34 @@ if (response.userRole === "ROLE_ADMIN") {
     } catch (error) {
       console.error(error);
       toast.error("Login failed");
+=======
+      setLoading(true);
+
+      const res = await axios.post("http://localhost:8080/api/users/login", {
+        email,
+        password,
+      });
+
+      // Save JWT & role
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("email", res.data.email);
+
+      alert("Login successful!");
+
+      // Role-based redirect
+      if (res.data.role === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Invalid email or password");
+    } finally {
+      setLoading(false);
+>>>>>>> 3fd2087cf38e63001e11315a21ae19361b956526
     }
   };
 
@@ -62,7 +93,9 @@ if (response.userRole === "ROLE_ADMIN") {
       <div className="col-md-5 shadow rounded p-4 bg-white login-card">
 
         <h3 className="text-center mb-3">Welcome</h3>
-        <p className="text-center text-muted mb-4">Login with your email</p>
+        <p className="text-center text-muted mb-4">
+          Login with your email
+        </p>
 
         <div className="mb-3">
           <label className="form-label">Email</label>
@@ -100,13 +133,18 @@ if (response.userRole === "ROLE_ADMIN") {
           </button>
         </div>
 
-        <button className="btn btn-dark w-100 mb-3" onClick={onLogin}>
-          Login
+        <button
+          className="btn btn-dark w-100 mb-3"
+          onClick={onLogin}
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-center text-muted">
           Or create an <Link to="/register">account</Link>
         </p>
+
       </div>
     </div>
   );

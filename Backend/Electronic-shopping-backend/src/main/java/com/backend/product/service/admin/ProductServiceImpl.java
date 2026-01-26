@@ -1,10 +1,10 @@
 package com.backend.product.service.admin;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.category.entity.Category;
 import com.backend.category.repository.CategoryRepository;
@@ -50,6 +50,11 @@ public class ProductServiceImpl implements ProductService {
                 .active(true)
                 .build();
 
+        
+        // Apply discount percentage (if provided) and calculate discounted price
+        applyDiscount(product, request.getDiscountPercentage());
+        
+
         return convertToResponse(productRepository.save(product));
     }
 
@@ -60,9 +65,16 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
+
+                //Discount fields added to response
+                .discountPercentage(product.getDiscountPercentage())
+                .discountedPrice(product.getDiscountedPrice())
+                
+
                 .stock(product.getStock())
                 .categoryId(product.getCategory().getId())
                 .categoryName(product.getCategory().getName())
+                .brand(product.getBrand())
                 .imgUrl(product.getImgUrl())
                 .active(product.getActive())
                 .createdAt(product.getCreatedAt())
@@ -73,11 +85,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getAllProducts() {
         return productRepository.findByActiveTrue()
-               .stream()
-              .map(this::convertToResponse)
-              .toList();
-    	
-    	
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
     // Get product by ID
@@ -99,6 +109,7 @@ public class ProductServiceImpl implements ProductService {
         if (request.getDescription() != null) product.setDescription(request.getDescription());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
         if (request.getStock() != null) product.setStock(request.getStock());
+        if (request.getBrand() != null) product.setBrand(request.getBrand());
 
         // Update category if provided
         if (request.getCategoryId() != null) {
@@ -109,6 +120,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Update image if provided
         if (request.getImage() != null && !request.getImage().isEmpty()) {
+
             // Delete old image from S3
             if (product.getImgUrl() != null) {
                 fileUploadService.deleteFile(product.getImgUrl());
@@ -119,6 +131,13 @@ public class ProductServiceImpl implements ProductService {
             product.setImgUrl(url);
         }
 
+        
+        // Re-apply discount percentage during update (if provided)
+        if (request.getDiscountPercentage() != null) {
+            applyDiscount(product, request.getDiscountPercentage());
+        }
+        
+
         Product updated = productRepository.save(product);
         return convertToResponse(updated);
     }
@@ -126,10 +145,11 @@ public class ProductServiceImpl implements ProductService {
     // Soft delete product
     @Override
     public void deleteProduct(Long productId) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
 
-        //delete image from S3 when product is deleted
+        // delete image from S3 when product is deleted
         if (product.getImgUrl() != null) {
             fileUploadService.deleteFile(product.getImgUrl());
         }
@@ -138,5 +158,28 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
+  
+    // Calculates discounted price using discount percentage
+    private void applyDiscount(Product product, Double discountPercentage) {
 
+        BigDecimal price = product.getPrice();
+
+        if (discountPercentage != null && discountPercentage > 0) {
+
+            BigDecimal discount = price
+                    .multiply(BigDecimal.valueOf(discountPercentage))
+                    .divide(BigDecimal.valueOf(100));
+
+            BigDecimal discountedPrice = price.subtract(discount);
+
+            product.setDiscountPercentage(discountPercentage);
+            product.setDiscountedPrice(discountedPrice);
+
+        } else {
+            // No discount - discounted price equals original price
+            product.setDiscountPercentage(null);
+            product.setDiscountedPrice(price);
+        }
+    }
+  
 }

@@ -34,8 +34,17 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return toCustomerResponse(product);
     }
 
+    // Get all active products
+    @Override
+    public List<CustomerProductResponse> getAllActiveProducts() {
 
-    //  Filter by category
+        return productRepository.findByActiveTrue()
+                .stream()
+                .map(this::toCustomerResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Filter by category
     @Override
     public List<CustomerProductResponse> getProductsByCategory(Long categoryId) {
 
@@ -45,7 +54,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .collect(Collectors.toList());
     }
 
-    //  Filter by brand
+    // Filter by brand
     @Override
     public List<CustomerProductResponse> getProductsByBrand(String brand) {
 
@@ -55,24 +64,46 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .collect(Collectors.toList());
     }
 
-    
+    // Convert Product entity to CustomerProductResponse DTO
     public CustomerProductResponse toCustomerResponse(Product product) {
 
         return CustomerProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .description(product.getDescription())
+
+                // Original price
                 .price(product.getPrice())
+
+                // Discount info
+                .discountPercentage(
+                    product.getDiscountPercentage() != null
+                        ? product.getDiscountPercentage()
+                        : 0
+                )
+
+                // Final price (never null)
+                .discountedPrice(
+                    product.getDiscountedPrice() != null
+                        ? product.getDiscountedPrice()
+                        : product.getPrice()
+                )
+
+                .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
                 .imgUrl(product.getImgUrl())
-                .description(product.getDescription())
                 .build();
     }
-    
-	//get brands by category
-	public List<String> getBrandsByCategory(Long categoryId) {
-	    return productRepository.findBrandsByCategory(categoryId);
-	}
 
+
+    @Override
+    public List<String> getAllActiveBrands() {
+        return productRepository.findAllBrands();
+    }
+
+    @Override
+    public List<String> getBrandsByCategory(Long categoryId) {
+        return productRepository.findBrandsByCategory(categoryId);
+    }
 
 }
-

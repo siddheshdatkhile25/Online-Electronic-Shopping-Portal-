@@ -51,23 +51,24 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Optional<CartItem> existingItem = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst();
+        Optional<CartItem> existingItem =
+                cartItemRepository.findByCartAndProduct(cart, product);
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
             item.setQuantity(item.getQuantity() + quantity);
+            cartItemRepository.save(item);  
         } else {
             CartItem item = new CartItem();
             item.setCart(cart);
             item.setProduct(product);
             item.setQuantity(quantity);
             item.setPrice(product.getPrice());
+
             cart.getCartItems().add(item);
+            cartItemRepository.save(item);   
         }
 
-        cartRepository.save(cart);
         return mapToDTO(cart);
     }
 
@@ -75,8 +76,15 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDTO getUserCart(String email) {
 
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Cart cart = cartRepository.findByUserEmail(email)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+                    return cartRepository.save(newCart);
+                });
 
         return mapToDTO(cart);
     }

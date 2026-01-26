@@ -28,28 +28,21 @@ export default function ProductDetails() {
   if (loading) return <h2>Loading...</h2>;
   if (!product) return <h2>Product not found</h2>;
 
-  const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const alreadyExists = cart.some((item) => item.id === product.id);
-
-    if (alreadyExists) {
-      toast.info("Product already in cart!");
-      navigate("/cart");
-      return;
-    }
-
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      imgUrl: product.imgUrl,
+  const addToCart = async () => {
+  try {
+    await api.post("/api/users/cart/add", null, {
+      params: {
+        productId: product.id,
+        quantity: 1,
+      },
     });
 
-    localStorage.setItem("cart", JSON.stringify(cart));
     toast.success("Added to cart!");
     navigate("/cart");
-  };
+  } catch {
+    toast.error("Failed to add to cart");
+  }
+};
 
   return (
     <div className="pd-container">

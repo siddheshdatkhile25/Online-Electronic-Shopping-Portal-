@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
 		//fetch cart
 		Cart cart = cartRepository.findByUser(user).orElseThrow( () -> new RuntimeException("Cart Not Found"));
 		
-		List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+		List<CartItem> cartItems = cartItemRepository.findByCart_CartId(cart.getCartId());
 		
 		if(cartItems.isEmpty()) {
 			throw new RuntimeException("Cart has no items");
@@ -105,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
         
         
         //clear cart 
-        cartItemRepository.deleteByCartId(cart.getCartId());
+        cartItemRepository.deleteByCart_CartId(cart.getCartId());
         
         return Map.of(
         			"orderId" , savedOrder.getId(),

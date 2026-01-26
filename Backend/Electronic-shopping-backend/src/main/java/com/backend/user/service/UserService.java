@@ -28,5 +28,8 @@ public interface UserService {
 
     void resetPassword(ResetPasswordDTO dto);
 
+
+	User getUserByEmail(String username);
+
     
 }

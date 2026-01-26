@@ -1,11 +1,13 @@
 package com.backend.product.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.backend.category.entity.Category;
 import com.backend.product.entity.Product;
 
 @Repository
@@ -29,6 +31,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		    AND p.category.id = :categoryId
 		""")
 		List<String> findBrandsByCategory(Long categoryId);
+
+		Optional<Product> findByIdAndActiveTrue(Long productId);
+
+		List<Product> findByActiveTrue();
+
 
 	
     

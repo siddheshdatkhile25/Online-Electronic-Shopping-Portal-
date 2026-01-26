@@ -34,15 +34,6 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return toCustomerResponse(product);
     }
 
-    //  Get all active products
-    @Override
-    public List<CustomerProductResponse> getAllActiveProducts() {
-
-        return productRepository.findByActiveTrue()
-                .stream()
-                .map(this::toCustomerResponse)
-                .collect(Collectors.toList());
-    }
 
     //  Filter by category
     @Override
@@ -76,15 +67,12 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .description(product.getDescription())
                 .build();
     }
-
-	@Override
-	public List<String> getAllActiveBrands() {
-		return productRepository.findAllBrands();
-	}
-	
+    
+	//get brands by category
 	public List<String> getBrandsByCategory(Long categoryId) {
 	    return productRepository.findBrandsByCategory(categoryId);
 	}
+
 
 }
 

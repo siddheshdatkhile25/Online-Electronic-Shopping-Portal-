@@ -7,15 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-
 public class LoginResponseDTO {
-
-	
-
-	
-	private String token;
-	private Long id;
+    private String token;
+    private Long userId;  // Renamed from 'id' to match frontend expectation (response.userId)
     private String firstname;
     private String lastname;
-    //private String userRole;
+    private String userRole;  // Uncommented and added
 }

@@ -49,6 +49,7 @@ public class CategoryServiceImpl implements CategoryService{
 				.id(savedCategory.getId())
 				.name(savedCategory.getName())
 				.imageUrl(savedCategory.getImageUrl())
+				.active(true)
 				.createdAt(savedCategory.getCreatedAt())
 				.build();
 		return res;
@@ -59,14 +60,25 @@ public class CategoryServiceImpl implements CategoryService{
 	@Override
 	public List<CategoryResponse> getAllCategories() {
 
-		return categoryRepository.findAll()
+		return categoryRepository.findByActiveTrue()
 		.stream()
 		.map(Category->CategoryResponse.builder()
 				.id(Category.getId())
 				.name(Category.getName())
 				.imageUrl(Category.getImageUrl())
+				.active(true)
 				.build())
 				.toList();
 				
 				}
+
+
+
+	@Override
+	public void deleteCategory(Long id) {
+		Category category=categoryRepository.findById(id)
+		.orElseThrow(()->new RuntimeException("category not found"));
+		category.setActive(false);
+		categoryRepository.save(category);
+	}
 }

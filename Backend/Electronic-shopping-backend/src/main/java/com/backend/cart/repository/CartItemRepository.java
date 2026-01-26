@@ -8,9 +8,9 @@ import com.backend.cart.entity.CartItem;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 	
-	List<CartItem> findByCartId(Long cartId); 
-	
-	List<CartItem> deleteByCartId(Long cartId); 
+	void deleteByCart_CartId(Long cartId);
+
+    List<CartItem> findByCart_CartId(Long cartId);
 	
 	
 

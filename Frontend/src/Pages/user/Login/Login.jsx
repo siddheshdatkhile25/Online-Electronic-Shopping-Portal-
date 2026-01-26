@@ -12,56 +12,49 @@ function Login() {
 
   const onLogin = async () => {
     if (!email || !password) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     try {
-      const userData = {
+      const response = await loginUser({
         email: email,
         password: password
-      };
+      });
 
-      const response = await loginUser(userData);
-
-      console.log(response);
-
-      
-
-      if (response) {
-        toast.success("Login Successful");
-      } else {
-        toast.error("Invalid Credentials");
+    
+      if (!response) {
+        toast.error("Invalid credentials");
+        return;
       }
+
+      toast.success("Login Successful");
 
       const user = {
         firstname: response.firstname,
         lastname: response.lastname
       };
 
-
+      // Store in sessionStorage
+      sessionStorage.setItem("token", response.token);
       sessionStorage.setItem("role", response.userRole);
-      sessionStorage.setItem("user" , JSON.stringify(user) )
+      sessionStorage.setItem("user", JSON.stringify(user));
       sessionStorage.setItem("userId", response.userId);
 
-      if (response.data.userRole == "ADMIN") {
-        navigate("/admin/dashboard");
-      } else if (response.data.userRole == "USER") {
-        navigate("/");
-      } else {
-        toast.error("Invalid role");
-      }
+      // Role-based navigation
+if (response.userRole === "ROLE_ADMIN") {
+  navigate("/admin");
+} else if (response.userRole === "ROLE_USER") {
+  navigate("/");
+} else {
+  toast.error("Invalid role");
+}
 
-    }catch(error){
-      toast.error(error);
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Login failed");
     }
-
-
-
-
-
-    // Store data in sessionStorage
-    //sessionStorage.setItem("user", JSON.stringify(userData));
   };
 
   return (
@@ -99,9 +92,12 @@ function Login() {
             <label className="form-check-label">Remember me</label>
           </div>
 
-          <button className="btn btn-link p-0"
-            onClick={() => navigate(`/forget-password`)}
-          >Forgot Password?</button>
+          <button
+            className="btn btn-link p-0"
+            onClick={() => navigate("/forget-password")}
+          >
+            Forgot Password?
+          </button>
         </div>
 
         <button className="btn btn-dark w-100 mb-3" onClick={onLogin}>

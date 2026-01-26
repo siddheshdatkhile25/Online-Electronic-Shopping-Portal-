@@ -34,7 +34,9 @@ public class Category {
 	@Column(name = "img_url", nullable = false)
 	private String imageUrl;
 
-	
+	@Column(nullable = false)
+	private boolean active = true;
+
 	@CreationTimestamp
 	@Column(updatable=false)
 	private LocalDateTime createdAt;

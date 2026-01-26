@@ -41,10 +41,27 @@ function Navbar() {
         {/* RIGHT SECTION */}
         <div className="nav-right">
           <ul className="nav-icons">
-            <li><img src={shoppingCartIcon} alt="Cart" 
-            onClick={()=>navigate(`cart`)}
-            /></li>
-            <li><img src={wishlistIcon} alt="Wishlist" /></li>
+            <li>
+              <img
+                src={shoppingCartIcon}
+                alt="Cart"
+                // onClick={() => {
+                //   isLoggedIn ? navigate("/cart") : navigate("/login");
+                // }}
+                onClick={() => navigate("/cart")}
+              />
+            </li>
+            <li>
+              <img
+                src={wishlistIcon}
+                alt="Wishlist"
+                // onClick={() => {
+                //   isLoggedIn ? navigate("/wishlist") : navigate("/login");
+                // }}
+                onClick={() => navigate("/wishlist")}
+                style={{ cursor: "pointer" }}
+              />
+            </li>
           </ul>
 
           {/* CONDITIONAL RENDERING */}

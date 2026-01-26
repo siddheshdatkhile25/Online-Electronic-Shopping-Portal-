@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
-import { loginUser } from "../../../services/user";
-import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,50 +12,11 @@ function Login() {
 
   const onLogin = async () => {
     if (!email || !password) {
-      toast.error("Please fill all fields");
+      alert("Please fill all fields");
       return;
     }
 
     try {
-<<<<<<< HEAD
-      const response = await loginUser({
-        email: email,
-        password: password
-      });
-
-    
-      if (!response) {
-        toast.error("Invalid credentials");
-        return;
-      }
-
-      toast.success("Login Successful");
-
-      const user = {
-        firstname: response.firstname,
-        lastname: response.lastname
-      };
-
-      // Store in sessionStorage
-      sessionStorage.setItem("token", response.token);
-      sessionStorage.setItem("role", response.userRole);
-      sessionStorage.setItem("user", JSON.stringify(user));
-      sessionStorage.setItem("userId", response.userId);
-
-      // Role-based navigation
-if (response.userRole === "ROLE_ADMIN") {
-  navigate("/admin");
-} else if (response.userRole === "ROLE_USER") {
-  navigate("/");
-} else {
-  toast.error("Invalid role");
-}
-
-
-    } catch (error) {
-      console.error(error);
-      toast.error("Login failed");
-=======
       setLoading(true);
 
       const res = await axios.post("http://localhost:8080/api/users/login", {
@@ -84,7 +43,6 @@ if (response.userRole === "ROLE_ADMIN") {
       alert("Invalid email or password");
     } finally {
       setLoading(false);
->>>>>>> 3fd2087cf38e63001e11315a21ae19361b956526
     }
   };
 

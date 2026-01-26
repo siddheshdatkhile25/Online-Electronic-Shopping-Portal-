@@ -3,8 +3,10 @@ package com.backend.security;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,6 +21,10 @@ public class JwtFilter extends OncePerRequestFilter  {
 	@Autowired
     private JwtUtil jwtUtil;
 	
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+	
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, 
@@ -30,16 +36,43 @@ public class JwtFilter extends OncePerRequestFilter  {
 		String authHeader = request.getHeader("Authorization");
 		
 		// 2. Check for Bearer token
+//		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//			
+//		String token = authHeader.substring(7); // Remove "Bearer "
+//		
+//		Authentication auth = jwtUtil.validateToken(token); // 3. Validate token
+//		
+//		if (auth != null) // 4. Set authentication in SecurityContext
+//			
+//		SecurityContextHolder.getContext().setAuthentication(auth);
+//		}
+		
+		
 		if (authHeader != null && authHeader.startsWith("Bearer ")) {
-			
-		String token = authHeader.substring(7); // Remove "Bearer "
+
+            String token = authHeader.substring(7);
+            String username = jwtUtil.extractUsername(token);
+
+            if (username != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,   
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
 		
-		Authentication auth = jwtUtil.validateToken(token); // 3. Validate token
 		
-		if (auth != null) // 4. Set authentication in SecurityContext
-			
-		SecurityContextHolder.getContext().setAuthentication(auth);
-		}
+		
+	//
 		filterChain.doFilter(request, response); // 5. Continue filter chain
 		
 	}

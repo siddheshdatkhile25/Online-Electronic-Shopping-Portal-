@@ -11,9 +11,9 @@ import com.backend.order.entites.Orders;
 public interface OrderRepository extends JpaRepository<Orders, Long>{
 	
     // Get all orders of a user
-    List<Orders> findByUserIdOrderByOrderDateTimeDesc(Integer userId);
-
+    List<Orders> findByUserIdOrderByOrderDateTimeDesc(Long userId);
+    
     // Optional: get single order of a user (security-safe)
-    Orders findByIdAndUserId(Integer orderId, Integer userId);
-
+    Orders findByIdAndUserId(Long orderId, Long userId);
+    
 }

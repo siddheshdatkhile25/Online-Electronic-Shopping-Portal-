@@ -1,18 +1,16 @@
 package com.backend.cart.service;
 
-import org.springframework.stereotype.Service;
-
-import com.backend.cart.dto.AddToCartDTO;
-import com.backend.cart.entity.Cart;
-
-import jakarta.transaction.Transactional;
-
-
+import com.backend.cart.dto.CartDTO;
 
 public interface CartService {
-	
-	Cart addToCart(AddToCartDTO dto);
-    Cart viewCart();
+
+    CartDTO addItemToCart(String email, Long productId, int quantity);
+
+    CartDTO getUserCart(String email);
+
+    CartDTO updateQuantity(Long cartItemId, int quantity);
+
     void removeItem(Long cartItemId);
 
+    void clearCart(String email);
 }

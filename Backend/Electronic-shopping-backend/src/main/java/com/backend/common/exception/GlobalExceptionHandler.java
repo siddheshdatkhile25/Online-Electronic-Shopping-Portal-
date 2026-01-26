@@ -1,7 +1,5 @@
 package com.backend.common.exception;
 
-
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +18,13 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse(ex.getMessage(), false));
     }
 
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiResponse> handleDuplicate(DuplicateResourceException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiResponse(ex.getMessage(), false));
+    }
+    
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse> handleRuntime(RuntimeException ex) {
         return ResponseEntity

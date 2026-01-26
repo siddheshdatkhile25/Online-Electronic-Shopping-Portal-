@@ -14,6 +14,12 @@ public class CustomerProductResponse {
 	    private String name;
 	    private String description;
 	    private BigDecimal price;
+	    
+	    // Discount info (read-only for customer)
+	    private Double discountPercentage;
+	    private BigDecimal discountedPrice;
+	    
+	    
 	    private String categoryName;
 	    private String brand;
 	    private String imgUrl;

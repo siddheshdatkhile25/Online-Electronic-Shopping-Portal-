@@ -38,12 +38,12 @@ const LatestProducts = () => {
 
   return (
     <div className="latest-container">
-     
+
       <div className="latest-header">
         <h2>Products</h2>
       </div>
 
-      
+
       <div className="filter-bar">
         <div className="filter-left">
           <h3>Top Brands</h3>
@@ -73,7 +73,7 @@ const LatestProducts = () => {
         </div>
       </div>
 
-     
+
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
@@ -83,8 +83,16 @@ const LatestProducts = () => {
               <h4>{item.name}</h4>
 
               <p className="price">
-                ₹{item.price}
+                {item.discountPercentage > 0 ? (
+                  <>
+                    <span className="old-price">₹{item.price}</span>{" "}
+                    <span className="new-price">₹{item.discountedPrice}</span>
+                  </>
+                ) : (
+                  <span>₹{item.price}</span>
+                )}
               </p>
+
 
               <button
                 className="view-btn"

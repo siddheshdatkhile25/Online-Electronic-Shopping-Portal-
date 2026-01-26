@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Login.css";
 import { loginUser } from "../../../services/user";
 import { toast } from "react-toastify";
@@ -7,6 +8,7 @@ import { toast } from "react-toastify";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -17,51 +19,33 @@ function Login() {
     }
 
     try {
-      const userData = {
-        email: email,
-        password: password
-      };
+      setLoading(true);
 
-      const response = await loginUser(userData);
+      const res = await axios.post("http://localhost:8080/api/users/login", {
+        email,
+        password,
+      });
 
-      console.log(response);
+      // Save JWT & role
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("email", res.data.email);
 
-      
+      alert("Login successful!");
 
-      if (response) {
-        toast.success("Login Successful");
-      } else {
-        toast.error("Invalid Credentials");
-      }
-
-      const user = {
-        firstname: response.firstname,
-        lastname: response.lastname
-      };
-
-
-      sessionStorage.setItem("role", response.userRole);
-      sessionStorage.setItem("user" , JSON.stringify(user) )
-      sessionStorage.setItem("userId", response.userId);
-
-      if (response.data.userRole == "ADMIN") {
+      // Role-based redirect
+      if (res.data.role === "ADMIN") {
         navigate("/admin/dashboard");
-      } else if (response.data.userRole == "USER") {
-        navigate("/");
       } else {
-        toast.error("Invalid role");
+        navigate("/");
       }
 
-    }catch(error){
-      toast.error(error);
+    } catch (error) {
+      console.error(error);
+      alert("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
-
-
-
-
-
-    // Store data in sessionStorage
-    //sessionStorage.setItem("user", JSON.stringify(userData));
   };
 
   return (
@@ -69,7 +53,9 @@ function Login() {
       <div className="col-md-5 shadow rounded p-4 bg-white login-card">
 
         <h3 className="text-center mb-3">Welcome</h3>
-        <p className="text-center text-muted mb-4">Login with your email</p>
+        <p className="text-center text-muted mb-4">
+          Login with your email
+        </p>
 
         <div className="mb-3">
           <label className="form-label">Email</label>
@@ -99,18 +85,26 @@ function Login() {
             <label className="form-check-label">Remember me</label>
           </div>
 
-          <button className="btn btn-link p-0"
-            onClick={() => navigate(`/forget-password`)}
-          >Forgot Password?</button>
+          <button
+            className="btn btn-link p-0"
+            onClick={() => navigate("/forget-password")}
+          >
+            Forgot Password?
+          </button>
         </div>
 
-        <button className="btn btn-dark w-100 mb-3" onClick={onLogin}>
-          Login
+        <button
+          className="btn btn-dark w-100 mb-3"
+          onClick={onLogin}
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-center text-muted">
           Or create an <Link to="/register">account</Link>
         </p>
+
       </div>
     </div>
   );

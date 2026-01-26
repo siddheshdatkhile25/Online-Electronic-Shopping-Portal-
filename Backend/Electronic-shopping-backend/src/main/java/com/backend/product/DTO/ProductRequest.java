@@ -25,6 +25,9 @@ public class ProductRequest {
 	
 	private Long categoryId;
 	
+	//Product Discount
+	private Double discountPercentage;
+
 	private String brand;
 	//MultipartFile is used to receive image files sent via multipart/form-data
 	private MultipartFile image;

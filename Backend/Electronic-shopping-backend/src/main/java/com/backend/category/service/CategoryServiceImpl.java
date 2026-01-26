@@ -9,6 +9,7 @@ import com.backend.category.DTO.CategoryRequest;
 import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.entity.Category;
 import com.backend.category.repository.CategoryRepository;
+import com.backend.common.exception.DuplicateResourceException;
 import com.backend.common.service.FileUploadService;
 import com.backend.product.repository.ProductRepository;
 
@@ -22,26 +23,29 @@ public class CategoryServiceImpl implements CategoryService{
 	private final FileUploadService fileUploadServices;
 
 
-
+	public CategoryServiceImpl(CategoryRepository categoryRepository,FileUploadService fileUploadService) {
+		
+		this.categoryRepository = categoryRepository;
+		 this.fileUploadService = fileUploadService;
+	}
 
 	@Override
 	public CategoryResponse addCategory(CategoryRequest request) {
 		
-		if(categoryRepository.existsByName(request.getName())) {
-			throw new RuntimeException("category already exists");
-		}
-		String imgUrl=null;
-		imgUrl=fileUploadServices.uploadFile(request.getImage(),"categories");
+		if (categoryRepository.existsByName(request.getName())) {
+	        throw new DuplicateResourceException("Category already exists");
+	    }
+		
+		String imgUrl = fileUploadService.uploadFile(request.getImage(), "categories");
 		 
 		Category category=new Category();
 		category.setName(request.getName());
 		category.setImageUrl(imgUrl);
+		
 		Category savedCategory =categoryRepository.save(category);
 		return convertToResponse(savedCategory);
 		
 	}
-
-
 
 	public CategoryResponse convertToResponse(Category savedCategory) {
 		CategoryResponse res=CategoryResponse.builder()

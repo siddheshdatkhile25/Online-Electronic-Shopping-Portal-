@@ -67,6 +67,16 @@ public class Product extends BaseEntity{
 	private Boolean active=true;
 
 	
+	
+	// DISCOUNT (PERCENTAGE)
+
+    // e.g. 10 means 10% discount
+    @Column(name = "discount_percentage")
+    private Double discountPercentage;
+
+    // final price after applying discount percentage
+    @Column(name = "discounted_price")
+    private BigDecimal discountedPrice;
 
 	
 }

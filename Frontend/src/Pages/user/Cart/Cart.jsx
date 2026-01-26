@@ -1,119 +1,143 @@
 import "./cart.css";
-import productsData from "../../../data/ProductData.json";
 import { useEffect, useState } from "react";
+import api from "../../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Cart() {
-  const [cartProducts, setCartProducts] = useState([]);
+  const [cart, setCart] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const categoryMap = {};
-    Object.keys(productsData).forEach((key) => {
-      const normalized = key.toLowerCase().replace(/s$/, "");
-      categoryMap[normalized] = productsData[key];
-    });
-
-    const fullProducts = storedCart
-      .map((item) => {
-        const cat = item.category.toLowerCase().replace(/s$/, "");
-        const productList = categoryMap[cat];
-        return productList ? productList.find((p) => p.id === item.id) : null;
-      })
-      .filter(Boolean);
-
-    setCartProducts(fullProducts);
-  }, []);
-
-  const removeItem = (id, category) => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const updated = storedCart.filter(
-      (item) =>
-        !(
-          item.id === id &&
-          item.category.toLowerCase().replace(/s$/, "") ===
-            category.toLowerCase().replace(/s$/, "")
-        )
-    );
-
-    localStorage.setItem("cart", JSON.stringify(updated));
-
-    setCartProducts((prev) =>
-      prev.filter(
-        (item) =>
-          !(
-            item.id === id &&
-            item.category.toLowerCase().replace(/s$/, "") ===
-              category.toLowerCase().replace(/s$/, "")
-          )
-      )
-    );
+  // ================= LOAD CART =================
+  const loadCart = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/api/users/cart");
+      setCart(res.data);
+    } catch {
+      setCart({ items: [], cartTotal: 0 });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const subtotal = cartProducts.reduce((sum, item) => sum + item.price, 0);
+  useEffect(() => {
+    loadCart();
+  }, []);
+
+  // ================= REMOVE ITEM =================
+  const removeItem = async (cartItemId) => {
+    try {
+      await api.delete(`/api/users/cart/remove/${cartItemId}`);
+      toast.success("Item removed");
+      loadCart();
+    } catch {
+      toast.error("Failed to remove item");
+    }
+  };
+
+  // ================= UPDATE QUANTITY =================
+  const updateQuantity = async (cartItemId, newQty) => {
+    if (newQty < 1) return;
+
+    try {
+      await api.put("/api/users/cart/update", null, {
+        params: {
+          cartItemId,
+          quantity: newQty,
+        },
+      });
+      loadCart();
+    } catch {
+      toast.error("Failed to update quantity");
+    }
+  };
+
+  // ================= CLEAR CART =================
+  const clearCart = async () => {
+    try {
+      await api.delete("/api/users/cart/clear");
+      toast.success("Cart cleared");
+      loadCart();
+    } catch {
+      toast.error("Failed to clear cart");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="cart-container">
+        <h2>Loading cart...</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="cart-container">
-
       {/* LEFT SIDE */}
       <div className="cart-left">
         <h1 className="cart-title">Your Cart</h1>
         <p className="gray">Not ready to checkout? Continue shopping</p>
 
         <div className="cart-list">
-          {cartProducts.length === 0 ? (
+          {!cart || cart.items.length === 0 ? (
             <div className="empty-box">
               <p>Your cart is empty</p>
-              <button className="shop-btn">Start Shopping</button>
+              <button className="shop-btn" onClick={() => navigate("/")}>
+                Start Shopping
+              </button>
             </div>
           ) : (
-            cartProducts.map((item) => (
-              <div key={item.id} className="cart-card">
-
-                <img src={item.images[0]} alt={item.name} className="cart-img" />
+            cart.items.map((item) => (
+              <div key={item.cartItemId} className="cart-card">
+                <img
+                  src="https://via.placeholder.com/100"
+                  alt={item.productName}
+                  className="cart-img"
+                />
 
                 <div className="cart-details">
-                  <h3>{item.name}</h3>
-                  <p className="gray-small">Category: {item.category}</p>
-                  <p className="price">₹{item.price.toLocaleString()}</p>
+                  <h3>{item.productName}</h3>
+
+                  {/* QUANTITY CONTROLS */}
+                  <div className="qty-box">
+                    <button
+                      className="qty-btn"
+                      disabled={item.quantity === 1}
+                      onClick={() =>
+                        updateQuantity(item.cartItemId, item.quantity - 1)
+                      }
+                    >
+                      −
+                    </button>
+
+                    <span className="qty-value">{item.quantity}</span>
+
+                    <button
+                      className="qty-btn"
+                      onClick={() =>
+                        updateQuantity(item.cartItemId, item.quantity + 1)
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <p className="price">
+                    ₹{item.totalPrice.toLocaleString()}
+                  </p>
                 </div>
 
                 <button
                   className="remove-btn"
-                  onClick={() => removeItem(item.id, item.category)}
+                  onClick={() => removeItem(item.cartItemId)}
                 >
                   Remove
                 </button>
-
               </div>
             ))
           )}
-        </div>
-
-        {/* ORDER INFO */}
-        <div className="info-section">
-          <h2>Order Information</h2>
-
-          <div className="info-row">
-            <span>Return Policy</span>
-            <span>−</span>
-          </div>
-          <p className="info-desc">
-            Learn everything about our simple, customer-friendly returns.
-          </p>
-
-          <div className="info-row">
-            <span>Shipping Options</span>
-            <span>+</span>
-          </div>
-
-          <div className="info-row">
-            <span>Payment Options</span>
-            <span>+</span>
-          </div>
         </div>
       </div>
 
@@ -122,10 +146,9 @@ export default function Cart() {
         <h2>Order Summary</h2>
 
         <div className="summary-box">
-
           <div className="summary-line">
             <span>Subtotal</span>
-            <strong>₹{subtotal.toLocaleString()}</strong>
+            <strong>₹{cart.cartTotal.toLocaleString()}</strong>
           </div>
 
           <div className="summary-line">
@@ -135,12 +158,19 @@ export default function Cart() {
 
           <div className="summary-line total">
             <span>Total</span>
-            <strong>₹{subtotal.toLocaleString()}</strong>
+            <strong>₹{cart.cartTotal.toLocaleString()}</strong>
           </div>
         </div>
 
+        {cart.items.length > 0 && (
+          <button className="clear-cart-btn" onClick={clearCart}>
+            Clear Cart
+          </button>
+        )}
+
         <button
           className="checkout-btn"
+          disabled={cart.items.length === 0}
           onClick={() => navigate("/checkout")}
         >
           Continue to Checkout

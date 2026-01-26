@@ -19,6 +19,7 @@ import Payment from './pages/user/Payment/Payment'
 import ContactUs from './Pages/user/ContactUs/ContactUs'
 import Profile from './Pages/user/Profile/Profile'
 import OrderList from './Pages/user/Order/OrderList'
+import Wishlist from './pages/user/Wishlist/Wishlist';
 
 import AddProduct from './Pages/admin/AddProduct/AddProduct'
 import AddCategory from './Pages/admin/AddCategory/AddCategory'
@@ -57,12 +58,14 @@ function App() {
           <Route path='product-listing/:categoryId' element={<SectionPage />} />
           <Route path='product/:id' element={<ProductDetails />} />
           <Route path='cart' element={<Cart />} />
+          <Route path='wishlist' element={<Wishlist />} />
           <Route path='checkout' element={<Checkout />} />
           <Route path='add-address' element={<AddAddress />} />
           <Route path='payment' element={<Payment />} />
           <Route path='contact-us' element={<ContactUs />} />
           <Route path='profile' element={<Profile />} />
           <Route path='orders' element={<OrderList/>} />
+          
         </Route>
 
         {/* ADMIN ROUTES */}

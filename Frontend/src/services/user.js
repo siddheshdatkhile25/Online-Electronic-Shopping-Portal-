@@ -114,5 +114,23 @@ export const getUserProfile = async (id) => {
   }
 };
 
-
-
+export const addUserAddress = async (addressData) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const url = `${config.server}/api/users/addresses`;
+    const response = await axios.post(url, addressData, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    console.log("Add address response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Add address error:", error);
+    throw error;
+  }
+};

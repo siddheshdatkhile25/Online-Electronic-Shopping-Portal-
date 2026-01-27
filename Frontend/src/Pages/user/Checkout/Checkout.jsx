@@ -2,18 +2,35 @@ import "./checkout.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/axiosInstance";
+import { toast } from "react-toastify";
 
 export default function Checkout() {
   const [cart, setCart] = useState({ items: [], cartTotal: 0 });
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCheckoutData();
+    fetchUserId();
   }, []);
+
+  const fetchUserId = async () => {
+    try {
+      // Get userId from localStorage (set during login)
+      const storedUserId = localStorage.getItem("userId");
+      if (storedUserId) {
+        setUserId(storedUserId);
+      }
+    } catch (err) {
+      console.error("Failed to get user ID:", err);
+    }
+  };
 
   const loadCheckoutData = async () => {
     try {
@@ -40,6 +57,35 @@ export default function Checkout() {
     loadCheckoutData();
   };
 
+  const handleContinueToPayment = async () => {
+    if (!selectedAddressId || !userId) {
+      setError("Please select an address and ensure you are logged in");
+      return;
+    }
+
+    try {
+      setPlacing(true);
+      setError("");
+      const response = await api.post("/api/orders/place", {
+        addressId: selectedAddressId,
+        userId: parseInt(userId),
+      });
+      console.log("Order placed:", response.data);
+      // Save orderId to localStorage for Payment page
+      if (response.data.orderId) {
+        localStorage.setItem("orderId", response.data.orderId);
+      }
+      toast.success("Order Placed")
+      navigate("/payment");
+    } catch (err) {
+      setError("Failed to place order. Please try again.");
+      toast.error("Failed to place order. Please try again.")
+      console.error("Place order error:", err);
+    } finally {
+      setPlacing(false);
+    }
+  };
+
   if (loading) {
     return <h2 style={{ padding: "40px" }}>Loading checkout...</h2>;
   }
@@ -59,6 +105,8 @@ export default function Checkout() {
           </div>
 
           <h3 className="small-heading">Delivery Address</h3>
+
+          {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
 
           <div className="address-section">
             {addresses.map(addr => (
@@ -100,10 +148,10 @@ export default function Checkout() {
 
           <button
             className="primary-btn"
-            disabled={!selectedAddressId}
-            onClick={() => navigate("/payment")}
+            disabled={!selectedAddressId || placing}
+            onClick={handleContinueToPayment}
           >
-            Continue to Payment
+            {placing ? "Processing..." : "Continue to Payment"}
           </button>
         </div>
 

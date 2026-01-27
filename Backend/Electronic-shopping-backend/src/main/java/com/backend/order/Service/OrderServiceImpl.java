@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 import com.backend.cart.entity.Cart;
@@ -27,10 +26,8 @@ import com.backend.order.entites.OrderItem;
 import com.backend.order.entites.Orders;
 import com.backend.order.entites.Payment;
 import com.backend.payment.Repository.PaymentRepository;
-import com.backend.product.controller.customer.CustomerProductController;
 import com.backend.product.entity.Product;
 import com.backend.product.repository.ProductRepository;
-import com.backend.security.CustomUserDetailsService;
 import com.backend.user.Repository.UserAddressRepository;
 import com.backend.user.Repository.UserRepository;
 import com.backend.user.entites.User;
@@ -267,7 +264,7 @@ public class OrderServiceImpl implements OrderService {
 	        // Payment info
 
             response.setPaymentStatus(payment.getStatus());
-            response.setPaymentMode(payment.getMode());
+            response.setPaymentMode(payment.getMode() != null ? payment.getMode() : null);
             response.setTotalAmount(payment.getAmount());
 	        
 

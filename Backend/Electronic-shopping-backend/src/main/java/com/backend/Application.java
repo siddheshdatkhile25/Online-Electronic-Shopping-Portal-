@@ -6,10 +6,12 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "com.backend")
 public class Application {
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -28,7 +30,7 @@ public class Application {
 		.setMatchingStrategy(MatchingStrategies.STRICT)
 		//configure mapper - not to transfer nulls from src -> dest
 		.setPropertyCondition(Conditions.isNotNull());
-		return mapper;//Method rets configured ModelMapper bean to SC
+		return mapper; //Method rets configured ModelMapper bean to SC
 	}
 	
 

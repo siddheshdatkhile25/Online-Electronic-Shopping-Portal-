@@ -7,12 +7,28 @@ export default function Payment() {
   const [cart, setCart] = useState({ items: [], cartTotal: 0 });
   const [loading, setLoading] = useState(true);
   const [saveCard, setSaveCard] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [paying, setPaying] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCart();
+    fetchOrderId();
   }, []);
+
+  const fetchOrderId = () => {
+    try {
+      // Get orderId from localStorage (set during checkout)
+      const storedOrderId = localStorage.getItem("orderId");
+      if (storedOrderId) {
+        setOrderId(storedOrderId);
+      }
+    } catch (err) {
+      console.error("Failed to get order ID:", err);
+    }
+  };
 
   const loadCart = async () => {
     try {
@@ -20,6 +36,29 @@ export default function Payment() {
       setCart(res.data);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCOD = async () => {
+    if (!orderId) {
+      setError("Order not found. Please go back and try again.");
+      return;
+    }
+
+    try {
+      setPaying(true);
+      setError("");
+      console.log("Setting payment mode for orderId:", orderId);
+      const response = await api.put(`/api/payments/${orderId}/mode`, {
+        paymentMode: "COD",
+      });
+      console.log("Payment mode set to COD:", response.data);
+      navigate("/orders");
+    } catch (err) {
+      setError("Failed to set payment mode. Please try again.");
+      console.error("Payment error:", err.response?.data || err.message);
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -44,6 +83,10 @@ export default function Payment() {
             <span className="active-step">Payment</span>
           </div>
 
+          {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
+
+  
+
           {/* QUICK PAY */}
           <div className="card-section">
             <h3 className="section-title">Quick Pay</h3>
@@ -52,8 +95,8 @@ export default function Payment() {
               <button className="razorpay-btn" onClick={handleConfirmPayment}>
                 Pay with Razorpay
               </button>
-              <button className="upi-btn" onClick={handleConfirmPayment}>
-                Pay via UPI Apps
+              <button className="upi-btn" onClick={handleCOD}>
+                Pay Via Cash On Delivery
               </button>
             </div>
           </div>

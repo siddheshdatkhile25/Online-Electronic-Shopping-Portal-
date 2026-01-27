@@ -29,6 +29,7 @@ public class UserAddressController {
             @RequestBody UserAddressDTO dto,
             Authentication auth
     ) {
+    	System.out.println(dto);
         userService.addUserAddress(dto, auth.getName());
         return ResponseEntity.ok().build();
     }

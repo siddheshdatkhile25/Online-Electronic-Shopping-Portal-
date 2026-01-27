@@ -8,13 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.backend.user.Repository.PasswordResetOtpRepository;
 import com.backend.user.Repository.UserRepository;
-import com.backend.user.UserDto.LoginRequestDTO;
-import com.backend.user.UserDto.LoginResponseDTO;
 import com.backend.user.UserDto.RegisterUserDTO;
 import com.backend.user.UserDto.ResetPasswordDTO;
 import com.backend.user.UserDto.UpdateUserDTO;
@@ -24,7 +21,6 @@ import com.backend.user.UserDto.UserListResponseDTO;
 import com.backend.user.entites.PasswordResetOtp;
 import com.backend.user.entites.User;
 import com.backend.user.entites.UserAddress;
-import com.backend.user.service.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -137,26 +133,18 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public void forgotPassword(String email) {
-
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        String otp = String.valueOf(
-                (int)(Math.random() * 90000) + 10000
-        );
-
-        PasswordResetOtp resetOtp = new PasswordResetOtp();
-        resetOtp.setEmail(email);
-        resetOtp.setOtp(otp);
-        resetOtp.setExpiryTime(LocalDateTime.now().plusMinutes(10));
-        resetOtp.setUsed(false);
-
-        otpRepo.save(resetOtp);
-
-        // Simulate sending email
-        System.out.println("OTP for password reset: " + otp);
-    }
+        public void forgotPassword(String email) {
+                // Generate OTP and save, user variable not needed
+                String otp = String.valueOf((int)(Math.random() * 90000) + 10000);
+                PasswordResetOtp resetOtp = new PasswordResetOtp();
+                resetOtp.setEmail(email);
+                resetOtp.setOtp(otp);
+                resetOtp.setExpiryTime(LocalDateTime.now().plusMinutes(10));
+                resetOtp.setUsed(false);
+                otpRepo.save(resetOtp);
+                // Simulate sending email
+                System.out.println("OTP for password reset: " + otp);
+        }
     
     
     @Override
@@ -194,14 +182,14 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public User getUserByEmail(String email) {
-        return userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
+        @Override
+        public User getUserByEmail(String email) {
+                return userRepo.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+        }
     
     @Override
     public void addUserAddress(UserAddressDTO dto, String email) {
-
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -212,9 +200,9 @@ public class UserServiceImpl implements UserService {
         address.setDistrict(dto.getDistrict());
         address.setState(dto.getState());
         address.setPincode(dto.getPincode());
+        address.setUser(user); // Set the user reference
 
         user.getAddresses().add(address);
-
         userRepo.save(user); // cascade saves address
     }
     
@@ -243,14 +231,20 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        boolean removed = user.getAddresses()
-                .removeIf(addr -> addr.getId().equals(addressId));
-
-        if (!removed) {
-            throw new RuntimeException("Address not found");
-        }
-
-        userRepo.save(user); // orphanRemoval deletes address
+                // Remove address by id
+                List<UserAddress> addresses = user.getAddresses();
+                boolean removed = false;
+                for (int i = 0; i < addresses.size(); i++) {
+                        if (addresses.get(i).getId().equals(addressId)) {
+                                addresses.remove(i);
+                                removed = true;
+                                break;
+                        }
+                }
+                if (!removed) {
+                        throw new RuntimeException("Address not found");
+                }
+                userRepo.save(user); // orphanRemoval deletes address
     }
 
 

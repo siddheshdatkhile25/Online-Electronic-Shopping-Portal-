@@ -1,6 +1,7 @@
 import "./addAddress.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import api from "../../../api/axiosInstance";
 
 export default function AddAddress() {
   const navigate = useNavigate();
@@ -27,13 +28,24 @@ export default function AddAddress() {
     });
   };
 
-  const submitForm = () => {
-    console.log("Address Added:", form);
+  // ================= SUBMIT ADDRESS =================
+  const submitForm = async () => {
+    try {
+      const payload = {
+        addressLine1: form.address,
+        addressLine2: form.apartment || "N/A",
+        city: form.city,
+        district: form.city, // using city as district for now
+        state: form.state,
+        pincode: form.zipcode,
+      };
 
-    // Save to localStorage or backend later if needed
-    // localStorage.setItem("addresses", JSON.stringify(form));
+      await api.post("/api/users/addresses", payload);
 
-    navigate("/checkout"); // back to checkout
+      navigate("/checkout"); 
+    } catch {
+      alert("Failed to add address");
+    }
   };
 
   return (
@@ -41,7 +53,6 @@ export default function AddAddress() {
       <h1 className="address-title">Add Address</h1>
 
       <div className="form-container">
-
         <h3 className="section-title">Shipping Information</h3>
 
         <div className="two-input">

@@ -18,8 +18,7 @@ export default function ProductDetails() {
         setProduct(res.data.data);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         toast.error("Product not found");
         navigate("/");
       });
@@ -29,24 +28,31 @@ export default function ProductDetails() {
   if (!product) return <h2>Product not found</h2>;
 
   const addToCart = async () => {
-  try {
-    await api.post("/api/users/cart/add", null, {
-      params: {
-        productId: product.id,
-        quantity: 1,
-      },
-    });
+    try {
+      await api.post("/api/users/cart/add", null, {
+        params: {
+          productId: product.id,
+          quantity: 1,
+        },
+      });
+      toast.success("Added to cart!");
+      navigate("/cart");
+    } catch {
+      toast.error("Failed to add to cart");
+    }
+  };
 
-    toast.success("Added to cart!");
-    navigate("/cart");
-  } catch {
-    toast.error("Failed to add to cart");
-  }
-};
+  const addToWishlist = async () => {
+    try {
+      await api.post(`/api/users/wishlist/add/${product.id}`);
+      toast.success("Added to wishlist ❤️");
+    } catch {
+      toast.error("Failed to add to wishlist");
+    }
+  };
 
   return (
     <div className="pd-container">
-
       {/* LEFT */}
       <div className="pd-left">
         <div className="pd-main-img">
@@ -58,7 +64,6 @@ export default function ProductDetails() {
       <div className="pd-right">
         <h1 className="pd-title">{product.name}</h1>
 
-        
         <p className="pd-price">
           {product.discountPercentage > 0 ? (
             <>
@@ -77,20 +82,23 @@ export default function ProductDetails() {
           )}
         </p>
 
-
         <p className="pd-desc">{product.description}</p>
-
         <p><strong>Brand:</strong> {product.brand}</p>
 
-        <button className="pd-btn" onClick={addToCart}>
-           Add to Cart
-        </button>
+        <div className="pd-actions">
+          <button className="pd-btn pd-cart-btn" onClick={addToCart}>
+            🛒 Add to Cart
+          </button>
+
+          <button className="pd-btn pd-wishlist-btn" onClick={addToWishlist}>
+            ❤️ Add to Wishlist
+          </button>
+        </div>
 
         <p className="pd-footer">
           Free shipping • <span>Free Returns</span>
         </p>
       </div>
-
     </div>
   );
 }

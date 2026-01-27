@@ -1,69 +1,58 @@
 import "./payment.css";
 import { useEffect, useState } from "react";
-import productsData from "../../../data/ProductData.json";
+import { useNavigate } from "react-router-dom";
+import api from "../../../api/axiosInstance";
 
 export default function Payment() {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState({ items: [], cartTotal: 0 });
+  const [loading, setLoading] = useState(true);
   const [saveCard, setSaveCard] = useState(false);
 
+  const navigate = useNavigate();
+
+  // ================= LOAD CART FROM BACKEND =================
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const categoryMap = Object.fromEntries(
-      Object.entries(productsData).map(([key, value]) => [
-        key.toLowerCase().replace(/s$/, ""),
-        value,
-      ])
-    );
-
-    const fullProducts = storedCart
-      .map((item) => {
-        const cat = item.category.toLowerCase().replace(/s$/, "");
-        return categoryMap[cat]?.find((p) => p.id === item.id) || null;
-      })
-      .filter(Boolean);
-
-    setCartItems(fullProducts);
+    loadCart();
   }, []);
 
-  const subtotal = cartItems.reduce((sum, p) => sum + p.price, 0);
-
-  const handleConfirmPayment = () => {
-    // Save order to localStorage
-    const orderId = 'ORD-' + Date.now();
-    const order = {
-      id: orderId,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Processing',
-      items: cartItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        category: item.category,
-        price: item.price,
-        quantity: 1,
-        image: item.images[0]
-      })),
-      total: subtotal
-    };
-
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    existingOrders.push(order);
-    localStorage.setItem('orders', JSON.stringify(existingOrders));
-
-    // Clear cart after successful order
-    localStorage.removeItem('cart');
-
-    alert("Payment Successful! Order placed.");
-
-    // Navigate to orders page
-    window.location.href = '/orders';
+  const loadCart = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/api/users/cart");
+      setCart(res.data);
+    } catch {
+      setCart({ items: [], cartTotal: 0 });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // ================= PAYMENT HANDLER (TEMP) =================
+  const handleConfirmPayment = () => {
+    if (cart.items.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    alert("Payment successful (mock). Order placed.");
+
+    // 🔜 Next step: Razorpay success callback
+    navigate("/orders"); // or order-success page
+  };
+
+  if (loading) {
+    return (
+      <div className="payment-wrapper">
+        <h2 style={{ padding: "40px" }}>Loading payment...</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="payment-wrapper">
       <div className="payment-container">
 
-        {/* LEFT SIDE */}
+        {/* ================= LEFT SIDE ================= */}
         <div className="payment-left">
           <h1 className="payment-title">Checkout</h1>
 
@@ -73,7 +62,7 @@ export default function Payment() {
             <span className="active-step">Payment</span>
           </div>
 
-          {/* Payment Buttons */}
+          {/* QUICK PAY (UI ONLY) */}
           <div className="quick-pay">
             <button className="razorpay-btn" onClick={handleConfirmPayment}>
               Pay with Razorpay
@@ -86,6 +75,7 @@ export default function Payment() {
 
           <h3 className="form-heading">Or Pay Using Card</h3>
 
+          {/* CARD FORM (UI ONLY – DO NOT PROCESS) */}
           <div className="payment-form">
             <input className="input-field" placeholder="Cardholder Name" />
             <input className="input-field" placeholder="Card Number" />
@@ -117,18 +107,28 @@ export default function Payment() {
           </div>
         </div>
 
-        {/* RIGHT SIDE SUMMARY */}
+        {/* ================= RIGHT SIDE ================= */}
         <div className="payment-right">
           <h2>Your Cart</h2>
 
-          {cartItems.map((item) => (
-            <div key={item.id} className="cart-item-box">
-              <img src={item.images[0]} className="cart-img" />
+          {cart.items.length === 0 && (
+            <p className="gray-small">Your cart is empty</p>
+          )}
+
+          {cart.items.map((item) => (
+            <div key={item.cartItemId} className="cart-item-box">
+              <img
+                src={item.imageUrl || "https://via.placeholder.com/80"}
+                className="cart-img"
+                alt={item.productName}
+              />
 
               <div className="cart-info">
-                <h3>{item.name}</h3>
-                <p className="gray-small">Quantity: 1</p>
-                <p className="price">₹{item.price.toLocaleString()}</p>
+                <h3>{item.productName}</h3>
+                <p className="gray-small">Quantity: {item.quantity}</p>
+                <p className="price">
+                  ₹{item.totalPrice.toLocaleString()}
+                </p>
               </div>
             </div>
           ))}
@@ -136,12 +136,12 @@ export default function Payment() {
           <div className="summary-box">
             <div className="summary-line">
               <span>Subtotal</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
 
             <div className="summary-line total">
               <span>Total</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
           </div>
         </div>

@@ -1,5 +1,7 @@
 package com.backend.user.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import com.backend.user.UserDto.LoginRequestDTO;
@@ -7,6 +9,7 @@ import com.backend.user.UserDto.LoginResponseDTO;
 import com.backend.user.UserDto.RegisterUserDTO;
 import com.backend.user.UserDto.ResetPasswordDTO;
 import com.backend.user.UserDto.UpdateUserDTO;
+import com.backend.user.UserDto.UserAddressDTO;
 import com.backend.user.UserDto.UserDetailsResponseDTO;
 import com.backend.user.UserDto.UserListResponseDTO;
 import com.backend.user.entites.User;
@@ -30,6 +33,12 @@ public interface UserService {
 
 
 	User getUserByEmail(String username);
+	
+	void addUserAddress(UserAddressDTO dto, String email);
+
+    List<UserAddressDTO> getUserAddresses(String email);
+    
+    void deleteUserAddress(Long addressId, String email);
 
     
 }

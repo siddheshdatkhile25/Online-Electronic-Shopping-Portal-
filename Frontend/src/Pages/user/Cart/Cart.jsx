@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function Cart() {
-  const [cart, setCart] = useState(null);
+  const [cart, setCart] = useState({ items: [], cartTotal: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -81,7 +81,7 @@ export default function Cart() {
         <p className="gray">Not ready to checkout? Continue shopping</p>
 
         <div className="cart-list">
-          {!cart || cart.items.length === 0 ? (
+          {cart.items.length === 0 ? (
             <div className="empty-box">
               <p>Your cart is empty</p>
               <button className="shop-btn" onClick={() => navigate("/")}>
@@ -92,7 +92,7 @@ export default function Cart() {
             cart.items.map((item) => (
               <div key={item.cartItemId} className="cart-card">
                 <img
-                  src="https://via.placeholder.com/100"
+                  src={item.imageUrl || "https://via.placeholder.com/100"}
                   alt={item.productName}
                   className="cart-img"
                 />
@@ -100,27 +100,35 @@ export default function Cart() {
                 <div className="cart-details">
                   <h3>{item.productName}</h3>
 
-                  {/* QUANTITY CONTROLS */}
-                  <div className="qty-box">
-                    <button
-                      className="qty-btn"
-                      disabled={item.quantity === 1}
-                      onClick={() =>
-                        updateQuantity(item.cartItemId, item.quantity - 1)
-                      }
-                    >
-                      −
-                    </button>
+                  <div className="cart-meta">
+                    <div className="qty-box">
+                      <button
+                        className="qty-btn"
+                        disabled={item.quantity === 1}
+                        onClick={() =>
+                          updateQuantity(item.cartItemId, item.quantity - 1)
+                        }
+                      >
+                        −
+                      </button>
 
-                    <span className="qty-value">{item.quantity}</span>
+                      <span className="qty-value">{item.quantity}</span>
+
+                      <button
+                        className="qty-btn"
+                        onClick={() =>
+                          updateQuantity(item.cartItemId, item.quantity + 1)
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
 
                     <button
-                      className="qty-btn"
-                      onClick={() =>
-                        updateQuantity(item.cartItemId, item.quantity + 1)
-                      }
+                      className="remove-text-btn"
+                      onClick={() => removeItem(item.cartItemId)}
                     >
-                      +
+                      Remove
                     </button>
                   </div>
 
@@ -128,13 +136,6 @@ export default function Cart() {
                     ₹{item.totalPrice.toLocaleString()}
                   </p>
                 </div>
-
-                <button
-                  className="remove-btn"
-                  onClick={() => removeItem(item.cartItemId)}
-                >
-                  Remove
-                </button>
               </div>
             ))
           )}

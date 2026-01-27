@@ -1,6 +1,7 @@
 package com.backend.user.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -185,7 +186,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ Hash the new password before saving
         user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
         userRepo.save(user);
 
@@ -198,19 +198,60 @@ public class UserServiceImpl implements UserService {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+    
+    @Override
+    public void addUserAddress(UserAddressDTO dto, String email) {
 
-    
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    
-    
-    
+        UserAddress address = new UserAddress();
+        address.setAddressLine1(dto.getAddressLine1());
+        address.setAddressLine2(dto.getAddressLine2());
+        address.setCity(dto.getCity());
+        address.setDistrict(dto.getDistrict());
+        address.setState(dto.getState());
+        address.setPincode(dto.getPincode());
 
-    
-    
+        user.getAddresses().add(address);
 
+        userRepo.save(user); // cascade saves address
+    }
     
+    @Override
+    public List<UserAddressDTO> getUserAddresses(String email) {
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getAddresses().stream()
+                .map(addr -> new UserAddressDTO(
+                		addr.getId(),
+                        addr.getAddressLine1(),
+                        addr.getAddressLine2(),
+                        addr.getCity(),
+                        addr.getDistrict(),
+                        addr.getState(),
+                        addr.getPincode()
+                ))
+                .toList();
+    }
     
-    
+    @Override
+    public void deleteUserAddress(Long addressId, String email) {
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean removed = user.getAddresses()
+                .removeIf(addr -> addr.getId().equals(addressId));
+
+        if (!removed) {
+            throw new RuntimeException("Address not found");
+        }
+
+        userRepo.save(user); // orphanRemoval deletes address
+    }
 
 
 }

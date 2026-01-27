@@ -27,7 +27,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     public CustomerProductResponse getActiveProductById(Long productId) {
 
         Product product = productRepository
-                .findByCategory_IdAndActiveTrue(productId)
+                .findByIdAndActiveTrue(productId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 

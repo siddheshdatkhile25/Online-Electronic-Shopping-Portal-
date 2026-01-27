@@ -83,7 +83,7 @@ export default function ProductDetails() {
         <p><strong>Brand:</strong> {product.brand}</p>
 
         <button className="pd-btn" onClick={addToCart}>
-          🛒 Add to Cart
+           Add to Cart
         </button>
 
         <p className="pd-footer">

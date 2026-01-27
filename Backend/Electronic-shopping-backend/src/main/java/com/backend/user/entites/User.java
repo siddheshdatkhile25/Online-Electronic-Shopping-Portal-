@@ -31,7 +31,6 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = {"passwordHash"})
 
-//User entity itself act as the authenticated principal
 
 public class User extends BaseEntity implements UserDetails {
 

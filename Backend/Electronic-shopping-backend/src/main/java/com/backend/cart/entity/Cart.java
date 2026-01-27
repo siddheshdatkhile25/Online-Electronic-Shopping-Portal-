@@ -7,7 +7,6 @@ import java.util.List;
 import com.backend.user.entites.User;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,11 +32,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
+
 public class Cart {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "cart_id")
 	private Long cartId;
 	
 	@OneToOne

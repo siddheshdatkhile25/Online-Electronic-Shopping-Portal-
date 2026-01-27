@@ -13,5 +13,7 @@ public interface CategoryService {
 		CategoryResponse addCategory(CategoryRequest request);
 
 		List<CategoryResponse> getAllCategories();
+
+		//void deleteCategory(Long id);
 }
 

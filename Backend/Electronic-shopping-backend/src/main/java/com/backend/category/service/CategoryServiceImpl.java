@@ -13,14 +13,11 @@ import com.backend.common.exception.DuplicateResourceException;
 import com.backend.common.service.FileUploadService;
 import com.backend.product.repository.ProductRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService{
 	
 	private final CategoryRepository categoryRepository;
-	private final FileUploadService fileUploadServices;
+	private final FileUploadService fileUploadService;
 
 
 	public CategoryServiceImpl(CategoryRepository categoryRepository,FileUploadService fileUploadService) {
@@ -72,4 +69,8 @@ public class CategoryServiceImpl implements CategoryService{
 				.toList();
 				
 				}
+
+
+
+
 }

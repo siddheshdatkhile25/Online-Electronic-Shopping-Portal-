@@ -43,38 +43,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(RegisterUserDTO dto) {
-
         if (userRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
-        
+
         User user = new User();
         user.setFirstname(dto.getFirstname());
         user.setLastname(dto.getLastname());
-        
-        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        user.setPasswordHash(dto.getPassword());
-        
-        UserAddressDTO addressDTO = dto.getAddress();
-        
-        UserAddress address = new UserAddress();
-        address.setAddressLine1(addressDTO.getAddressLine1());
-        address.setAddressLine2(addressDTO.getAddressLine2());
-        address.setCity(addressDTO.getCity());
-        address.setDistrict(addressDTO.getDistrict());
-        address.setState(addressDTO.getState());
-        address.setPincode(addressDTO.getPincode());
-        
         user.setUserRole("USER");
-        user.getAddresses().add(address);
-        User savedUser = userRepo.save(user); 
-        return savedUser;
-        
+
+        // ✅ Hash password
+        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+
+        // Save addresses if present
+        if (dto.getAddress() != null) {
+            UserAddress address = new UserAddress();
+            address.setAddressLine1(dto.getAddress().getAddressLine1());
+            address.setAddressLine2(dto.getAddress().getAddressLine2());
+            address.setCity(dto.getAddress().getCity());
+            address.setDistrict(dto.getAddress().getDistrict());
+            address.setState(dto.getAddress().getState());
+            address.setPincode(dto.getAddress().getPincode());
+            user.getAddresses().add(address);
+        }
+
+        return userRepo.save(user);
     }
-    
+
     
     @Override
     public UserDetailsResponseDTO getUserById(Long id) {
@@ -188,13 +185,20 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.setPasswordHash(dto.getNewPassword()); // later encrypt
+        // ✅ Hash the new password before saving
+        user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
         userRepo.save(user);
 
         resetOtp.setUsed(true);
         otpRepo.save(resetOtp);
     }
-    
+
+
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     
 
     

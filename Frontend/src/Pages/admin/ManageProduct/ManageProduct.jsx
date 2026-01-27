@@ -1,36 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../../api/axiosInstance"; 
+import api from "../../../api/axiosInstance";
 import "./ManageProduct.css";
 import { toast } from "react-toastify";
 
 const ManageProduct = () => {
   const navigate = useNavigate();
+
+  // PRODUCTS
   const [products, setProducts] = useState([]);
+
+  // SEARCH + FILTER
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
 
-  // Fetch all active products
-  useEffect(() => {
+  // CATEGORIES FOR DELETE
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+
+  // FETCH PRODUCTS
+  const fetchProducts = () => {
     api
       .get("/admin/products")
       .then((res) => {
+        console.log("Products fetched:", res.data.data);
         setProducts(res.data.data);
       })
       .catch((err) => {
         console.error(err);
         toast.error("Failed to fetch products");
       });
+  };
+
+  // FETCH CATEGORIES
+  const fetchCategories = () => {
+    api
+      .get("/admin/categories")
+      .then((res) => {
+        console.log("Categories fetched:", res.data.data);
+        setCategoriesList(res.data.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to fetch categories");
+      });
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
   }, []);
 
-  // Delete product
+  // DELETE PRODUCT
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       api
         .delete(`/admin/products/${id}`)
         .then(() => {
-          setProducts(products.filter((p) => p.id !== id));
           toast.success("Product deleted successfully");
+          setProducts(products.filter((p) => p.id !== id));
         })
         .catch((err) => {
           console.error(err);
@@ -39,20 +67,50 @@ const ManageProduct = () => {
     }
   };
 
-  // Edit product
+  // DELETE CATEGORY
+  const handleDeleteCategory = () => {
+    if (!selectedCategoryId) {
+      toast.warning("Please select a category");
+      return;
+    }
+
+    if (
+      window.confirm(
+        "Deleting this category may affect related products. Are you sure?"
+      )
+    ) {
+      api
+        .delete(`/admin/categories/${selectedCategoryId}`)
+        .then(() => {
+          toast.success("Category deleted successfully");
+          // Update categories dropdown
+          setCategoriesList((prev) =>
+            prev.filter((c) => c.id !== Number(selectedCategoryId))
+          );
+          setSelectedCategoryId("");
+          fetchProducts(); // refresh products in case category affects them
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to delete category");
+        });
+    }
+  };
+
+  // EDIT PRODUCT
   const handleEdit = (id) => {
     navigate(`/admin/edit-product/${id}`);
   };
 
-  // Apply discount
+  // APPLY DISCOUNT
   const handleApplyDiscount = (id) => {
     navigate(`/admin/apply-discount/${id}`);
   };
 
-  // Categories for filter
-  const categories = ["All", ...new Set(products.map((p) => p.categoryName))];
+  // CATEGORY FILTER OPTIONS FOR SEARCH
+  const categoriesForFilter = ["All", ...new Set(products.map((p) => p.categoryName))];
 
-  // Filtered products
+  // FILTER PRODUCTS
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
@@ -65,9 +123,39 @@ const ManageProduct = () => {
   return (
     <div className="product-page">
       <div className="container mt-4">
-        <h2 className="page-title">Manage Products</h2>
+        {/* HEADER */}
+        <div className="page-header">
+          <h2 className="page-title">Manage Products</h2>
 
-        {/* Filters */}
+          {/* DELETE CATEGORY */}
+          <div className="delete-category-box">
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              className="category-dropdown"
+            >
+              <option value="">Select Category</option>
+              {categoriesList.length > 0 ? (
+                categoriesList.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No categories available</option>
+              )}
+            </select>
+
+            <button
+              className="btn btn-delete-category"
+              onClick={handleDeleteCategory}
+            >
+              Delete Category
+            </button>
+          </div>
+        </div>
+
+        {/* FILTERS */}
         <div className="filter-section">
           <div className="search-box">
             <input
@@ -78,25 +166,27 @@ const ManageProduct = () => {
               className="search-input"
             />
           </div>
+
           <div className="filter-box">
             <label>Category: </label>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
             >
-              {categories.map((cat) => (
+              {categoriesForFilter.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
               ))}
             </select>
           </div>
+
           <div className="stats-box">
             <span>Total Products: {filteredProducts.length}</span>
           </div>
         </div>
 
-        {/* Product Table */}
+        {/* PRODUCT TABLE */}
         <div className="table-container table-responsive">
           <table className="table table-bordered table-striped text-center align-middle">
             <thead>
@@ -111,6 +201,7 @@ const ManageProduct = () => {
                 <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((p) => (
@@ -142,10 +233,16 @@ const ManageProduct = () => {
                     </td>
 
                     <td>
-                      <button onClick={() => handleEdit(p.id)} className="btn btn-edit">
+                      <button
+                        onClick={() => handleEdit(p.id)}
+                        className="btn btn-edit"
+                      >
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(p.id)} className="btn btn-delete">
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        className="btn btn-delete"
+                      >
                         Delete
                       </button>
                       <button

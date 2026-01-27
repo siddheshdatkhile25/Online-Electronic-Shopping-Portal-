@@ -84,12 +84,10 @@ public class ProductServiceImpl implements ProductService {
     // Get all active products
     @Override
     public List<ProductResponse> getAllProducts() {
-//        return productRepository.findByActiveTrue()
-//                .stream()
-//                .map(this::convertToResponse)
-//                .toList();
-    	
-    	return null;
+        return productRepository.findByActiveTrue()
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
     // Get product by ID

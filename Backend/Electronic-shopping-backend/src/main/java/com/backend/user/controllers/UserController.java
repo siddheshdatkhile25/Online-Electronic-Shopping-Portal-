@@ -17,17 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.common.dtos.ApiResponse;
 import com.backend.security.JwtUtil;
-import com.backend.user.UserDto.ForgotPasswordRequestDTO;
 import com.backend.user.UserDto.LoginRequestDTO;
 import com.backend.user.UserDto.LoginResponseDTO;
 import com.backend.user.UserDto.RegisterUserDTO;
 import com.backend.user.UserDto.RegisterUserResponseDTO;
-import com.backend.user.UserDto.ResetPasswordDTO;
 import com.backend.user.UserDto.UpdateUserDTO;
 import com.backend.user.UserDto.UserDetailsResponseDTO;
 import com.backend.user.UserDto.UserListResponseDTO;
-import com.backend.user.UserDto.UserResponseDTO;
-import com.backend.user.UserDto.VerifyOtpDTO;
 import com.backend.user.entites.User;
 import com.backend.user.service.UserService;
 
@@ -154,39 +150,7 @@ public class UserController {
 
 	    return ResponseEntity.ok(response);
 	}
-	
-	
-	@PostMapping("/forgot-password")
-	public ResponseEntity<ApiResponse<String>> forgotPassword(
-	        @Valid @RequestBody ForgotPasswordRequestDTO dto) {
 
-	    userService.forgotPassword(dto.getEmail());
-
-	    return ResponseEntity.ok(
-	            new ApiResponse<>("OTP sent to registered email", null)
-	    );
-	}
-
-	
-	@PostMapping("/verify-otp")
-	public ResponseEntity<ApiResponse<String>> verifyOtp(
-	        @RequestBody VerifyOtpDTO dto) {
-
-	    userService.verifyOtp(dto.getEmail(), dto.getOtp());
-	    return ResponseEntity.ok(
-	            new ApiResponse<>("OTP verified successfully", null)
-	    );
-	}
-	
-	@PostMapping("/reset-password")
-	public ResponseEntity<ApiResponse<String>> resetPassword(
-	        @RequestBody ResetPasswordDTO dto) {
-
-	    userService.resetPassword(dto);
-	    return ResponseEntity.ok(
-	            new ApiResponse<>("Password reset successful", null)
-	    );
-	}
 
 
 }

@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Register.css";
+import { registerUser } from "../../../services/user";
+import { toast } from "react-toastify";
 
 const STATE_DISTRICT_MAP = {
   "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
@@ -23,6 +25,7 @@ function Register() {
   const [addrLine1, setAddrLine1] = useState("");
   const [addrLine2, setAddrLine2] = useState("");
   const [addrLine3, setAddrLine3] = useState("");
+  const [pincode, setPincode] = useState("");
   const [district, setDistrict]   = useState("");
   const [stateName, setStateName] = useState("");
 
@@ -36,34 +39,52 @@ function Register() {
     return STATE_DISTRICT_MAP[stateName] || [];
   }, [stateName]);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // minimal validation
     if (!firstName.trim() || !email.trim() || !password || !confirmPassword) {
-      alert("Please fill required fields: First name, Email and Passwords.");
+      toast.warning("Please fill required fields: First name, Email and Passwords.");
       return;
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      toast.warning("Passwords do not match.");
       return;
     }
 
     const user = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      firstname: firstName.trim(),
+      lastname: lastName.trim(),
       email: email.trim(),
+      password : password.trim(),
       phone: phone.trim(),
       address: {
-        line1: addrLine1.trim(),
-        line2: addrLine2.trim(),
-        line3: addrLine3.trim(),
-        district,
-        state: stateName
+        addressLine1: addrLine1.trim(),
+        addressLine2: addrLine2.trim(),
+        city: addrLine3.trim(),
+        district : district,
+        state: stateName,
+        pincode : pincode
       }
-    };
+    }
 
-    sessionStorage.setItem("user", JSON.stringify(user));
-    alert("Registered successfully.");
-    navigate("/login");
+    const response = await registerUser(user);
+    console.log(response);
+    
+
+    if(response){
+      toast.success('Successfully Registered !')
+
+
+      navigate('/login')
+    }else{
+      toast.error(response['error'])
+    }
+
+
+
+
+
+    sessionStorage.setItem("user", JSON.stringify(response));
+    
   };
 
   return (
@@ -156,17 +177,27 @@ function Register() {
             value={stateName}
             onChange={(e) => {
               setStateName(e.target.value);
-              setDistrict(""); 
-            }}
-          >
-            <option value="">Select State</option>
-            {Object.keys(STATE_DISTRICT_MAP).map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+                setDistrict(""); 
+              }}
+              >
+              <option value="">Select State</option>
+              {Object.keys(STATE_DISTRICT_MAP).map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+              </select>
+            </div>
+
+        <div className="row-2">
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Pincode"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+          />
         </div>
 
-        {/* Passwords */}
+            {/* Passwords */}
         <div className="row-2">
           <input
             className="form-control"

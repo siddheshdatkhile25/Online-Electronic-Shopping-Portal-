@@ -77,7 +77,9 @@ function App() {
           <Route path='edit-product/:id' element={<EditProduct />} />
           <Route path='apply-discount/:id' element={<ApplyDiscount />} />
           <Route path='view-orders' element={<CustomerOrders />} />
-        
+
+          {/* <Route path='manage-payment' element={<PaymentPage/>}/> */}
+
         </Route>
       </Routes>
     </div>

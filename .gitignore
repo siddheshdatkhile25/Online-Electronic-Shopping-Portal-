@@ -1,58 +1,3 @@
-# Java
-*.class
-*.jar
-*.war
-*.ear
-target/
-.classpath
-.project
-.settings/
-.idea/
-*.iml
-*.iws
-*.ipr
-bin/
-out/
-.gradle/
-build/
-.DS_Store
-
-# React
-node_modules/
-npm-debug.log
-yarn-error.log
-dist/
-build/
-.cache/
-.env
-.env.local
-.env.*.local
-.parcel-cache
-.parcel-cache/
-
-# IDEs
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-logs/
-*.log
-
-# Dependencies
-package-lock.json
-yarn.lock
-
-<<<<<<< HEAD
-/src/main/resources/application.properties
-/.metadata/
-=======
-
 # ===============================
 # Java / JVM
 # ===============================
@@ -133,4 +78,6 @@ node_modules/
 # Test reports
 # ===============================
 /test-output/
->>>>>>> cd09e11d34ead9b84af757499b3fd9bfb88bac75
+# Eclipse workspace files
+.metadata/
+

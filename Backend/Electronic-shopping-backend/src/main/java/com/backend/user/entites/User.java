@@ -1,5 +1,7 @@
 package com.backend.user.entites;
 
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,8 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.backend.common.entites.BaseEntity;
 
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +32,6 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = {"passwordHash"})
 
-//User entity itself act as the authenticated principal
 
 public class User extends BaseEntity implements UserDetails {
 
@@ -50,6 +55,16 @@ public class User extends BaseEntity implements UserDetails {
 
     // UserDetails METHODS
     
+
+    @OneToMany(
+    	    cascade = CascadeType.ALL,
+    	    orphanRemoval = true, //Safe deletes
+    	    fetch = FetchType.EAGER
+    	)
+    @JoinColumn(name = "user_id")
+    private List<UserAddress> addresses = new ArrayList<>();
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + userRole));
@@ -84,5 +99,6 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isAccountNonLocked() {
         return true;
     }
+
 
 }

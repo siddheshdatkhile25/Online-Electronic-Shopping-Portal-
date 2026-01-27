@@ -17,12 +17,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      // Fetch all products belonging to a specific category
      List<Product> findByCategoryId(Long categoryId);
 
-    //only available products
-    List<Product> findByActiveTrue();
-
-	Optional<Product> findByIdAndActiveTrue(Long productId);
-
 	List<Product> findByCategory_IdAndActiveTrue(Long categoryId);
+	
+	Optional<Product> findByIdAndActiveTrue(Long productId);
 
 	List<Product> findByBrandIgnoreCaseAndActiveTrue(String brand);
 	
@@ -37,6 +34,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		""")
 		List<String> findBrandsByCategory(Long categoryId);
 
+		List<Product> findByActiveTrue();
+
+		//Optional<Product> findByCategory_IdAndActiveTrue(Long categoryId);
 	
     
 }

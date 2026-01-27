@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import "./Otp.css";
+import { verifyOtp } from "../../../services/user";
 
 function OtpVerify() {
   const [otp, setOtp] = useState(["", "", "", "", ""]);
@@ -60,17 +61,29 @@ function OtpVerify() {
     }
 
     try {
-      const response = await verifyOtp(code); // backend call
-      if (response.status === "success") {
+      localStorage.setItem("verify-otp", code);
+
+      const verifyObj = {
+        email: localStorage.getItem("verify-email"),
+        otp: localStorage.getItem("verify-otp")
+      };
+
+      // ✅ correct logging
+      console.log("verify axios called", verifyObj);
+
+      const response = await verifyOtp(verifyObj); // backend call
+
+      if (response.data === "success") {
         toast.success("OTP verified");
-        // navigate where you want after success
-        navigate("/login");
+        navigate("/reset-password");
       } else {
         toast.error(response.error || "OTP verification failed");
       }
     } catch (err) {
+      console.error(err);
       toast.error("Something went wrong");
     }
+
   };
 
   return (
@@ -93,12 +106,12 @@ function OtpVerify() {
           ))}
         </div>
 
-        <div className="text-end text-muted small mb-4">
+        <div className="text-end text-muted small mb-4 flex-gap">
           Resend in {formattedTime()}
         </div>
-
+        {/* navigate(`/reset-password`) */}
         <div className="text-center">
-          <button className="btn btn-dark px-4" onClick={()=>navigate(`/reset-password`)}>
+          <button className="btn btn-dark px-4" onClick={onVerify}>
             Verify OTP
           </button>
         </div>

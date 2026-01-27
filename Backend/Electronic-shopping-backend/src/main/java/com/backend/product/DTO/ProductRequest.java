@@ -2,7 +2,6 @@ package com.backend.product.DTO;
 
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 

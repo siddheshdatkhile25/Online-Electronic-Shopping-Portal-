@@ -15,6 +15,7 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -57,7 +58,8 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(
     	    cascade = CascadeType.ALL,
-    	    orphanRemoval = true //Safe deletes
+    	    orphanRemoval = true, //Safe deletes
+    	    fetch = FetchType.EAGER
     	)
     @JoinColumn(name = "user_id")
     private List<UserAddress> addresses = new ArrayList<>();

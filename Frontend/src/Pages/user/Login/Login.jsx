@@ -28,6 +28,7 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
       localStorage.setItem("email", res.data.email);
+      localStorage.setItem("userId" , res.data.id);
 
       alert("Login successful!");
 

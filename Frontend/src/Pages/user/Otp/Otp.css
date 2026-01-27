@@ -10,6 +10,7 @@
 .otp-input {
   width: 56px;
   height: 48px;
+  margin: 0 5px;
   text-align: center;
   font-size: 20px;
   padding: 0;

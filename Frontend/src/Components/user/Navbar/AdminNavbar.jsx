@@ -18,6 +18,9 @@ function AdminNavbar() {
         <div className="nav-right">
           <ul className="nav-menu">
             <li className="nav-item">
+             <Link className="nav-link active" aria-current="page" to='/admin'>Dashboard</Link>
+            </li>
+            <li className="nav-item">
              <Link className="nav-link active" aria-current="page" to='/admin/add-category'>Add Category</Link>
             </li>
             <li className="nav-item">

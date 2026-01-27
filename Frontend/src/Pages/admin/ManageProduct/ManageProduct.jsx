@@ -232,8 +232,9 @@ const ManageProduct = () => {
                       ₹{(p.discountedPrice ?? p.price).toLocaleString()}
                     </td>
 
-                    <td>
-                      <button
+                    <td >
+                     <div className="action-button">
+                         <button
                         onClick={() => handleEdit(p.id)}
                         className="btn btn-edit"
                       >
@@ -245,12 +246,13 @@ const ManageProduct = () => {
                       >
                         Delete
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => handleApplyDiscount(p.id)}
                         className="btn btn-discount"
                       >
                         Discount
-                      </button>
+                      </button> */}
+                     </div>
                     </td>
                   </tr>
                 ))

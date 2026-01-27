@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
-  const isLoggedIn = sessionStorage.getItem("user") !== null;
+  const isLoggedIn = localStorage.getItem("token") !== null;
 
   // Dropdown toggle state
   const [openMenu, setOpenMenu] = useState(false);
@@ -55,7 +55,7 @@ function Navbar() {
             >
               <div className="profile-circle">
                 {/* Optional: Add user initial */}
-                {JSON.parse(sessionStorage.getItem("user"))?.firstname
+                {localStorage.getItem("email")
                   ?.charAt(0)
                   .toUpperCase()}
 

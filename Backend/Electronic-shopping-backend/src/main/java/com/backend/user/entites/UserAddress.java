@@ -17,9 +17,6 @@ import lombok.Setter;
 @AttributeOverride(name = "id", column = @Column(name = "address_id"))
 public class UserAddress extends BaseEntity {
 
-    
-
-    
 
     // Line 1: Room no, Floor, Building
     @Column(name = "address_line_1", nullable = false, length = 150)

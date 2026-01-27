@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(dto.getPhone());
         user.setUserRole("USER");
 
-        // ✅ Hash password
+        
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
 
         // Save addresses if present
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
                 user.getLastname(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getUserRole()
+                user.getAddresses()
         );
     }
     
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
                 updatedUser.getLastname(),
                 updatedUser.getEmail(),
                 updatedUser.getPhone(),
-                updatedUser.getUserRole()
+                updatedUser.getAddresses()
         );
     }
     

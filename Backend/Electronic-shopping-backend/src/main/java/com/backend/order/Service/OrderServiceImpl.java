@@ -102,10 +102,10 @@ public class OrderServiceImpl implements OrderService {
 			orderItem.setOrder(savedOrder);
 			orderItem.setProduct(cartItem.getProduct());
 			orderItem.setQuantity(cartItem.getQuantity());
-			orderItem.setPrice(cartItem.getProduct().getPrice());
+			orderItem.setPrice(cartItem.getProduct().getDiscountedPrice());
 			
 			totalAmount = totalAmount.add(
-					cartItem.getProduct().getPrice()
+					cartItem.getProduct().getDiscountedPrice()
 					.multiply(BigDecimal.valueOf(cartItem.getQuantity()))
 			);
 			
@@ -143,8 +143,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
     public List<MyOrderResponse> getMyOrders(Long userId) {
 
-        //Get logged-in user from JWT
-        //Long userId = SecurityUtil.getCurrentUserId();
+        
 
         // Fetch orders
         List<Orders> orders =
@@ -153,9 +152,9 @@ public class OrderServiceImpl implements OrderService {
         // Map to response DTO
         return orders.stream().map(order -> {
 
-            Payment payment = paymentRepository
-                    .findByOrderId(order.getId())
-                    .orElseThrow(() -> new RuntimeException("Payment not found"));
+//            Payment payment = paymentRepository
+//                    .findByOrderId(order.getId())
+//                    .orElseThrow(() -> new RuntimeException("Payment not found"));
             
          // Order Items
             List<OrderItem> orderItems =
@@ -176,8 +175,8 @@ public class OrderServiceImpl implements OrderService {
             response.setOrderId(order.getId());
             response.setOrderDateTime(order.getOrderDateTime());
             response.setOrderStatus(order.getStatus());
-            response.setPaymentStatus(payment.getStatus());
-            response.setAmount(payment.getAmount());
+            //response.setPaymentStatus(payment.getStatus());
+            //response.setAmount(payment.getAmount());
             response.setItems(itemResponses);
             
             

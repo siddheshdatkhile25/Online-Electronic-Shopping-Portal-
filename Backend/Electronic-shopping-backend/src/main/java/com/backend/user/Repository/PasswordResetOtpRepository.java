@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.backend.user.entites.PasswordResetOtp;
 
 public interface PasswordResetOtpRepository extends JpaRepository<PasswordResetOtp , Integer>{
-	Optional<PasswordResetOtp> findByEmailAndOtpAndUsedFalse(
+	Optional<PasswordResetOtp> findByEmailAndOtpAndUsedTrue(
             String email, String otp);
+	
+	Optional<PasswordResetOtp> findByEmailAndOtpAndUsedFalse(String email, String otp);
 }

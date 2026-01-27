@@ -97,9 +97,9 @@
 }
 
 /* Action Buttons */
-.action-buttons {
+.action-button {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
 }

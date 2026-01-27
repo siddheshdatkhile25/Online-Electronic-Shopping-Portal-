@@ -11,7 +11,6 @@ export default function Checkout() {
 
   const navigate = useNavigate();
 
-  // ================= LOAD CART + ADDRESSES =================
   useEffect(() => {
     loadCheckoutData();
   }, []);
@@ -19,83 +18,60 @@ export default function Checkout() {
   const loadCheckoutData = async () => {
     try {
       setLoading(true);
-
       const [cartRes, addressRes] = await Promise.all([
         api.get("/api/users/cart"),
         api.get("/api/users/addresses"),
       ]);
-
       setCart(cartRes.data);
       setAddresses(addressRes.data);
-    } catch {
-      setCart({ items: [], cartTotal: 0 });
-      setAddresses([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // ================= REMOVE CART ITEM =================
-  const removeItem = async (cartItemId) => {
-    try {
-      await api.delete(`/api/users/cart/remove/${cartItemId}`);
-      loadCheckoutData();
-    } catch {
-      alert("Failed to remove item");
-    }
+  const removeItem = async (id) => {
+    await api.delete(`/api/users/cart/remove/${id}`);
+    loadCheckoutData();
   };
 
-  // ================= REMOVE ADDRESS =================
-  const removeAddress = async (addressId) => {
-    try {
-      await api.delete(`/api/users/addresses/${addressId}`);
-      if (selectedAddressId === addressId) {
-        setSelectedAddressId(null);
-      }
-      loadCheckoutData();
-    } catch {
-      alert("Failed to remove address");
-    }
+  const removeAddress = async (id) => {
+    await api.delete(`/api/users/addresses/${id}`);
+    if (selectedAddressId === id) setSelectedAddressId(null);
+    loadCheckoutData();
   };
 
   if (loading) {
-    return (
-      <div className="checkout-wrapper">
-        <h2 style={{ padding: "40px" }}>Loading checkout...</h2>
-      </div>
-    );
+    return <h2 style={{ padding: "40px" }}>Loading checkout...</h2>;
   }
 
   return (
     <div className="checkout-wrapper">
       <div className="checkout-container">
 
-        {/* ================= LEFT SIDE ================= */}
+        {/* LEFT */}
         <div className="checkout-left">
           <h1 className="page-title">Checkout</h1>
 
           <div className="steps">
             <span className="active-step">Address</span>
-            <span className="divider">/</span>
+            <span className="divider">›</span>
             <span className="step">Payment</span>
           </div>
 
-          <h3 className="small-heading">Select Address</h3>
+          <h3 className="small-heading">Delivery Address</h3>
 
           <div className="address-section">
-            {addresses.length === 0 && (
-              <p className="gray-small">No address found. Please add one.</p>
-            )}
-
-            {addresses.map((addr) => (
+            {addresses.map(addr => (
               <div
                 key={addr.id}
                 className={`address-card ${
                   selectedAddressId === addr.id ? "address-active" : ""
                 }`}
+                onClick={() => setSelectedAddressId(addr.id)}
               >
-                <div onClick={() => setSelectedAddressId(addr.id)}>
-                  <p className="addr-name">Delivery Address</p>
+                <div className="address-radio" />
+                <div className="address-content">
+                  <p className="addr-name">Home</p>
                   <p className="addr-text">
                     {addr.addressLine1}, {addr.addressLine2}, {addr.city},{" "}
                     {addr.state} - {addr.pincode}
@@ -104,7 +80,10 @@ export default function Checkout() {
 
                 <button
                   className="remove-address-btn"
-                  onClick={() => removeAddress(addr.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeAddress(addr.id);
+                  }}
                 >
                   Remove
                 </button>
@@ -119,12 +98,6 @@ export default function Checkout() {
             </button>
           </div>
 
-          <div className="save-info-row">
-            <label>
-              <input type="checkbox" /> Save contact information
-            </label>
-          </div>
-
           <button
             className="primary-btn"
             disabled={!selectedAddressId}
@@ -134,39 +107,27 @@ export default function Checkout() {
           </button>
         </div>
 
-        {/* ================= RIGHT SIDE ================= */}
+        {/* RIGHT */}
         <div className="checkout-right">
-          <h2>Your Cart</h2>
+          <h2>Your Order</h2>
 
-          {cart.items.length === 0 && (
-            <p className="gray-small">Your cart is empty</p>
-          )}
-
-          {cart.items.map((item) => (
+          {cart.items.map(item => (
             <div key={item.cartItemId} className="cart-item-box">
-              <img
-                src={item.imageUrl || "https://via.placeholder.com/80"}
-                alt={item.productName}
-                className="cart-img"
-              />
+              <img src={item.imageUrl} alt={item.productName} />
 
               <div className="cart-info">
-                <h3>{item.productName}</h3>
+                <h4>{item.productName}</h4>
+                <p className="gray-small">Qty: {item.quantity}</p>
+              </div>
 
-                <div className="cart-meta">
-                  <p className="gray-small">Quantity: {item.quantity}</p>
-
-                  <button
-                    className="remove-btn"
-                    onClick={() => removeItem(item.cartItemId)}
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <p className="price">
-                  ₹{item.totalPrice.toLocaleString()}
-                </p>
+              <div className="cart-price">
+                ₹{item.totalPrice.toLocaleString()}
+                <button
+                  className="remove-btn"
+                  onClick={() => removeItem(item.cartItemId)}
+                >
+                  Remove
+                </button>
               </div>
             </div>
           ))}
@@ -176,7 +137,6 @@ export default function Checkout() {
               <span>Subtotal</span>
               <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
-
             <div className="summary-line total">
               <span>Total</span>
               <strong>₹{cart.cartTotal.toLocaleString()}</strong>

@@ -80,7 +80,7 @@ export default function Payment() {
             </button>
 
             <button className="upi-btn" onClick={handleConfirmPayment}>
-              Pay via UPI Apps
+              Cash On Delivery
             </button>
           </div>
 

@@ -36,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // Fetch payment
-        Payment payment = paymentRepository.findByOrderId(orderId)
+        Payment payment = paymentRepository.findByOrder_Id(orderId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
         // Set payment mode

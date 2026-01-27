@@ -35,6 +35,9 @@ public class Orders extends BaseEntity{
     @Column(name = "status")
     private OrderStatus status;
     
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_address_id")
+    private OrderAddress deliveryAddress;
 
 //    @ManyToOne
 //    @JoinColumn(name = "payment_id")

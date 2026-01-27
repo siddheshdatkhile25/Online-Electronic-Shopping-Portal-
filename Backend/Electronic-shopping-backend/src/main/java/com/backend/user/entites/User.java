@@ -57,11 +57,11 @@ public class User extends BaseEntity implements UserDetails {
     
 
     @OneToMany(
+    		mappedBy = "user",
     	    cascade = CascadeType.ALL,
     	    orphanRemoval = true, //Safe deletes
-    	    fetch = FetchType.EAGER
+    	    fetch = FetchType.LAZY
     	)
-    @JoinColumn(name = "user_id")
     private List<UserAddress> addresses = new ArrayList<>();
 
 

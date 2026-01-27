@@ -9,6 +9,6 @@ import com.backend.order.entites.Payment;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-	Optional<Payment> findByOrderId(Long orderId);
+	Optional<Payment> findByOrder_Id(Long orderId);
 	
 }

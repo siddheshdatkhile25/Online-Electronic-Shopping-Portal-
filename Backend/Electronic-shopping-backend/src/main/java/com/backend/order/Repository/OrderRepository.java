@@ -13,6 +13,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long>{
     // Get all orders of a user
     List<Orders> findByUserIdOrderByOrderDateTimeDesc(Long userId);
     
+    List<Orders> findAllByOrderByOrderDateTimeDesc();
+    
     // Optional: get single order of a user (security-safe)
     Orders findByIdAndUserId(Long orderId, Long userId);
     

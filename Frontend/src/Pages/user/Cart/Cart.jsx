@@ -12,7 +12,6 @@ export default function Cart() {
   // ================= LOAD CART =================
   const loadCart = async () => {
     try {
-      setLoading(true);
       const res = await api.get("/api/users/cart");
       setCart(res.data);
     } catch {
@@ -26,27 +25,11 @@ export default function Cart() {
     loadCart();
   }, []);
 
-  // ================= REMOVE ITEM =================
-  const removeItem = async (cartItemId) => {
-    try {
-      await api.delete(`/api/users/cart/remove/${cartItemId}`);
-      toast.success("Item removed");
-      loadCart();
-    } catch {
-      toast.error("Failed to remove item");
-    }
-  };
-
-  // ================= UPDATE QUANTITY =================
-  const updateQuantity = async (cartItemId, newQty) => {
-    if (newQty < 1) return;
-
+  const updateQuantity = async (cartItemId, qty) => {
+    if (qty < 1) return;
     try {
       await api.put("/api/users/cart/update", null, {
-        params: {
-          cartItemId,
-          quantity: newQty,
-        },
+        params: { cartItemId, quantity: qty },
       });
       loadCart();
     } catch {
@@ -54,124 +37,112 @@ export default function Cart() {
     }
   };
 
-  // ================= CLEAR CART =================
-  const clearCart = async () => {
-    try {
-      await api.delete("/api/users/cart/clear");
-      toast.success("Cart cleared");
-      loadCart();
-    } catch {
-      toast.error("Failed to clear cart");
-    }
+  const removeItem = async (id) => {
+    await api.delete(`/api/users/cart/remove/${id}`);
+    toast.success("Item removed");
+    loadCart();
   };
 
-  if (loading) {
-    return (
-      <div className="cart-container">
-        <h2>Loading cart...</h2>
-      </div>
-    );
-  }
+  const clearCart = async () => {
+    await api.delete("/api/users/cart/clear");
+    toast.success("Cart cleared");
+    loadCart();
+  };
+
+  if (loading) return <h2 style={{ padding: 40 }}>Loading...</h2>;
 
   return (
     <div className="cart-container">
-      {/* LEFT SIDE */}
+      {/* LEFT */}
       <div className="cart-left">
         <h1 className="cart-title">Your Cart</h1>
         <p className="gray">Not ready to checkout? Continue shopping</p>
 
-        <div className="cart-list">
-          {cart.items.length === 0 ? (
-            <div className="empty-box">
-              <p>Your cart is empty</p>
-              <button className="shop-btn" onClick={() => navigate("/")}>
-                Start Shopping
-              </button>
-            </div>
-          ) : (
-            cart.items.map((item) => (
-              <div key={item.cartItemId} className="cart-card">
+        {cart.items.length === 0 ? (
+          <div className="empty-box">
+            <p>Your cart is empty</p>
+            <button className="shop-btn" onClick={() => navigate("/")}>
+              Start Shopping
+            </button>
+          </div>
+        ) : (
+          <div className="cart-list">
+            {cart.items.map((item) => (
+              <div className="cart-card" key={item.cartItemId}>
+                {/* IMAGE */}
                 <img
-                  src={item.imageUrl || "https://via.placeholder.com/100"}
+                  src={item.imageUrl}
                   alt={item.productName}
                   className="cart-img"
                 />
 
-                <div className="cart-details">
+                {/* DETAILS */}
+                <div className="cart-middle">
                   <h3>{item.productName}</h3>
 
-                  <div className="cart-meta">
-                    <div className="qty-box">
-                      <button
-                        className="qty-btn"
-                        disabled={item.quantity === 1}
-                        onClick={() =>
-                          updateQuantity(item.cartItemId, item.quantity - 1)
-                        }
-                      >
-                        −
-                      </button>
-
-                      <span className="qty-value">{item.quantity}</span>
-
-                      <button
-                        className="qty-btn"
-                        onClick={() =>
-                          updateQuantity(item.cartItemId, item.quantity + 1)
-                        }
-                      >
-                        +
-                      </button>
-                    </div>
-
+                  <div className="qty-box">
                     <button
-                      className="remove-text-btn"
-                      onClick={() => removeItem(item.cartItemId)}
+                      disabled={item.quantity === 1}
+                      onClick={() =>
+                        updateQuantity(item.cartItemId, item.quantity - 1)
+                      }
                     >
-                      Remove
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() =>
+                        updateQuantity(item.cartItemId, item.quantity + 1)
+                      }
+                    >
+                      +
                     </button>
                   </div>
+                </div>
 
+                {/* PRICE + REMOVE */}
+                <div className="cart-right-info">
                   <p className="price">
                     ₹{item.totalPrice.toLocaleString()}
                   </p>
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeItem(item.cartItemId)}
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* RIGHT SIDE */}
-      <div className="cart-right">
+      {/* RIGHT */}
+      <div className="cart-summary">
         <h2>Order Summary</h2>
 
-        <div className="summary-box">
-          <div className="summary-line">
-            <span>Subtotal</span>
-            <strong>₹{cart.cartTotal.toLocaleString()}</strong>
-          </div>
-
-          <div className="summary-line">
-            <span>Shipping</span>
-            <span className="gray-small">Calculated at next step</span>
-          </div>
-
-          <div className="summary-line total">
-            <span>Total</span>
-            <strong>₹{cart.cartTotal.toLocaleString()}</strong>
-          </div>
+        <div className="summary-line">
+          <span>Subtotal</span>
+          <strong>₹{cart.cartTotal.toLocaleString()}</strong>
         </div>
 
-        {cart.items.length > 0 && (
-          <button className="clear-cart-btn" onClick={clearCart}>
-            Clear Cart
-          </button>
-        )}
+        <div className="summary-line">
+          <span>Shipping</span>
+          <span className="gray-small">Calculated at next step</span>
+        </div>
+
+        <div className="summary-line total">
+          <span>Total</span>
+          <strong>₹{cart.cartTotal.toLocaleString()}</strong>
+        </div>
+
+        <button className="clear-btn" onClick={clearCart}>
+          Clear Cart
+        </button>
 
         <button
           className="checkout-btn"
-          disabled={cart.items.length === 0}
           onClick={() => navigate("/checkout")}
         >
           Continue to Checkout

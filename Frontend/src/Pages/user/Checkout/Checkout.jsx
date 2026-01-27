@@ -1,63 +1,79 @@
 import "./checkout.css";
 import { useEffect, useState } from "react";
-import productsData from "../../../data/ProductData.json";
-import addressData from "../../../data/AddressData.json";
 import { useNavigate } from "react-router-dom";
+import api from "../../../api/axiosInstance";
 
 export default function Checkout() {
-  const [cartItems, setCartItems] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [cart, setCart] = useState({ items: [], cartTotal: 0 });
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
-  const addressList = addressData.addresses;
-
+  // ================= LOAD CART + ADDRESSES =================
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const categoryMap = Object.fromEntries(
-      Object.entries(productsData).map(([key, value]) => [
-        key.toLowerCase().replace(/s$/, ""),
-        value,
-      ])
-    );
-
-    const fullProducts = storedCart
-      .map((item) => {
-        const cat = item.category.toLowerCase().replace(/s$/, "");
-        return categoryMap[cat]?.find((p) => p.id === item.id) || null;
-      })
-      .filter(Boolean);
-
-    setCartItems(fullProducts);
+    loadCheckoutData();
   }, []);
 
-  const removeItem = (id, category) => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const loadCheckoutData = async () => {
+    try {
+      setLoading(true);
 
-    const updated = cart.filter(
-      (item) =>
-        !(
-          item.id === id &&
-          item.category.toLowerCase().replace(/s$/, "") ===
-            category.toLowerCase().replace(/s$/, "")
-        )
-    );
+      const [cartRes, addressRes] = await Promise.all([
+        api.get("/api/users/cart"),
+        api.get("/api/users/addresses"),
+      ]);
 
-    localStorage.setItem("cart", JSON.stringify(updated));
-    setCartItems((prev) => prev.filter((p) => p.id !== id));
+      setCart(cartRes.data);
+      setAddresses(addressRes.data);
+    } catch {
+      setCart({ items: [], cartTotal: 0 });
+      setAddresses([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const subtotal = cartItems.reduce((sum, p) => sum + p.price, 0);
+  // ================= REMOVE CART ITEM =================
+  const removeItem = async (cartItemId) => {
+    try {
+      await api.delete(`/api/users/cart/remove/${cartItemId}`);
+      loadCheckoutData();
+    } catch {
+      alert("Failed to remove item");
+    }
+  };
+
+  // ================= REMOVE ADDRESS =================
+  const removeAddress = async (addressId) => {
+    try {
+      await api.delete(`/api/users/addresses/${addressId}`);
+      if (selectedAddressId === addressId) {
+        setSelectedAddressId(null);
+      }
+      loadCheckoutData();
+    } catch {
+      alert("Failed to remove address");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="checkout-wrapper">
+        <h2 style={{ padding: "40px" }}>Loading checkout...</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="checkout-wrapper">
       <div className="checkout-container">
 
-        {/* LEFT SIDE */}
+        {/* ================= LEFT SIDE ================= */}
         <div className="checkout-left">
           <h1 className="page-title">Checkout</h1>
 
-          {/* Step Indicator */}
           <div className="steps">
             <span className="active-step">Address</span>
             <span className="divider">/</span>
@@ -67,16 +83,31 @@ export default function Checkout() {
           <h3 className="small-heading">Select Address</h3>
 
           <div className="address-section">
-            {addressList.map((addr) => (
+            {addresses.length === 0 && (
+              <p className="gray-small">No address found. Please add one.</p>
+            )}
+
+            {addresses.map((addr) => (
               <div
                 key={addr.id}
                 className={`address-card ${
-                  selectedAddress === addr.id ? "address-active" : ""
+                  selectedAddressId === addr.id ? "address-active" : ""
                 }`}
-                onClick={() => setSelectedAddress(addr.id)}
               >
-                <p className="addr-name">{addr.name}</p>
-                <p className="addr-text">{addr.address}</p>
+                <div onClick={() => setSelectedAddressId(addr.id)}>
+                  <p className="addr-name">Delivery Address</p>
+                  <p className="addr-text">
+                    {addr.addressLine1}, {addr.addressLine2}, {addr.city},{" "}
+                    {addr.state} - {addr.pincode}
+                  </p>
+                </div>
+
+                <button
+                  className="remove-address-btn"
+                  onClick={() => removeAddress(addr.id)}
+                >
+                  Remove
+                </button>
               </div>
             ))}
 
@@ -88,61 +119,67 @@ export default function Checkout() {
             </button>
           </div>
 
-          {/* Save Contact Info FIXED */}
           <div className="save-info-row">
             <label>
-              <input type="checkbox" />
-              Save contact information
+              <input type="checkbox" /> Save contact information
             </label>
           </div>
 
           <button
             className="primary-btn"
-            disabled={!selectedAddress}
+            disabled={!selectedAddressId}
             onClick={() => navigate("/payment")}
           >
             Continue to Payment
           </button>
         </div>
 
-        {/* RIGHT SIDE - CART SUMMARY */}
+        {/* ================= RIGHT SIDE ================= */}
         <div className="checkout-right">
           <h2>Your Cart</h2>
 
-          {cartItems.map((item) => (
-            <div key={item.id} className="cart-item-box">
-              <img src={item.images[0]} alt={item.name} className="cart-img" />
+          {cart.items.length === 0 && (
+            <p className="gray-small">Your cart is empty</p>
+          )}
+
+          {cart.items.map((item) => (
+            <div key={item.cartItemId} className="cart-item-box">
+              <img
+                src={item.imageUrl || "https://via.placeholder.com/80"}
+                alt={item.productName}
+                className="cart-img"
+              />
 
               <div className="cart-info">
-                <h3>{item.name}</h3>
-                <p className="gray-small">Category: {item.category}</p>
-                <p className="gray-small">Quantity: 1</p>
-                <p className="price">₹{item.price.toLocaleString()}</p>
-              </div>
+                <h3>{item.productName}</h3>
 
-              <button
-                className="remove-btn"
-                onClick={() => removeItem(item.id, item.category)}
-              >
-                Remove
-              </button>
+                <div className="cart-meta">
+                  <p className="gray-small">Quantity: {item.quantity}</p>
+
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeItem(item.cartItemId)}
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <p className="price">
+                  ₹{item.totalPrice.toLocaleString()}
+                </p>
+              </div>
             </div>
           ))}
-
-          <input
-            className="coupon-input"
-            placeholder="Enter coupon code"
-          />
 
           <div className="summary-box">
             <div className="summary-line">
               <span>Subtotal</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
 
             <div className="summary-line total">
               <span>Total</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
           </div>
         </div>

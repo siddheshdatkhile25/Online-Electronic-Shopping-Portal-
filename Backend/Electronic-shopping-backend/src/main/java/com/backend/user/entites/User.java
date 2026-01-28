@@ -15,7 +15,7 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -25,15 +25,13 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "users",
-indexes= {
-		@Index(name = "idx_user_email", columnList = "email", unique = true)
-})
+@Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString(exclude = {"passwordHash"})
+
 
 public class User extends BaseEntity implements UserDetails {
 
@@ -59,10 +57,11 @@ public class User extends BaseEntity implements UserDetails {
     
 
     @OneToMany(
+    		mappedBy = "user",
     	    cascade = CascadeType.ALL,
-    	    orphanRemoval = true //Safe deletes
+    	    orphanRemoval = true, //Safe deletes
+    	    fetch = FetchType.LAZY
     	)
-    @JoinColumn(name = "user_id")
     private List<UserAddress> addresses = new ArrayList<>();
 
 

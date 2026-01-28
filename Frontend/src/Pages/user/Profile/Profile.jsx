@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getUserProfile } from '../../../services/user';
 import './Profile.css';
 
 function Profile() {
@@ -13,24 +14,39 @@ function Profile() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Load user data from sessionStorage
-    const storedUser = JSON.parse(sessionStorage.getItem('user')) || {};
-    setUser({
-      firstName: storedUser.firstName || '',
-      lastName: storedUser.lastName || '',
-      email: storedUser.email || '',
-      phone: storedUser.phone || '',
-      addresses: storedUser.addresses || []
-    });
-    setEditedUser({
-      firstName: storedUser.firstName || '',
-      lastName: storedUser.lastName || '',
-      email: storedUser.email || '',
-      phone: storedUser.phone || '',
-      addresses: storedUser.addresses || []
-    });
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await getUserProfile(localStorage.getItem("userId"));
+        if (response) {
+          const profileData = response.data;
+          const userData = {
+            firstName: profileData.firstname || '',
+            lastName: profileData.lastname || '',
+            email: profileData.email || '',
+            phone: profileData.phone || '',
+            addresses: profileData.address || []
+          };
+          setUser(userData);
+          setEditedUser(userData);
+          // Store in localStorage for consistency
+          localStorage.setItem('user', JSON.stringify(userData));
+        } else {
+          setError('Failed to load profile data');
+        }
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setError('Failed to load profile data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
   }, []);
 
   const handleEdit = () => {
@@ -38,9 +54,9 @@ function Profile() {
   };
 
   const handleSave = () => {
-    // Save updated user data to sessionStorage
+    // Save updated user data to localStorage
     const updatedUser = { ...editedUser };
-    sessionStorage.setItem('user', JSON.stringify(updatedUser));
+    localStorage.setItem('user', JSON.stringify(updatedUser));
     setUser(updatedUser);
     setIsEditing(false);
     alert('Profile updated successfully!');
@@ -58,6 +74,29 @@ function Profile() {
       [name]: value
     }));
   };
+
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <h2>My Profile</h2>
+        <div className="profile-card">
+          <p>Loading profile data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <h2>My Profile</h2>
+        <div className="profile-card">
+          <p>Error: {error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
@@ -83,7 +122,7 @@ function Profile() {
             <input
               type="text"
               name="firstName"
-              value={editedUser.firstName}
+              value={editedUser.firstname}
               onChange={handleChange}
               placeholder="Enter your first name"
             />
@@ -97,7 +136,7 @@ function Profile() {
             <input
               type="text"
               name="lastName"
-              value={editedUser.lastName}
+              value={editedUser.lastname}
               onChange={handleChange}
               placeholder="Enter your last name"
             />
@@ -125,7 +164,7 @@ function Profile() {
             {user.addresses.length > 0 ? (
               user.addresses.map((address, index) => (
                 <div key={index} className="address-item">
-                  {address.street}, {address.city}, {address.state}, {address.zip}
+                  {address.addressLine1}, {address.addressLine2}, {address.city},{address.district},{address.state}, {address.pincode}
                 </div>
               ))
             ) : (

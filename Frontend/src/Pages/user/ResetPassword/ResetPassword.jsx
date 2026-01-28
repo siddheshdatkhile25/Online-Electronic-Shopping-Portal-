@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"; // define this API
 import "./ResetPassword.css";
+import { resetPassword } from "../../../services/user";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -21,13 +22,14 @@ function ResetPassword() {
     }
 
     try {
+      console.log("pass1")
       const response = await resetPassword(password); // backend call
-
-      if (response.status === "success") {
+      console.log("pass2")
+      if (response.data === "success") {
         toast.success("Password reset successful");
         navigate("/login");
       } else {
-        toast.error(response.error || "Password reset failed");
+        toast.error("Password reset failed");
       }
     } catch (err) {
       toast.error("Something went wrong");

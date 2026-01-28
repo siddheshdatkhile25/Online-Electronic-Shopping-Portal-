@@ -76,7 +76,7 @@ function Register() {
 
       navigate('/login')
     }else{
-      toast.error(response['error'])
+      toast.error("invalid data")
     }
 
 

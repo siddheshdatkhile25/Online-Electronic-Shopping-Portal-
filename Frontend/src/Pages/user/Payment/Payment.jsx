@@ -1,107 +1,125 @@
 import "./payment.css";
 import { useEffect, useState } from "react";
-import productsData from "../../../data/ProductData.json";
+import { useNavigate } from "react-router-dom";
+import api from "../../../api/axiosInstance";
 
 export default function Payment() {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState({ items: [], cartTotal: 0 });
+  const [loading, setLoading] = useState(true);
   const [saveCard, setSaveCard] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [paying, setPaying] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const categoryMap = Object.fromEntries(
-      Object.entries(productsData).map(([key, value]) => [
-        key.toLowerCase().replace(/s$/, ""),
-        value,
-      ])
-    );
-
-    const fullProducts = storedCart
-      .map((item) => {
-        const cat = item.category.toLowerCase().replace(/s$/, "");
-        return categoryMap[cat]?.find((p) => p.id === item.id) || null;
-      })
-      .filter(Boolean);
-
-    setCartItems(fullProducts);
+    loadCart();
+    fetchOrderId();
   }, []);
 
-  const subtotal = cartItems.reduce((sum, p) => sum + p.price, 0);
+  const fetchOrderId = () => {
+    try {
+      // Get orderId from localStorage (set during checkout)
+      const storedOrderId = localStorage.getItem("orderId");
+      if (storedOrderId) {
+        setOrderId(storedOrderId);
+      }
+    } catch (err) {
+      console.error("Failed to get order ID:", err);
+    }
+  };
+
+  const loadCart = async () => {
+    try {
+      const res = await api.get("/api/users/cart");
+      setCart(res.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCOD = async () => {
+    if (!orderId) {
+      setError("Order not found. Please go back and try again.");
+      return;
+    }
+
+    try {
+      setPaying(true);
+      setError("");
+      console.log("Setting payment mode for orderId:", orderId);
+      const response = await api.put(`/api/payments/${orderId}/mode`, {
+        paymentMode: "COD",
+      });
+      console.log("Payment mode set to COD:", response.data);
+      navigate("/orders");
+    } catch (err) {
+      setError("Failed to set payment mode. Please try again.");
+      console.error("Payment error:", err.response?.data || err.message);
+    } finally {
+      setPaying(false);
+    }
+  };
 
   const handleConfirmPayment = () => {
-    // Save order to localStorage
-    const orderId = 'ORD-' + Date.now();
-    const order = {
-      id: orderId,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Processing',
-      items: cartItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        category: item.category,
-        price: item.price,
-        quantity: 1,
-        image: item.images[0]
-      })),
-      total: subtotal
-    };
-
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    existingOrders.push(order);
-    localStorage.setItem('orders', JSON.stringify(existingOrders));
-
-    // Clear cart after successful order
-    localStorage.removeItem('cart');
-
-    alert("Payment Successful! Order placed.");
-
-    // Navigate to orders page
-    window.location.href = '/orders';
+    alert("Payment successful (mock)");
+    navigate("/orders");
   };
+
+  if (loading) return <h2 style={{ padding: 40 }}>Loading payment…</h2>;
 
   return (
     <div className="payment-wrapper">
       <div className="payment-container">
 
-        {/* LEFT SIDE */}
+        {/* LEFT */}
         <div className="payment-left">
-          <h1 className="payment-title">Checkout</h1>
+          <h1 className="page-title">Checkout</h1>
 
           <div className="steps">
             <span className="step">Address</span>
-            <span className="divider">/</span>
+            <span className="divider">›</span>
             <span className="active-step">Payment</span>
           </div>
 
-          {/* Payment Buttons */}
-          <div className="quick-pay">
-            <button className="razorpay-btn" onClick={handleConfirmPayment}>
-              Pay with Razorpay
-            </button>
+          {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
 
-            <button className="upi-btn" onClick={handleConfirmPayment}>
-              Pay via UPI Apps
-            </button>
+  
+
+          {/* QUICK PAY */}
+          <div className="card-section">
+            <h3 className="section-title">Quick Pay</h3>
+
+            <div className="quick-pay">
+              <button className="razorpay-btn" onClick={handleConfirmPayment}>
+                Pay with Razorpay
+              </button>
+              <button className="upi-btn" onClick={handleCOD}>
+                Pay Via Cash On Delivery
+              </button>
+            </div>
           </div>
 
-          <h3 className="form-heading">Or Pay Using Card</h3>
+          {/* CARD PAYMENT */}
+          <div className="card-section">
+            <h3 className="section-title">Pay Using Card</h3>
 
-          <div className="payment-form">
-            <input className="input-field" placeholder="Cardholder Name" />
-            <input className="input-field" placeholder="Card Number" />
+            <div className="payment-form">
+              <input className="input-field" placeholder="Cardholder Name" />
+              <input className="input-field" placeholder="Card Number" />
 
-            <div className="row-3">
-              <select className="input-field">
-                <option>Month</option>
-              </select>
-              <select className="input-field">
-                <option>Year</option>
-              </select>
-              <input className="input-field" placeholder="CVC" />
-            </div>
+              <div className="row-3">
+                <select className="input-field">
+                  <option>MM</option>
+                </select>
+                <select className="input-field">
+                  <option>YY</option>
+                </select>
+                <input className="input-field" placeholder="CVC" />
+              </div>
 
-            <div className="save-card-row">
-              <label>
+              <label className="save-card">
                 <input
                   type="checkbox"
                   checked={saveCard}
@@ -109,39 +127,42 @@ export default function Payment() {
                 />
                 Save card for future payments
               </label>
-            </div>
 
-            <button className="confirm-btn" onClick={handleConfirmPayment}>
-              Confirm & Pay
-            </button>
+              <button className="confirm-btn" onClick={handleConfirmPayment}>
+                Confirm & Pay
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE SUMMARY */}
+        {/* RIGHT */}
         <div className="payment-right">
-          <h2>Your Cart</h2>
+          <h2 className="order-title">Your Order</h2>
 
-          {cartItems.map((item) => (
-            <div key={item.id} className="cart-item-box">
-              <img src={item.images[0]} className="cart-img" />
+          {cart.items.map(item => (
+            <div key={item.cartItemId} className="order-item">
+              <img src={item.imageUrl} alt={item.productName} />
 
-              <div className="cart-info">
-                <h3>{item.name}</h3>
-                <p className="gray-small">Quantity: 1</p>
-                <p className="price">₹{item.price.toLocaleString()}</p>
+              <div className="order-info">
+                <p className="product-name">{item.productName}</p>
+                <span className="qty">Qty: {item.quantity}</span>
+              </div>
+
+              <div className="order-price">
+                ₹{item.totalPrice.toLocaleString()}
               </div>
             </div>
           ))}
 
-          <div className="summary-box">
+          <div className="summary">
             <div className="summary-line">
               <span>Subtotal</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <span>₹{cart.cartTotal.toLocaleString()}</span>
             </div>
 
             <div className="summary-line total">
               <span>Total</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <span>₹{cart.cartTotal.toLocaleString()}</span>
             </div>
           </div>
         </div>

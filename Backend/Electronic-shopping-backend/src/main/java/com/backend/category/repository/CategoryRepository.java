@@ -6,4 +6,5 @@ import com.backend.category.entity.Category;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     boolean existsByName(String name);
+
 }

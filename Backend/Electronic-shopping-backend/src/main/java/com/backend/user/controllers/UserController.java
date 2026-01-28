@@ -3,6 +3,7 @@ package com.backend.user.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,13 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.common.dtos.ApiResponse;
 import com.backend.security.JwtUtil;
+import com.backend.user.UserDto.ForgotPasswordRequestDTO;
 import com.backend.user.UserDto.LoginRequestDTO;
 import com.backend.user.UserDto.LoginResponseDTO;
 import com.backend.user.UserDto.RegisterUserDTO;
 import com.backend.user.UserDto.RegisterUserResponseDTO;
+import com.backend.user.UserDto.ResetPasswordDTO;
 import com.backend.user.UserDto.UpdateUserDTO;
 import com.backend.user.UserDto.UserDetailsResponseDTO;
 import com.backend.user.UserDto.UserListResponseDTO;
+import com.backend.user.UserDto.VerifyOtpDTO;
 import com.backend.user.entites.User;
 import com.backend.user.service.UserService;
 
@@ -50,81 +54,40 @@ public class UserController {
 	@Autowired 
 	private JwtUtil jwtUtil;
 	
-//	@PostMapping("/login")
-//	public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto) {
-//		
-//		try {
-//			// 1. Create authentication token with credentials
-//			
-//			Authentication authToken =
-//			        new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
-//			
-//			// 2. Authenticate using AuthenticationManager
-//			Authentication authenticated =
-//			        authenticationManager.authenticate(authToken);
-//			
-//			 // 3. Generate JWT token
-//			String jwt = jwtUtil.createToken(authenticated);
-//			
-//			User user = (User) authenticated.getPrincipal();
-//			
-//			 // 4. Return token
-//			 return ResponseEntity.ok(
-//		                new LoginResponseDTO(
-//		                        jwt,
-//		                        user.getId(),
-//		                        user.getFirstname(),
-//		                        user.getLastname(),
-//		                        user.getUserRole()
-//		                ));
-//		}
-//		catch(AuthenticationException e)
-//		{
-//			return ResponseEntity.status(401).body("Invalid credentials");
-//		}
-//	}
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto) {
-
-	    try {
-	        // 1. Create auth token
-	        Authentication authToken =
-	                new UsernamePasswordAuthenticationToken(
-	                        dto.getEmail(),
-	                        dto.getPassword()
-	                );
-
-	        // 2. Authenticate
-	        Authentication authenticated =
-	                authenticationManager.authenticate(authToken);
-
-	        // 3. Generate JWT
-	        String jwt = jwtUtil.createToken(authenticated);
-
-	        // 4. Get logged-in user (Spring Security user)
-	        org.springframework.security.core.userdetails.User principal =
-	                (org.springframework.security.core.userdetails.User)
-	                authenticated.getPrincipal();
-
-	        // 5. Fetch FULL user from DB
-	        User user = userService.findByEmail(principal.getUsername());
-
-	        // 6. Send response
-	        return ResponseEntity.ok(
-	                new LoginResponseDTO(
-	                        jwt,
-	                        user.getId(),
-	                        user.getFirstname(),
-	                        user.getLastname(),
-	                        user.getUserRole()
-	                )
-	        );
-
-	    } catch (AuthenticationException e) {
-	        return ResponseEntity.status(401).body("Invalid credentials");
-	    }
+		
+		try {
+			// 1. Create authentication token with credentials
+			
+			Authentication authToken =
+			        new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
+			
+			// 2. Authenticate using AuthenticationManager
+			Authentication authenticated =
+			        authenticationManager.authenticate(authToken);
+			
+			 // 3. Generate JWT token
+			String jwt = jwtUtil.createToken(authenticated);
+			
+			User user = (User) authenticated.getPrincipal();
+			
+			 // 4. Return token
+			 return ResponseEntity.ok(
+		                new LoginResponseDTO(
+		                        jwt,
+		                        user.getId(),
+		                        user.getFirstname(),
+		                        user.getLastname(),
+		                        user.getEmail(),
+		                        user.getUserRole()
+		                ));
+		}
+		catch(AuthenticationException e)
+		{
+			return ResponseEntity.status(401).body("Invalid credentials");
+		}
 	}
-
 	
 	
 	@PostMapping("/register")
@@ -147,12 +110,11 @@ public class UserController {
 	}
 
 	
-	@GetMapping("/getUser")
 	public String getAllUser() {
 		return "Hello From Backend";
 	}
 	
-	
+	//update user 
 	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponse<UserDetailsResponseDTO>> getUserById(
 	        @PathVariable Long id) {
@@ -180,7 +142,8 @@ public class UserController {
 	
 	
 	
-	@GetMapping
+	//get All user For admin-side
+	@GetMapping("/getUser")
 	public ResponseEntity<ApiResponse<Page<UserListResponseDTO>>> getAllUsers(
 	        @RequestParam(defaultValue = "0") int page,
 	        @RequestParam(defaultValue = "10") int size) {
@@ -192,6 +155,51 @@ public class UserController {
 
 	    return ResponseEntity.ok(response);
 	}
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<ApiResponse<String>> forgotPassword(
+	        @Valid @RequestBody ForgotPasswordRequestDTO dto) {
+
+	    userService.forgotPassword(dto.getEmail());
+
+	    return ResponseEntity.ok(
+	            new ApiResponse<>("OTP sent to registered email", null)
+	    );
+	}
+
+	
+	@PostMapping("/verify-otp")
+	public ResponseEntity<ApiResponse<String>> verifyOtp(
+	        @RequestBody VerifyOtpDTO dto) {
+
+	    try {
+	    	userService.verifyOtp(dto.getEmail(), dto.getOtp());
+		    return ResponseEntity.ok(
+		            new ApiResponse<String>("OTP verified successfully", "success")
+		    );
+	    }catch(Exception ex) {
+	    	
+	    	return ResponseEntity
+	    			.status(HttpStatus.BAD_REQUEST)
+	    			.body(new ApiResponse<>("Invalid OTP", "error"));
+	    }
+	}
+	
+	@PostMapping("/reset-password")
+	public ResponseEntity<ApiResponse> resetPassword(
+	        @RequestBody ResetPasswordDTO dto) {
+
+	    userService.resetPassword(dto);
+	    return ResponseEntity.ok(
+	            new ApiResponse("Password reset successfull", "success")
+	    );
+	}
+	
+	
+	
+	
+	
+	
 
 
 

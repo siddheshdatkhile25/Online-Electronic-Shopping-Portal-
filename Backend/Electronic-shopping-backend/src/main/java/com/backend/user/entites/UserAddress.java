@@ -16,10 +16,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @AttributeOverride(name = "id", column = @Column(name = "address_id"))
 public class UserAddress extends BaseEntity {
-
-    
-
-    
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // Line 1: Room no, Floor, Building
     @Column(name = "address_line_1", nullable = false, length = 150)

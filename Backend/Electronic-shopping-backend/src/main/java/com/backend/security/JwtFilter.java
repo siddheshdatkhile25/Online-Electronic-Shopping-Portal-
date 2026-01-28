@@ -36,17 +36,7 @@ public class JwtFilter extends OncePerRequestFilter  {
 		String authHeader = request.getHeader("Authorization");
 		
 		// 2. Check for Bearer token
-//		if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//			
-//		String token = authHeader.substring(7); // Remove "Bearer "
-//		
-//		Authentication auth = jwtUtil.validateToken(token); // 3. Validate token
-//		
-//		if (auth != null) // 4. Set authentication in SecurityContext
-//			
-//		SecurityContextHolder.getContext().setAuthentication(auth);
-//		}
-		
+
 		
 		if (authHeader != null && authHeader.startsWith("Bearer ")) {
 

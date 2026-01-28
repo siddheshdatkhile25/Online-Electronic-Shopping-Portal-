@@ -1,82 +1,140 @@
 import "./checkout.css";
 import { useEffect, useState } from "react";
-import productsData from "../../../data/ProductData.json";
-import addressData from "../../../data/AddressData.json";
 import { useNavigate } from "react-router-dom";
+import api from "../../../api/axiosInstance";
+import { toast } from "react-toastify";
 
 export default function Checkout() {
-  const [cartItems, setCartItems] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [cart, setCart] = useState({ items: [], cartTotal: 0 });
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
-  const addressList = addressData.addresses;
-
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const categoryMap = Object.fromEntries(
-      Object.entries(productsData).map(([key, value]) => [
-        key.toLowerCase().replace(/s$/, ""),
-        value,
-      ])
-    );
-
-    const fullProducts = storedCart
-      .map((item) => {
-        const cat = item.category.toLowerCase().replace(/s$/, "");
-        return categoryMap[cat]?.find((p) => p.id === item.id) || null;
-      })
-      .filter(Boolean);
-
-    setCartItems(fullProducts);
+    loadCheckoutData();
+    fetchUserId();
   }, []);
 
-  const removeItem = (id, category) => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const updated = cart.filter(
-      (item) =>
-        !(
-          item.id === id &&
-          item.category.toLowerCase().replace(/s$/, "") ===
-            category.toLowerCase().replace(/s$/, "")
-        )
-    );
-
-    localStorage.setItem("cart", JSON.stringify(updated));
-    setCartItems((prev) => prev.filter((p) => p.id !== id));
+  const fetchUserId = async () => {
+    try {
+      // Get userId from localStorage (set during login)
+      const storedUserId = localStorage.getItem("userId");
+      if (storedUserId) {
+        setUserId(storedUserId);
+      }
+    } catch (err) {
+      console.error("Failed to get user ID:", err);
+    }
   };
 
-  const subtotal = cartItems.reduce((sum, p) => sum + p.price, 0);
+  const loadCheckoutData = async () => {
+    try {
+      setLoading(true);
+      const [cartRes, addressRes] = await Promise.all([
+        api.get("/api/users/cart"),
+        api.get("/api/users/addresses"),
+      ]);
+      setCart(cartRes.data);
+      setAddresses(addressRes.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeItem = async (id) => {
+    await api.delete(`/api/users/cart/remove/${id}`);
+    loadCheckoutData();
+  };
+
+  const removeAddress = async (id) => {
+    await api.delete(`/api/users/addresses/${id}`);
+    if (selectedAddressId === id) setSelectedAddressId(null);
+    loadCheckoutData();
+  };
+
+  const handleContinueToPayment = async () => {
+    if (!selectedAddressId || !userId) {
+      setError("Please select an address and ensure you are logged in");
+      return;
+    }
+
+    try {
+      setPlacing(true);
+      setError("");
+      const response = await api.post("/api/orders/place", {
+        addressId: selectedAddressId,
+        userId: parseInt(userId),
+      });
+      console.log("Order placed:", response.data);
+      // Save orderId to localStorage for Payment page
+      if (response.data.orderId) {
+        localStorage.setItem("orderId", response.data.orderId);
+      }
+      toast.success("Order Placed")
+      navigate("/payment");
+    } catch (err) {
+      setError("Failed to place order. Please try again.");
+      toast.error("Failed to place order. Please try again.")
+      console.error("Place order error:", err);
+    } finally {
+      setPlacing(false);
+    }
+  };
+
+  if (loading) {
+    return <h2 style={{ padding: "40px" }}>Loading checkout...</h2>;
+  }
 
   return (
     <div className="checkout-wrapper">
       <div className="checkout-container">
 
-        {/* LEFT SIDE */}
+        {/* LEFT */}
         <div className="checkout-left">
           <h1 className="page-title">Checkout</h1>
 
-          {/* Step Indicator */}
           <div className="steps">
             <span className="active-step">Address</span>
-            <span className="divider">/</span>
+            <span className="divider">›</span>
             <span className="step">Payment</span>
           </div>
 
-          <h3 className="small-heading">Select Address</h3>
+          <h3 className="small-heading">Delivery Address</h3>
+
+          {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
 
           <div className="address-section">
-            {addressList.map((addr) => (
+            {addresses.map(addr => (
               <div
                 key={addr.id}
                 className={`address-card ${
-                  selectedAddress === addr.id ? "address-active" : ""
+                  selectedAddressId === addr.id ? "address-active" : ""
                 }`}
-                onClick={() => setSelectedAddress(addr.id)}
+                onClick={() => setSelectedAddressId(addr.id)}
               >
-                <p className="addr-name">{addr.name}</p>
-                <p className="addr-text">{addr.address}</p>
+                <div className="address-radio" />
+                <div className="address-content">
+                  <p className="addr-name">Home</p>
+                  <p className="addr-text">
+                    {addr.addressLine1}, {addr.addressLine2}, {addr.city},{" "}
+                    {addr.state} - {addr.pincode}
+                  </p>
+                </div>
+
+                <button
+                  className="remove-address-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeAddress(addr.id);
+                  }}
+                >
+                  Remove
+                </button>
               </div>
             ))}
 
@@ -88,61 +146,48 @@ export default function Checkout() {
             </button>
           </div>
 
-          {/* Save Contact Info FIXED */}
-          <div className="save-info-row">
-            <label>
-              <input type="checkbox" />
-              Save contact information
-            </label>
-          </div>
-
           <button
             className="primary-btn"
-            disabled={!selectedAddress}
-            onClick={() => navigate("/payment")}
+            disabled={!selectedAddressId || placing}
+            onClick={handleContinueToPayment}
           >
-            Continue to Payment
+            {placing ? "Processing..." : "Continue to Payment"}
           </button>
         </div>
 
-        {/* RIGHT SIDE - CART SUMMARY */}
+        {/* RIGHT */}
         <div className="checkout-right">
-          <h2>Your Cart</h2>
+          <h2>Your Order</h2>
 
-          {cartItems.map((item) => (
-            <div key={item.id} className="cart-item-box">
-              <img src={item.images[0]} alt={item.name} className="cart-img" />
+          {cart.items.map(item => (
+            <div key={item.cartItemId} className="cart-item-box">
+              <img src={item.imageUrl} alt={item.productName} />
 
               <div className="cart-info">
-                <h3>{item.name}</h3>
-                <p className="gray-small">Category: {item.category}</p>
-                <p className="gray-small">Quantity: 1</p>
-                <p className="price">₹{item.price.toLocaleString()}</p>
+                <h4>{item.productName}</h4>
+                <p className="gray-small">Qty: {item.quantity}</p>
               </div>
 
-              <button
-                className="remove-btn"
-                onClick={() => removeItem(item.id, item.category)}
-              >
-                Remove
-              </button>
+              <div className="cart-price">
+                ₹{item.totalPrice.toLocaleString()}
+                <button
+                  className="remove-btn"
+                  onClick={() => removeItem(item.cartItemId)}
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           ))}
-
-          <input
-            className="coupon-input"
-            placeholder="Enter coupon code"
-          />
 
           <div className="summary-box">
             <div className="summary-line">
               <span>Subtotal</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
-
             <div className="summary-line total">
               <span>Total</span>
-              <strong>₹{subtotal.toLocaleString()}</strong>
+              <strong>₹{cart.cartTotal.toLocaleString()}</strong>
             </div>
           </div>
         </div>

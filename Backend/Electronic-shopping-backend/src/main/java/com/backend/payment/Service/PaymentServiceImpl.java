@@ -1,5 +1,6 @@
 package com.backend.payment.Service;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -34,11 +35,22 @@ public class PaymentServiceImpl implements PaymentService {
         if (!OrderStatus.PLACED.equals(order.getStatus())) {
             throw new RuntimeException("Payment mode cannot be changed");
         }
+        
+        
+
 
         // Fetch payment
-        Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
-
+        Payment payment = paymentRepository.findByOrder_Id(orderId)
+                .orElseGet(() -> {
+                    // Create new payment if it doesn't exist
+                    Payment newPayment = new Payment();
+                    newPayment.setOrder(order);
+                    //newPayment.setAmount(order.ge);
+                    return newPayment;
+                });
+        
+        System.out.println(payment);
+        
         // Set payment mode
         payment.setMode(request.getPaymentMode());
 

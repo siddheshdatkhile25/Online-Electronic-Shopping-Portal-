@@ -1,8 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "./ForgotPassword.css";
+import { toast } from "react-toastify";
+import { sendOtp } from "../../../services/user";
 
 const ForgotPassword = () => {
+  const [email, setEmail] = useState("");
+
+  const onSentOtp = async () => {
+    if (!email ) {
+      toast.warning("Please Enter Email");
+      return;
+    }
+    
+    const response = await sendOtp(email);
+
+    if(response){
+      toast.success(response.message);
+      localStorage.setItem("verify-email", email);
+      navigate("/otp")
+    }else{
+      toast.error("Invalid Credentials !");
+    }
+  }
+
   const navigate = useNavigate();
 
   return (
@@ -10,7 +32,7 @@ const ForgotPassword = () => {
       <div className="forgot-card">
         <h3 className="forgot-title">Forgot Password</h3>
         <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '1.5rem' }}>
-          Enter your email to receive reset instructions.
+          Enter your email .
         </p>
 
         <form>
@@ -22,6 +44,7 @@ const ForgotPassword = () => {
               type="email"
               className="input-field"
               placeholder="Enter your email"
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -33,7 +56,7 @@ const ForgotPassword = () => {
             type="button" 
             className="submit-btn" 
             style={{ marginTop: '1rem', backgroundColor: '#1f2937' }}
-            onClick={() => navigate(`/otp`)}
+            onClick={onSentOtp}
           >
             Send OTP
           </button>

@@ -101,6 +101,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return productRepository.findAllBrands();
     }
 
+    //brands per category
     @Override
     public List<String> getBrandsByCategory(Long categoryId) {
         return productRepository.findBrandsByCategory(categoryId);

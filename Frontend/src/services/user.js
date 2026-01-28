@@ -105,7 +105,8 @@ export const getUserProfile = async (id) => {
     });
     console.log("Get user profile response:", response.data);
 
-    return response.data;
+    // Backend returns ApiResponse with data property
+    return response.data.data || response.data;
 
     
   } catch (error) {

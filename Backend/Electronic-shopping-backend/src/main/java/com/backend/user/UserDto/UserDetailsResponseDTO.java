@@ -20,5 +20,5 @@ public class UserDetailsResponseDTO {
     private String lastname;
     private String email;
     private String phone;
-    private List<UserAddress> Address;
+    private List<UserAddress> addresses;
 }

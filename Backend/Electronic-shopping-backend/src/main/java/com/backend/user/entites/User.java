@@ -16,7 +16,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -60,7 +59,7 @@ public class User extends BaseEntity implements UserDetails {
     		mappedBy = "user",
     	    cascade = CascadeType.ALL,
     	    orphanRemoval = true, //Safe deletes
-    	    fetch = FetchType.LAZY
+    	    fetch = FetchType.EAGER
     	)
     private List<UserAddress> addresses = new ArrayList<>();
 

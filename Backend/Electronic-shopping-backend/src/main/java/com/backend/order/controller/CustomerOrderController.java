@@ -1,4 +1,4 @@
-package com.backend.order.Controller.User;
+package com.backend.order.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,16 +8,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.order.DTO.PlaceOrderRequest;
 import com.backend.order.Service.OrderService;
-
+import com.backend.order.DTO.PlaceOrderRequest;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
-public class OrderController {
+public class CustomerOrderController {
 	
 	private final OrderService orderService;
 
@@ -34,10 +33,7 @@ public class OrderController {
     	return ResponseEntity.ok(orderService.getMyOrders(userId));
     }
     
-    @GetMapping
-    public ResponseEntity<?> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrdersForAdmin());
-    }
+   
     
     
     

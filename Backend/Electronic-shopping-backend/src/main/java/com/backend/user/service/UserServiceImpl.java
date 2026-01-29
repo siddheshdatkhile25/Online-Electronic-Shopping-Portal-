@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.backend.common.service.OtpEmailService;
 import com.backend.user.Repository.PasswordResetOtpRepository;
 import com.backend.user.Repository.UserRepository;
 import com.backend.user.UserDto.RegisterUserDTO;
@@ -38,6 +39,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private OtpEmailService otpEmailService;
+    
 
     @Override
     public User registerUser(RegisterUserDTO dto) {
@@ -152,6 +157,7 @@ public class UserServiceImpl implements UserService {
                 otpRepo.save(resetOtp);
                 // Simulate sending email
                 System.out.println("OTP for password reset: " + otp);
+                otpEmailService.sendOtpEmail(email, otp);
         }
     
     

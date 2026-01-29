@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile } from '../../../services/user';
+import api from '../../../api/axiosInstance';
 import './Profile.css';
 
 function Profile() {
@@ -21,16 +22,29 @@ function Profile() {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        const response = await getUserProfile(localStorage.getItem("userId"));
-        if (response) {
-          const profileData = response.data;
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          setError('User not logged in');
+          setLoading(false);
+          return;
+        }
+        
+        const profileData = await getUserProfile(userId);
+        
+        console.log("Profile data received:", profileData);
+        
+        if (profileData) {
           const userData = {
             firstName: profileData.firstname || '',
             lastName: profileData.lastname || '',
             email: profileData.email || '',
             phone: profileData.phone || '',
-            addresses: profileData.address || []
+            addresses: Array.isArray(profileData.addresses) ? profileData.addresses : []
           };
+          
+          console.log("User data after mapping:", userData);
+          console.log("Addresses:", userData.addresses);
+          
           setUser(userData);
           setEditedUser(userData);
           // Store in localStorage for consistency
@@ -40,7 +54,7 @@ function Profile() {
         }
       } catch (err) {
         console.error('Error fetching profile:', err);
-        setError('Failed to load profile data');
+        setError('Failed to load profile data: ' + err.message);
       } finally {
         setLoading(false);
       }
@@ -122,7 +136,7 @@ function Profile() {
             <input
               type="text"
               name="firstName"
-              value={editedUser.firstname}
+              value={editedUser.firstName}
               onChange={handleChange}
               placeholder="Enter your first name"
             />
@@ -136,7 +150,7 @@ function Profile() {
             <input
               type="text"
               name="lastName"
-              value={editedUser.lastname}
+              value={editedUser.lastName}
               onChange={handleChange}
               placeholder="Enter your last name"
             />
@@ -161,10 +175,10 @@ function Profile() {
         <div className="profile-field">
           <label>Addresses:</label>
           <div className="addresses-list">
-            {user.addresses.length > 0 ? (
+            {user.addresses && Array.isArray(user.addresses) && user.addresses.length > 0 ? (
               user.addresses.map((address, index) => (
                 <div key={index} className="address-item">
-                  {address.addressLine1}, {address.addressLine2}, {address.city},{address.district},{address.state}, {address.pincode}
+                  {address.addressLine1}, {address.addressLine2}, {address.city}, {address.district}, {address.state}, {address.pincode}
                 </div>
               ))
             ) : (

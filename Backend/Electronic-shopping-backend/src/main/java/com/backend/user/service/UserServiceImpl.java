@@ -3,6 +3,7 @@ package com.backend.user.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -63,6 +64,7 @@ public class UserServiceImpl implements UserService {
             address.setDistrict(dto.getAddress().getDistrict());
             address.setState(dto.getAddress().getState());
             address.setPincode(dto.getAddress().getPincode());
+            address.setUser(user);
             user.getAddresses().add(address);
         }
 
@@ -75,6 +77,9 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        // Initialize addresses collection using Hibernate.initialize()
+        Hibernate.initialize(user.getAddresses());
 
         return new UserDetailsResponseDTO(
                 user.getId(),
@@ -104,6 +109,9 @@ public class UserServiceImpl implements UserService {
         user.setPhone(dto.getPhone());
 
         User updatedUser = userRepo.save(user);
+
+        // Initialize addresses collection using Hibernate.initialize()
+        Hibernate.initialize(updatedUser.getAddresses());
 
         return new UserDetailsResponseDTO(
                 updatedUser.getId(),
@@ -182,11 +190,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
-        @Override
-        public User getUserByEmail(String email) {
-                return userRepo.findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
-        }
+    @Override
+    public User getUserByEmail(String email) {
+            return userRepo.findByEmail(email)
+                            .orElseThrow(() -> new RuntimeException("User not found"));
+    }
     
     @Override
     public void addUserAddress(UserAddressDTO dto, String email) {

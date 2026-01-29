@@ -1,6 +1,8 @@
 import "./OrderList.css";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import api from '../../../api/axiosInstance';
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -8,34 +10,56 @@ export default function OrderList() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const userId = localStorage.getItem("userId");
+
+  // Helper function to construct full image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) {
+      console.warn("No image path provided");
+      return '/placeholder.png';
+    }
+    if (imagePath.startsWith('http')) {
+      console.log("Full URL image:", imagePath);
+      return imagePath;
+    }
+    const fullUrl = `http://localhost:8080${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
+    console.log("Constructed image URL:", fullUrl, "from:", imagePath);
+    return fullUrl;
+  };
   useEffect(() => {
-    // Load orders from localStorage
-    const storedOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-
-    const updatedOrders = storedOrders.map(order => {
-      if (order.status === 'Processing') {
-        return { ...order, status: 'Delivered' };
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        if (userId) {
+          const response = await api.get(`/api/orders/my-orders/${userId}`);
+          setOrders(response.data || []);
+          setError(null);
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setError("Failed to load orders");
+        setOrders([]);
+      } finally {
+        setLoading(false);
       }
-      return order;
-    });
+    };
 
-
-    setOrders(updatedOrders);
-
-    localStorage.setItem('orders', JSON.stringify(updatedOrders));
-  }, []);
+    fetchOrders();
+  }, [userId]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Delivered':
+      case 'DELIVERED':
         return '#28a745';
-      case 'In Transit':
+      case 'IN_TRANSIT':
         return '#007bff';
-      case 'Processing':
+      case 'PLACED':
         return '#ffc107';
-      case 'Cancelled':
+      case 'CANCELLED':
         return '#dc3545';
       default:
         return '#6c757d';
@@ -54,8 +78,8 @@ export default function OrderList() {
     setSelectedItem({ orderId, item });
     // Load existing review if any
     const existingReview = orders
-      .find(o => o.id === orderId)
-      ?.items.find(i => i.id === item.id)?.review;
+      .find(o => o.orderId === orderId)
+      ?.items.find(i => i.productId === item.productId)?.review;
 
     if (existingReview) {
       setReviewData(existingReview);
@@ -71,30 +95,38 @@ export default function OrderList() {
     setReviewData({ rating: 5, comment: '' });
   };
 
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
     if (!selectedItem) return;
 
-    const updatedOrders = orders.map(order => {
-      if (order.id === selectedItem.orderId) {
-        return {
-          ...order,
-          items: order.items.map(item => {
-            if (item.id === selectedItem.item.id) {
-              return {
-                ...item,
-                review: reviewData
-              };
-            }
-            return item;
-          })
-        };
-      }
-      return order;
-    });
+    try {
+      const updatedOrders = orders.map(order => {
+        if (order.orderId === selectedItem.orderId) {
+          return {
+            ...order,
+            items: order.items.map(item => {
+              if (item.productId === selectedItem.item.productId) {
+                return {
+                  ...item,
+                  review: reviewData
+                };
+              }
+              return item;
+            })
+          };
+        }
+        return order;
+      });
 
-    setOrders(updatedOrders);
-    localStorage.setItem('orders', JSON.stringify(updatedOrders));
-    closeReviewModal();
+      setOrders(updatedOrders);
+      
+      // Send review to backend
+      await api.post(`/api/orders/${selectedItem.orderId}/items/${selectedItem.item.productId}/review`, reviewData);
+      
+      closeReviewModal();
+    } catch (err) {
+      console.error("Error submitting review:", err);
+      alert("Failed to submit review");
+    }
   };
 
   return (
@@ -105,7 +137,18 @@ export default function OrderList() {
         <p className="gray">View and track your order history</p>
 
         <div className="order-list">
-          {orders.length === 0 ? (
+          {loading ? (
+            <div className="empty-box">
+              <p>Loading your orders...</p>
+            </div>
+          ) : error ? (
+            <div className="empty-box">
+              <p>{error}</p>
+              <button className="shop-btn" onClick={handleShopClick}>
+                Start Shopping
+              </button>
+            </div>
+          ) : orders.length === 0 ? (
             <div className="empty-box">
               <p>You haven't placed any orders yet</p>
               <button className="shop-btn" onClick={handleShopClick}>
@@ -114,13 +157,13 @@ export default function OrderList() {
             </div>
           ) : (
             orders.map((order) => (
-              <div key={order.id} className="order-card">
+              <div key={order.orderId} className="order-card">
                 {/* Order Header */}
                 <div className="order-header">
                   <div>
-                    <h3 className="order-id">{order.id}</h3>
+                    <h3 className="order-id">{order.orderId}</h3>
                     <p className="gray-small">
-                      Placed on {new Date(order.date).toLocaleDateString('en-IN', {
+                      Placed on {new Date(order.orderDateTime).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric'
@@ -130,9 +173,9 @@ export default function OrderList() {
                   <div className="order-header-right">
                     <span
                       className="status-badge"
-                      style={{ backgroundColor: getStatusColor(order.status) }}
+                      style={{ backgroundColor: getStatusColor(order.orderStatus) }}
                     >
-                      {order.status}
+                      {order.orderStatus}
                     </span>
                     <button
                       className="expand-btn"
@@ -147,15 +190,15 @@ export default function OrderList() {
                 {expandedOrder === order.id && (
                   <div className="order-items">
                     {order.items.map((item, index) => (
-                      <div key={`${item.id}-${index}`} className="item-card">
-                        <img src={item.image} alt={item.name} className="item-img" />
+                      <div key={`${item.productId}-${index}`} className="item-card">
+                        <img src={getImageUrl(item.productImage)} alt={item.productName} className="item-img" />
                         <div className="item-details">
-                          <h4 className="item-name">{item.name}</h4>
-                          <p className="gray-small">Category: {item.category}</p>
+                          <h4 className="item-name">{item.productName}</h4>
+                          <p className="gray-small">Product ID: {item.productId}</p>
                           <p className="price">₹{item.price.toLocaleString()}</p>
 
                           {/* Review Button/Display */}
-                          {order.status === 'Delivered' && (
+                          {order.orderStatus === 'DELIVERED' && (
                             <>
                               {item.review ? (
                                 <div className="review-display">
@@ -191,7 +234,7 @@ export default function OrderList() {
                 {/* Order Footer */}
                 <div className="order-footer">
                   <span className="total-label">Order Total:</span>
-                  <strong className="total-amount">₹{order.total.toLocaleString()}</strong>
+                  <strong className="total-amount">₹{order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()}</strong>
                 </div>
               </div>
             ))
@@ -234,28 +277,28 @@ export default function OrderList() {
 
           <div className="stat-card">
             <span className="stat-number">
-              {orders.filter(o => o.status === 'Delivered').length}
+              {orders.filter(o => o.orderStatus === 'DELIVERED').length}
             </span>
             <span className="stat-label">Delivered</span>
           </div>
 
           <div className="stat-card">
             <span className="stat-number">
-              {orders.filter(o => o.status === 'In Transit').length}
+              {orders.filter(o => o.orderStatus === 'IN_TRANSIT').length}
             </span>
             <span className="stat-label">In Transit</span>
           </div>
 
           <div className="stat-card">
             <span className="stat-number">
-              {orders.filter(o => o.status === 'Processing').length}
+              {orders.filter(o => o.orderStatus === 'PLACED').length}
             </span>
             <span className="stat-label">Processing</span>
           </div>
 
           <div className="summary-line total-spent">
             <span>Total Spent</span>
-            <strong>₹{orders.reduce((sum, order) => sum + order.total, 0).toLocaleString()}</strong>
+            <strong>₹{orders.reduce((sum, order) => sum + order.items.reduce((itemSum, item) => itemSum + (item.price * item.quantity), 0), 0).toLocaleString()}</strong>
           </div>
         </div>
 

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./CustomerOrders.css";
 import { toast } from "react-toastify";
+import api from "../../../api/axiosInstance"; 
+
 
 function CustomerOrders() {
   const [orders, setOrders] = useState([]);
@@ -8,82 +10,56 @@ function CustomerOrders() {
   const [filterStatus, setFilterStatus] = useState("All");
 
   useEffect(() => {
-    loadDummyOrders();
+    fetchOrders();
   }, []);
 
-  const loadDummyOrders = () => {
-    const dummyOrders = [
-      {
-        orderId: "ORD12345",
-        orderDate: "2025-01-10",
-        customerName: "Rohit Sharma",
-        mobile: "9876543210",
-        address: "Sector 15, Noida",
-        productName: "Samsung 55-inch LED TV",
-        quantity: 1,
-        price: 45999,
-        paymentType: "Online",
-        status: "Order Received",
-      },
-      {
-        orderId: "ORD12346",
-        orderDate: "2025-01-12",
-        customerName: "Priya Verma",
-        mobile: "9123456780",
-        address: "MG Road, Delhi",
-        productName: "HP Gaming Laptop",
-        quantity: 1,
-        price: 72999,
-        paymentType: "Cash on Delivery",
-        status: "Packed",
-      },
-      {
-        orderId: "ORD12347",
-        orderDate: "2025-01-14",
-        customerName: "Amit Kumar",
-        mobile: "9988776655",
-        address: "Andheri West, Mumbai",
-        productName: "iPhone 15 Pro",
-        quantity: 1,
-        price: 134999,
-        paymentType: "Online",
-        status: "Shipped",
-      },
-    ];
-
-    setOrders(dummyOrders);
+  //  Fetch orders from backend
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get("/admin/orders");
+      setOrders(res.data);
+    } catch (err) {
+      toast.error("Failed to load orders");
+    }
   };
 
-  const updateStatus = (orderId, newStatus) => {
+  // Update order status
+  const updateStatus = async (orderId, newStatus) => {
     if (!newStatus) {
-      toast.warning("Select a status first");
+      toast.warning("Select a status");
       return;
     }
 
-    const updated = orders.map((order) =>
-      order.orderId === orderId ? { ...order, status: newStatus } : order
-    );
+    try {
+      await api.put(`/admin/orders/${orderId}/status`, null, {
+        params: { status: newStatus },
+      });
 
-    setOrders(updated);
-    toast.success("Order status updated!");
+      toast.success("Order status updated");
+      fetchOrders();
+    } catch (err) {
+      toast.error(err.response?.data || "Update failed");
+    }
   };
 
- 
-  const statuses = ["All", ...new Set(orders.map((o) => o.status))];
+  const statuses = [
+    "All",
+    "PLACED",
+    "CONFIRMED",
+    "SHIPPED",
+    "DELIVERED",
+  ];
 
-  
   const filteredOrders = orders.filter((o) => {
     const search = searchTerm.toLowerCase();
 
     const matchesSearch =
-      o.customerName.toLowerCase().includes(search) ||
-      o.productName.toLowerCase().includes(search) ||
-      o.orderId.toLowerCase().includes(search) ||
-      o.address.toLowerCase().includes(search) ||
-      o.mobile.toLowerCase().includes(search);
+      o.userName.toLowerCase().includes(search) ||
+      o.orderId.toString().includes(search) ||
+      o.deliveryAddress.city.toLowerCase().includes(search);
 
     const matchesStatus =
-      filterStatus === "All" || o.status === filterStatus;
+      filterStatus === "All" || o.orderStatus === filterStatus;
 
     return matchesSearch && matchesStatus;
   });
@@ -92,7 +68,7 @@ function CustomerOrders() {
     <div className="product-page">
       <h2 className="page-title">Customer Orders</h2>
 
-     
+      {/* FILTER SECTION */}
       <div className="filter-section">
         <div className="search-box">
           <input
@@ -126,16 +102,17 @@ function CustomerOrders() {
         </div>
       </div>
 
+      {/* TABLE */}
       <div className="table-container">
         <table className="table table-bordered custom-table">
           <thead>
             <tr>
               <th>Order Date</th>
               <th>Order ID</th>
-              <th>Delivery Address</th>
-              <th>Product Details</th>
-              <th>Payment Type</th>
-              <th>Status</th>
+              <th>Customer</th>
+              <th>Products</th>
+              <th>Payment</th>
+              <th>Order Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -151,44 +128,80 @@ function CustomerOrders() {
 
             {filteredOrders.map((o) => (
               <tr key={o.orderId}>
-                <td>{o.orderDate}</td>
-                <td><b>{o.orderId}</b></td>
+                <td>{new Date(o.orderDate).toLocaleDateString()}</td>
 
                 <td>
-                  {o.customerName} <br />
-                  {o.address}
-                  <br />
-                  Mob: {o.mobile}
+                  <b>#{o.orderId}</b>
                 </td>
 
                 <td>
-                  {o.productName}
+                  {o.userName}
                   <br />
-                  Quantity: {o.quantity}
+                  {o.deliveryAddress.city},{" "}
+                  {o.deliveryAddress.state}
                   <br />
-                  <span className="price-green">₹{o.price}</span>
+                  {o.deliveryAddress.pincode}
                 </td>
-
-                <td>{o.paymentType}</td>
 
                 <td>
-                  <span className="badge bg-info p-2">{o.status}</span>
+                  {o.items.map((item) => (
+                    <div key={item.productId}>
+                      {item.productName} × {item.quantity}
+                      <br />
+                      <span className="price-green">
+                        ₹{item.totalAmount}
+                      </span>
+                    </div>
+                  ))}
                 </td>
 
+                {/* PAYMENT INFO */}
+                <td>
+                  Mode: {o.paymentMode ?? "COD"}
+                  <br />
+                  <span
+                    className={`badge ${
+                      o.paymentStatus === "SUCCESS"
+                        ? "bg-success"
+                        : "bg-warning"
+                    }`}
+                  >
+                    {o.paymentStatus}
+                  </span>
+                </td>
+
+                {/* ORDER STATUS */}
+                <td>
+                  <span className="badge bg-info p-2">
+                    {o.orderStatus}
+                  </span>
+                </td>
+
+                {/* ACTION */}
                 <td>
                   <div className="action-box">
                     <select
                       className="filter-select"
-                      onChange={(e) => (o.newStatus = e.target.value)}
+                      onChange={(e) =>
+                        (o.newStatus = e.target.value)
+                      }
                     >
                       <option value="">--select--</option>
-                      <option value="Order Received">Order Received</option>
-                      <option value="Packed">Packed</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Out For Delivery">
-                        Out For Delivery
-                      </option>
-                      <option value="Delivered">Delivered</option>
+                      {o.orderStatus === "PLACED" && (
+                        <option value="CONFIRMED">
+                          CONFIRMED
+                        </option>
+                      )}
+                      {o.orderStatus === "CONFIRMED" && (
+                        <option value="SHIPPED">
+                          SHIPPED
+                        </option>
+                      )}
+                      {o.orderStatus === "SHIPPED" && (
+                        <option value="DELIVERED">
+                          DELIVERED
+                        </option>
+                      )}
                     </select>
 
                     <button
@@ -202,7 +215,6 @@ function CustomerOrders() {
                   </div>
                 </td>
               </tr>
-
             ))}
           </tbody>
         </table>

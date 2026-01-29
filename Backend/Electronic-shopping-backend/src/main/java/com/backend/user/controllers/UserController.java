@@ -67,7 +67,7 @@ public class UserController {
 
 	        String jwt = jwtUtil.createToken(authenticated);
 
-	        // ✅ DO NOT CAST principal to User entity
+	       
 	        String email = authenticated.getName();
 
 	        // fetch your JPA user explicitly

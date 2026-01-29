@@ -2,6 +2,7 @@ package com.backend.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -31,11 +32,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse(ex.getMessage(), false));
     }
-
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<?> handleMailException(MailException ex){
+		return ResponseEntity
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body("email service failed.Please try again");
+    	
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleAll(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse("Something went wrong", false));
     }
+    
 }

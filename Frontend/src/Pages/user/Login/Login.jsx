@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import "./Login.css";
 
 function Login() {
@@ -12,7 +13,7 @@ function Login() {
 
   const onLogin = async () => {
     if (!email || !password) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
@@ -30,7 +31,7 @@ function Login() {
       localStorage.setItem("email", res.data.email);
       localStorage.setItem("userId" , res.data.id);
 
-      alert("Login successful!");
+      toast.success("Login successful!");
 
       // Role-based redirect
       if (res.data.role === "ADMIN") {
@@ -41,7 +42,7 @@ function Login() {
 
     } catch (error) {
       console.error(error);
-      alert("Invalid email or password");
+      toast.error("Invalid email or password");
     } finally {
       setLoading(false);
     }

@@ -22,7 +22,7 @@ public class OtpEmailService {
             "Your OTP for account verification is: " + otp + "\n\n" +
             "This OTP is valid for 10 minutes.\n\n" +
             "Regards,\n" +
-            "Your App Team"
+            "ElectroKart"
         );
         
         mailSender.send(message);

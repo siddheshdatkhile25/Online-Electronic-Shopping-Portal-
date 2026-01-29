@@ -2,9 +2,11 @@ import "./payment.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/axiosInstance";
+import loadRazorpayScript from "../../../utils/loadRazorpayScript";
+
 
 export default function Payment() {
-  const [cart, setCart] = useState({ items: [], cartTotal: 0 });
+  // const [caat setCCart= useState({ items: [], cacrrtTTaall: 0 });
   const [loading, setLoading] = useState(true);
   const [saveCard, setSaveCard] = useState(false);
   const [orderId, setOrderId] = useState(null);
@@ -67,6 +69,82 @@ export default function Payment() {
     navigate("/orders");
   };
 
+  const handleRazorpayPayment = async () => {
+  if (!orderId) {
+    setError("Order not found. Please go back and try again.");
+    return;
+  }
+
+  try {
+    setPaying(true);
+    setError("");
+
+    // Load Razorpay SDK
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      setError("Failed to load Razorpay. Please try again.");
+      return;
+    }
+
+    //Create Razorpay order (Backend)
+    const orderRes = await api.post(
+      `/api/payments/${orderId}/razorpay/order`
+    );
+
+    const { orderId: razorpayOrderId, amount, currency, key } = orderRes.data;
+
+    // Razorpay options
+    const options = {
+      key: key,
+      amount: amount,
+      currency: currency,
+      name: "ElectroKart",
+      description: "Order Payment",
+      order_id: razorpayOrderId,
+
+      handler: async function (response) {
+        try {
+          // Verify payment (Backend)
+          await api.post(
+            `/api/payments/${orderId}/razorpay/verify`,
+            {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            }
+          );
+
+          navigate("/orders"); // SUCCESS
+        } catch (err) {
+          console.error(err);
+          setError("Payment verification failed.");
+        }
+      },
+
+      prefill: {
+        name: "Customer",
+        email: "test@example.com",
+        contact: "9999999999",
+      },
+
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    // Open Razorpay popup
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+
+  } catch (err) {
+    console.error(err);
+    setError("Unable to initiate payment. Please try again.");
+  } finally {
+    setPaying(false);
+  }
+};
+
+
   if (loading) return <h2 style={{ padding: 40 }}>Loading payment…</h2>;
 
   return (
@@ -92,8 +170,9 @@ export default function Payment() {
             <h3 className="section-title">Quick Pay</h3>
 
             <div className="quick-pay">
-              <button className="razorpay-btn" onClick={handleConfirmPayment}>
-                Pay with Razorpay
+              <button className="razorpay-btn" onClick={handleRazorpayPayment}
+              disabled={paying}>
+                {paying ? "Processing..." : "Pay with Razorpay"}
               </button>
               <button className="upi-btn" onClick={handleCOD}>
                 Pay Via Cash On Delivery

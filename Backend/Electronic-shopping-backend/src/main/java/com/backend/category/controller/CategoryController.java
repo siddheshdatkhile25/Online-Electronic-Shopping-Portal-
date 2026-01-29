@@ -18,7 +18,7 @@ import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.service.CategoryService;
 import com.backend.common.dtos.ApiResponse;
 
-@PreAuthorize("hasRole('ADMIN')")
+
 @RestController
 @RequestMapping("/admin/categories")
 

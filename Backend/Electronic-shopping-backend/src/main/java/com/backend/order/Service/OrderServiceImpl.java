@@ -15,6 +15,7 @@ import com.backend.cart.repository.CartItemRepository;
 import com.backend.cart.repository.CartRepository;
 import com.backend.common.Enums.OrderStatus;
 import com.backend.common.Enums.PaymentStatus;
+import com.backend.notifications.MailService;
 import com.backend.order.DTO.AdminOrderItemResponse;
 import com.backend.order.DTO.AdminOrderResponse;
 import com.backend.order.DTO.MyOrderResponse;
@@ -51,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentRepository paymentRepository;
 	private final ProductRepository productRepository;
 	private final UserAddressRepository userAddressRepository;
-
+	private final MailService mailService;
 	@Override
 	public Object placeOrder(Long addressId , Long userId) {
 		
@@ -273,5 +274,62 @@ public class OrderServiceImpl implements OrderService {
 
 	    }).toList();
 	}
+
+	@Override
+	public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+
+	    Orders order = orderRepository.findById(orderId)
+	            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+	    OrderStatus currentStatus = order.getStatus();
+
+	    // Admin can go forward only
+	    if (!isValidTransition(currentStatus, newStatus)) {
+	        throw new RuntimeException(
+	                "Invalid order status transition: "
+	                        + currentStatus + " → " + newStatus);
+	    }
+
+	    // Update order status
+	    order.setStatus(newStatus);
+
+	    // Handle COD payment auto-success on delivery
+	    Payment payment = paymentRepository
+	            .findByOrder_Id(orderId)
+	            .orElse(null);
+
+	    if (newStatus == OrderStatus.DELIVERED
+	            && payment != null
+	            && payment.getMode() != null
+	            && payment.getMode().name().equals("COD")) {
+
+	        payment.setStatus(PaymentStatus.SUCCESS);
+	        paymentRepository.save(payment);
+	    }
+
+	    orderRepository.save(order);
+	    
+	    //after updating order status send email to customer
+	    String email=order.getUser().getEmail();
+	    String subject="Your order #" +orderId+ "status updated";
+	    String body="Hello " + order.getUser().getFirstname() + ",\n\n" +
+	              "Your order #" + orderId + " status has been updated to: " + newStatus + ".\n" +
+	              "Thank you for shopping with us!";
+	    
+	    mailService.sendEmail(email, subject, body);
+	}
+
+	private boolean isValidTransition(OrderStatus current, OrderStatus next) {
+
+	    return switch (current) {
+	        case PLACED -> next == OrderStatus.CONFIRMED;
+	        case CONFIRMED -> next == OrderStatus.SHIPPED;
+	        case SHIPPED -> next == OrderStatus.DELIVERED;
+	        default -> false;
+	    };
+	}
+
+
+
 
 }

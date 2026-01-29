@@ -67,7 +67,13 @@ export default function ProductDetails() {
         <p className="pd-price">
           {product.discountPercentage > 0 ? (
             <>
-              <span style={{ textDecoration: "line-through", color: "gray", marginRight: "10px" }}>
+              <span
+                style={{
+                  textDecoration: "line-through",
+                  color: "gray",
+                  marginRight: "10px",
+                }}
+              >
                 ₹{product.price}
               </span>
               <span style={{ color: "green", fontWeight: "bold" }}>
@@ -83,7 +89,9 @@ export default function ProductDetails() {
         </p>
 
         <p className="pd-desc">{product.description}</p>
-        <p><strong>Brand:</strong> {product.brand}</p>
+        <p>
+          <strong>Brand:</strong> {product.brand}
+        </p>
 
         <div className="pd-actions">
           <button className="pd-btn pd-cart-btn" onClick={addToCart}>

@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.common.dtos.ApiResponse;
 import com.backend.product.DTO.ProductRequest;
 import com.backend.product.DTO.ProductResponse;
-import com.backend.product.entity.Product;
 import com.backend.product.service.admin.ProductService;
 
 @RestController
@@ -34,20 +34,23 @@ public class ProductController {
 
     //For adding Products
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@ModelAttribute ProductRequest request) {
-      ProductResponse response=productService.createProduct(request);
-      return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("Product created successfully",response));
-	
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
+            @ModelAttribute ProductRequest request) {
+
+        ProductResponse response = productService.createProduct(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ApiResponse<>("Product created successfully", response));
     }
-    
+
     //get all products
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts(){
-    	List<ProductResponse> response=productService.getAllProducts();
-		return ResponseEntity.ok(new ApiResponse("All Products Available",response));
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
+        List<ProductResponse> response = productService.getAllProducts();
+        return ResponseEntity.ok(
+                new ApiResponse<>("All Products Available", response));
     }
-    
-    
+
     //get product by id
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> getProductById(
@@ -55,8 +58,7 @@ public class ProductController {
 
         ProductResponse product = productService.getProductById(productId);
         return ResponseEntity.ok(
-            new ApiResponse<>("Product fetched successfully", product)
-        );
+                new ApiResponse<>("Product fetched successfully", product));
     }
 
     //update product
@@ -67,11 +69,9 @@ public class ProductController {
 
         ProductResponse updated = productService.updateProduct(productId, request);
         return ResponseEntity.ok(
-            new ApiResponse<>("Product updated successfully", updated)
-        );
+                new ApiResponse<>("Product updated successfully", updated));
     }
 
-    
     //delete product
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(
@@ -79,21 +79,29 @@ public class ProductController {
 
         productService.deleteProduct(productId);
         return ResponseEntity.ok(
-            new ApiResponse<>("Product deleted successfully", null)
-        );
+                new ApiResponse<>("Product deleted successfully", null));
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    // Toggle product active/inactive status
+    @PutMapping("/{productId}/toggle-status")
+    public ResponseEntity<ApiResponse<ProductResponse>> toggleProductStatus(
+            @PathVariable Long productId) {
 
-    
+        ProductResponse response = productService.toggleProductStatus(productId);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Product status updated successfully", response));
+    }
+
+    // Add stock to existing product
+    @PutMapping("/{productId}/add-stock")
+    public ResponseEntity<ApiResponse<ProductResponse>> addProductStock(
+            @PathVariable Long productId,
+            @RequestParam Integer quantity) {
+
+        ProductResponse response =
+                productService.addProductStock(productId, quantity);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Stock added successfully", response));
+    }
 }

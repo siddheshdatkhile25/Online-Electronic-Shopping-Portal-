@@ -128,7 +128,7 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
-    // ================= DTO MAPPER =================
+ // ================= DTO MAPPER =================
     private CartDTO mapToDTO(Cart cart) {
 
         List<CartItemDTO> itemDTOs = cart.getCartItems().stream()
@@ -136,7 +136,13 @@ public class CartServiceImpl implements CartService {
                         item.getCartItemId(),
                         item.getProduct().getId(),
                         item.getProduct().getName(),
-                        item.getProduct().getImgUrl(),
+                        item.getProduct()
+                                .getImages()
+                                .stream()
+                                .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                                .findFirst()
+                                .map(img -> img.getImageUrl())
+                                .orElse(null),
                         item.getQuantity(),
                         item.getPrice(),
                         item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
@@ -149,4 +155,5 @@ public class CartServiceImpl implements CartService {
 
         return new CartDTO(cart.getCartId(), itemDTOs, total);
     }
+
 }

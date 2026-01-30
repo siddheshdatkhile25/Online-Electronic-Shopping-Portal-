@@ -2,11 +2,14 @@ package com.backend.product.DTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class ProductResponse {
 
@@ -14,25 +17,21 @@ public class ProductResponse {
     private String name;
     private String description;
 
-    // Original Price
     private BigDecimal price;
-
-    // Discount fields
     private Double discountPercentage;
     private BigDecimal discountedPrice;
 
     private Integer stock;
+    private String stockMessage;
 
     private Long categoryId;
     private String categoryName;
+
     private String brand;
-    private String imgUrl;
+
+    
+    private List<String> imageUrls;
+
     private Boolean active;
     private LocalDateTime createdAt;
-
-    // Indicates if stock is low (stock < 10)
-    private Boolean lowStock;
-
-    // Dynamic stock message like "Only 5 available"
-    private String stockMessage;
 }

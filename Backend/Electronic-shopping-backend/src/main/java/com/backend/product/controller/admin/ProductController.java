@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,76 +31,69 @@ public class ProductController {
         this.productService = productService;
     }
 
-    //For adding Products
-    @PostMapping(consumes = "multipart/form-data")
+    // ✅ CREATE PRODUCT (MULTIPART AUTO-DETECTED)
+    @PostMapping
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @ModelAttribute ProductRequest request) {
 
         ProductResponse response = productService.createProduct(request);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ApiResponse<>("Product created successfully", response));
     }
 
-    //get all products
+    // GET ALL PRODUCTS
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
         List<ProductResponse> response = productService.getAllProducts();
-        return ResponseEntity.ok(
-                new ApiResponse<>("All Products Available", response));
+        return ResponseEntity.ok(new ApiResponse<>("All Products Available", response));
     }
 
-    //get product by id
+    // GET PRODUCT BY ID
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> getProductById(
             @PathVariable Long productId) {
 
         ProductResponse product = productService.getProductById(productId);
-        return ResponseEntity.ok(
-                new ApiResponse<>("Product fetched successfully", product));
+        return ResponseEntity.ok(new ApiResponse<>("Product fetched successfully", product));
     }
 
-    //update product
-    @PutMapping(value = "/{productId}", consumes = "multipart/form-data")
+    // UPDATE PRODUCT
+    @PutMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long productId,
             @ModelAttribute ProductRequest request) {
 
         ProductResponse updated = productService.updateProduct(productId, request);
-        return ResponseEntity.ok(
-                new ApiResponse<>("Product updated successfully", updated));
+        return ResponseEntity.ok(new ApiResponse<>("Product updated successfully", updated));
     }
 
-    //delete product
+    // DELETE PRODUCT
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(
             @PathVariable Long productId) {
 
         productService.deleteProduct(productId);
-        return ResponseEntity.ok(
-                new ApiResponse<>("Product deleted successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>("Product deleted successfully", null));
     }
 
-    // Toggle product active/inactive status
+    // TOGGLE STATUS
     @PutMapping("/{productId}/toggle-status")
     public ResponseEntity<ApiResponse<ProductResponse>> toggleProductStatus(
             @PathVariable Long productId) {
 
         ProductResponse response = productService.toggleProductStatus(productId);
-        return ResponseEntity.ok(
-                new ApiResponse<>("Product status updated successfully", response));
+        return ResponseEntity.ok(new ApiResponse<>("Product status updated successfully", response));
     }
 
-    // Add stock to existing product
+    // ADD STOCK
     @PutMapping("/{productId}/add-stock")
     public ResponseEntity<ApiResponse<ProductResponse>> addProductStock(
             @PathVariable Long productId,
             @RequestParam Integer quantity) {
 
-        ProductResponse response =
-                productService.addProductStock(productId, quantity);
-
-        return ResponseEntity.ok(
-                new ApiResponse<>("Stock added successfully", response));
+        ProductResponse response = productService.addProductStock(productId, quantity);
+        return ResponseEntity.ok(new ApiResponse<>("Stock added successfully", response));
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.backend.common.exception.ResourceNotFoundException;
 import com.backend.product.DTO.CustomerProductResponse;
 import com.backend.product.entity.Product;
+import com.backend.product.entity.ProductImage;
 import com.backend.product.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
@@ -67,6 +68,20 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     // Convert Product entity to CustomerProductResponse DTO
     public CustomerProductResponse toCustomerResponse(Product product) {
 
+        List<String> imageUrls = product.getImages()
+                .stream()
+                .map(ProductImage::getImageUrl)
+                .toList();
+
+        String primaryImageUrl = product.getImages()
+                .stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                .findFirst()
+                .map(ProductImage::getImageUrl)
+                .orElse(
+                        imageUrls.isEmpty() ? null : imageUrls.get(0)
+                );
+
         return CustomerProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -77,34 +92,36 @@ public class CustomerProductServiceImpl implements CustomerProductService {
 
                 // Discount info
                 .discountPercentage(
-                    product.getDiscountPercentage() != null
-                        ? product.getDiscountPercentage()
-                        : 0
+                        product.getDiscountPercentage() != null
+                                ? product.getDiscountPercentage()
+                                : 0
                 )
 
                 // Final price (never null)
                 .discountedPrice(
-                    product.getDiscountedPrice() != null
-                        ? product.getDiscountedPrice()
-                        : product.getPrice()
+                        product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice()
                 )
 
                 .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
-                .imgUrl(product.getImgUrl())
+
+                // ✅ NEW
+                .primaryImageUrl(primaryImageUrl)
+                .imageUrls(imageUrls)
+
                 .build();
     }
-
 
     @Override
     public List<String> getAllActiveBrands() {
         return productRepository.findAllBrands();
     }
 
-    //brands per category
+    // brands per category
     @Override
     public List<String> getBrandsByCategory(Long categoryId) {
         return productRepository.findBrandsByCategory(categoryId);
     }
-
 }

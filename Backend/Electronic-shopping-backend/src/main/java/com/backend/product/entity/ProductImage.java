@@ -4,25 +4,33 @@ import com.backend.common.entites.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "product_images")
 @Data
-@Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductImage extends BaseEntity {
 
-public class ProductImage extends BaseEntity{
-
-   
-    @Column(nullable = false)
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
-    
-    //main img and sub images
+
+    // true = main image, false = secondary image
+    @Column(name = "is_primary", nullable = false)
     private Boolean isPrimary = false;
 
-    
+    // Many images belong to one product
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 }

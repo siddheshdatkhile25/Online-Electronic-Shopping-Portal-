@@ -103,3 +103,23 @@
   font-size: 14px;
   color: gray;
 }
+
+
+.pd-thumbnails {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pd-thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 5px;
+}
+
+.pd-thumb.active {
+  border-color: black;
+}

@@ -1,4 +1,4 @@
-package com.backend.product.DTO;
+package com.backend.product.controller.customer;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,12 +26,12 @@ public class ProductRequest {
 
     private Long categoryId;
 
-    // Product Discount
+    // Product Discount (percentage)
     private Double discountPercentage;
 
     private String brand;
 
-    // Multiple product images (max 4 handled in service)
+    // Multiple product images (max 4)
     private List<MultipartFile> images;
 
     // Used to add stock to an existing product without overwriting current stock

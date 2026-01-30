@@ -145,7 +145,12 @@ const ManageProduct = () => {
             {filteredProducts.map((p) => (
               <tr key={p.id}>
                 <td>
-                  <img src={p.imgUrl} alt={p.name} className="product-img" />
+                  <img
+                    src={p.imageUrls?.[0]}
+                    alt={p.name}
+                    className="product-img"
+                  />
+
                 </td>
 
                 <td>{p.name}</td>

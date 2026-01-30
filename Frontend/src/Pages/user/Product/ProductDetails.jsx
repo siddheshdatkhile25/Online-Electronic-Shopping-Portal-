@@ -19,7 +19,6 @@ export default function ProductDetails() {
         const data = res.data.data;
         setProduct(data);
 
-        // Set first image as main image
         if (data.imageUrls && data.imageUrls.length > 0) {
           setMainImage(data.imageUrls[0]);
         }
@@ -32,6 +31,23 @@ export default function ProductDetails() {
       });
   }, [id, navigate]);
 
+  // ✅ ONLY NEW LOGIC (NECESSARY)
+  const addToCart = async () => {
+    try {
+      await api.post("/api/users/cart/add", null, {
+        params: {
+          productId: product.id,
+          quantity: 1,
+        },
+      });
+      toast.success("Added to cart");
+      navigate("/cart");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add to cart");
+    }
+  };
+
   if (loading) return <h2>Loading...</h2>;
   if (!product) return <h2>Product not found</h2>;
 
@@ -40,13 +56,9 @@ export default function ProductDetails() {
       {/* LEFT SIDE */}
       <div className="pd-left">
         <div className="pd-main-img">
-          <img
-            src={mainImage || "/placeholder.png"}
-            alt={product.name}
-          />
+          <img src={mainImage || "/placeholder.png"} alt={product.name} />
         </div>
 
-        {/*  ALL THUMBNAILS */}
         {product.imageUrls?.length > 1 && (
           <div className="pd-thumbnails">
             {product.imageUrls.map((img, index) => (
@@ -54,9 +66,7 @@ export default function ProductDetails() {
                 key={index}
                 src={img}
                 alt={`product-${index}`}
-                className={`pd-thumb ${
-                  mainImage === img ? "active" : ""
-                }`}
+                className={`pd-thumb ${mainImage === img ? "active" : ""}`}
                 onClick={() => setMainImage(img)}
               />
             ))}
@@ -93,8 +103,14 @@ export default function ProductDetails() {
         </p>
 
         <div className="pd-actions">
-          <button className="pd-btn pd-cart-btn">🛒 Add to Cart</button>
-          <button className="pd-btn pd-wishlist-btn">❤️ Add to Wishlist</button>
+          {/* ✅ ONLY CHANGE HERE */}
+          <button className="pd-btn pd-cart-btn" onClick={addToCart}>
+            🛒 Add to Cart
+          </button>
+
+          <button className="pd-btn pd-wishlist-btn">
+            ❤️ Add to Wishlist
+          </button>
         </div>
       </div>
     </div>

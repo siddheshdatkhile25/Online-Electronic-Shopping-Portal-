@@ -1,7 +1,6 @@
 package com.backend.review.DTO;
 
 import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -9,9 +8,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class ReviewResponse {
 
-    private Long reviewId;
+    private Long id;
     private int rating;
     private String comment;
-    private LocalDateTime createdAt;
-    private String userName;
+    private LocalDateTime createdAt; 
+    private String userName;          
+    private Long userId;
 }

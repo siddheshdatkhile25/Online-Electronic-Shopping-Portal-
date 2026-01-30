@@ -12,6 +12,7 @@ export default function OrderList() {
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null); // ✅ For success/failure messages
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
@@ -30,6 +31,7 @@ export default function OrderList() {
     console.log("Constructed image URL:", fullUrl, "from:", imagePath);
     return fullUrl;
   };
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -53,16 +55,11 @@ export default function OrderList() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'DELIVERED':
-        return '#28a745';
-      case 'IN_TRANSIT':
-        return '#007bff';
-      case 'PLACED':
-        return '#ffc107';
-      case 'CANCELLED':
-        return '#dc3545';
-      default:
-        return '#6c757d';
+      case 'DELIVERED': return '#28a745';
+      case 'IN_TRANSIT': return '#007bff';
+      case 'PLACED': return '#ffc107';
+      case 'CANCELLED': return '#dc3545';
+      default: return '#6c757d';
     }
   };
 
@@ -99,16 +96,25 @@ export default function OrderList() {
     if (!selectedItem) return;
 
     try {
+      // Prepare payload as expected by backend
+      const payload = {
+        userId: parseInt(userId),
+        productId: selectedItem.item.productId,
+        rating: reviewData.rating,
+        comment: reviewData.comment
+      };
+
+      // Send review to backend
+      await api.post(`/api/reviews/add`, payload);
+
+      // Update local state to reflect review immediately
       const updatedOrders = orders.map(order => {
         if (order.orderId === selectedItem.orderId) {
           return {
             ...order,
             items: order.items.map(item => {
               if (item.productId === selectedItem.item.productId) {
-                return {
-                  ...item,
-                  review: reviewData
-                };
+                return { ...item, review: { rating: reviewData.rating, comment: reviewData.comment } };
               }
               return item;
             })
@@ -118,19 +124,24 @@ export default function OrderList() {
       });
 
       setOrders(updatedOrders);
-      
-      // Send review to backend
-      await api.post(`/api/orders/${selectedItem.orderId}/items/${selectedItem.item.productId}/review`, reviewData);
-      
       closeReviewModal();
+
+      // ✅ Show success message for 3 seconds
+      setMessage("Review submitted successfully!");
+      setTimeout(() => setMessage(null), 3000);
+
     } catch (err) {
       console.error("Error submitting review:", err);
-      alert("Failed to submit review");
+      setMessage("Failed to submit review");
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
   return (
     <div className="order-container">
+      {/* ✅ Message Display */}
+      {message && <div className="review-message">{message}</div>}
+
       {/* LEFT SIDE - Order List */}
       <div className="order-left">
         <h1 className="order-title">My Orders</h1>

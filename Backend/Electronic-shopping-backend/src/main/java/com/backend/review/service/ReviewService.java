@@ -10,4 +10,9 @@ public interface ReviewService {
 	  void addReview(AddReviewRequest request);
 
 	List<ReviewResponse> getReviewsByProduct(Long productId);
+	
+	void deleteReview(Long userId, Long productId);
+
+	void updateReview(AddReviewRequest request);
+
 }

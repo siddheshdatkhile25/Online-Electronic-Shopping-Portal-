@@ -1,6 +1,7 @@
 package com.backend.review.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long>{
 	//JPQL DTO Projection
 	@Query("""
 			SELECT new com.backend.review.DTO.ReviewResponse(
-			r.id,r.rating,r.comment,r.createdAt,CONCAT(r.user.firstname, ' ', r.user.lastname))
+			r.id,r.rating,r.comment,r.createdAt,CONCAT(r.user.firstname, ' ', r.user.lastname),r.user.id)
 			FROM Review r
 			WHERE r.product.id= :productId
 			ORDER BY r.createdAt DESC
@@ -28,5 +29,8 @@ public interface ReviewRepository extends JpaRepository<Review,Long>{
 	
 	//r.user.name => Review->User->Name
 	List<ReviewResponse> findReviewsByProduct(@Param("productId")Long productId);
+	
+	Optional<Review> findByUserIdAndProductId(Long userId, Long productId);
 
+	
 }

@@ -356,3 +356,14 @@
 .modal-actions button:last-child:hover {
   background-color: #0056b3;
 }
+.review-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #28a745; 
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}

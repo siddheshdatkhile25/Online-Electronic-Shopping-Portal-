@@ -50,7 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         // Validate order state
-        if (!OrderStatus.PLACED.equals(order.getStatus())) {
+        if (!OrderStatus.CREATED.equals(order.getStatus())) {
             throw new RuntimeException("Payment mode cannot be changed");
         }
         
@@ -129,7 +129,9 @@ public class PaymentServiceImpl implements PaymentService {
 	    payment.setStatus(PaymentStatus.SUCCESS);
 	    payment.setMode(PaymentMode.RAZORPAY);
 	    paymentRepository.save(payment);
-
+	    Orders order = payment.getOrder();
+	    order.setStatus(OrderStatus.CONFIRMED);
+	    orderRepository.save(order);
 	    return "Payment verified successfully";
 	}
 

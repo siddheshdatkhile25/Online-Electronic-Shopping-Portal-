@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
 		Orders order = new Orders();
 		order.setUser(user);
 		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.PLACED);
+		order.setStatus(OrderStatus.CREATED);
 		
 		UserAddress selectedAddress = userAddressRepository
 				.findByIdAndUser_Id(addressId, userId)
@@ -322,14 +322,13 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private boolean isValidTransition(OrderStatus current, OrderStatus next) {
-
 	    return switch (current) {
-	        case PLACED -> next == OrderStatus.CONFIRMED;
 	        case CONFIRMED -> next == OrderStatus.SHIPPED;
 	        case SHIPPED -> next == OrderStatus.DELIVERED;
 	        default -> false;
 	    };
 	}
+
 
 	
 	@Override

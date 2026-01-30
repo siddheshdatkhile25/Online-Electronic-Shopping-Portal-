@@ -14,5 +14,7 @@ public interface OrderService {
 	List<AdminOrderResponse> getAllOrdersForAdmin();
 	//admin update order status
 	void updateOrderStatus(Long orderId, OrderStatus status);
+	
+	Object getOrderDetails(Long orderId);
 
 }

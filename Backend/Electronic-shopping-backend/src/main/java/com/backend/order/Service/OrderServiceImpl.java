@@ -4,6 +4,7 @@ package com.backend.order.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.backend.cart.repository.CartItemRepository;
 import com.backend.cart.repository.CartRepository;
 import com.backend.common.Enums.OrderStatus;
 import com.backend.common.Enums.PaymentStatus;
+import com.backend.common.service.OtpEmailService;
 import com.backend.notifications.MailService;
 import com.backend.order.DTO.AdminOrderItemResponse;
 import com.backend.order.DTO.AdminOrderResponse;
@@ -43,7 +45,6 @@ import lombok.RequiredArgsConstructor;
 public class OrderServiceImpl implements OrderService {
 
 
-
 	private final CartRepository cartRepository;
 	private final CartItemRepository cartItemRepository;
 	private final OrderRepository orderRepository;
@@ -53,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
 	private final ProductRepository productRepository;
 	private final UserAddressRepository userAddressRepository;
 	private final MailService mailService;
+
+    
 	@Override
 	public Object placeOrder(Long addressId , Long userId) {
 		
@@ -155,7 +158,6 @@ public class OrderServiceImpl implements OrderService {
         			"paymentStatus", payment.getStatus(),
         			"ammount", totalAmount
         		);
-        		
 		
 	}
 	
@@ -328,6 +330,62 @@ public class OrderServiceImpl implements OrderService {
 	        default -> false;
 	    };
 	}
+
+	
+	@Override
+	public MyOrderResponse getOrderDetails(Long orderId) {
+
+	    // 1️⃣ Fetch order
+	    Orders order = orderRepository.findById(orderId)
+	            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+	    // 2️⃣ Fetch payment
+	    Payment payment = paymentRepository
+	            .findByOrder_Id(order.getId())
+	            .orElse(null);
+
+	    // 3️⃣ Fetch order items
+	    List<OrderItem> orderItems =
+	            orderItemRepository.findByOrderId(order.getId());
+
+	    // 4️⃣ Map OrderItem → OrderItemResponse
+	    List<OrderItemResponse> itemResponses =
+	            orderItems.stream().map(item -> {
+	                OrderItemResponse dto = new OrderItemResponse();
+	                dto.setProductId(item.getProduct().getId());
+	                dto.setProductName(item.getProduct().getName());
+	                dto.setQuantity(item.getQuantity());
+	                dto.setPrice(item.getPrice());
+	                dto.setProductImage(item.getProduct().getImgUrl());
+	                return dto;
+	            }).toList();
+
+	    // 5️⃣ Compute total amount (safe fallback if payment is null)
+	    BigDecimal totalAmount;
+	    if (payment != null) {
+	        totalAmount = payment.getAmount();
+	    } else {
+	        totalAmount = orderItems.stream()
+	                .map(item ->
+	                        item.getPrice()
+	                            .multiply(BigDecimal.valueOf(item.getQuantity())))
+	                .reduce(BigDecimal.ZERO, BigDecimal::add);
+	    }
+
+	    // 6️⃣ Build response
+	    MyOrderResponse response = new MyOrderResponse();
+	    response.setOrderId(order.getId());
+	    response.setOrderDateTime(order.getOrderDateTime());
+	    response.setOrderStatus(order.getStatus());
+	    response.setPaymentStatus(
+	            payment != null ? payment.getStatus() : PaymentStatus.PENDING
+	    );
+	    response.setAmount(totalAmount);
+	    response.setItems(itemResponses);
+
+	    return response;
+	}
+
 
 
 

@@ -1,98 +1,117 @@
-import React, { useState } from 'react';
-import './Navbar.css';
-import shoppingCartIcon from '../icons/shopping-cart.png';
-import wishlistIcon from '../icons/wishlist.png';
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Navbar.css";
+
+import shoppingCartIcon from "../icons/shopping-cart.png";
+import wishlistIcon from "../icons/wishlist.png";
 
 function Navbar() {
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem("token") !== null;
 
-  // Dropdown toggle state
+  const isLoggedIn = Boolean(localStorage.getItem("token"));
+  const userEmail = localStorage.getItem("email");
+
   const [openMenu, setOpenMenu] = useState(false);
 
+  /* -------------------- Handlers -------------------- */
+  const handleNavigate = (path) => {
+    setOpenMenu(false);
+    navigate(path);
+  };
+
   const handleLogout = () => {
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
     setOpenMenu(false);
     navigate("/login");
   };
 
+  /* -------------------- JSX -------------------- */
   return (
-    <nav className='navbar' data-bs-theme='dark'>
-      <div className='container-fluid'>
+    <nav className="navbar" data-bs-theme="dark">
+      <div className="container-fluid">
 
-        {/* LEFT SECTION */}
+        {/* LEFT */}
         <div className="nav-left">
-          <h2 className='navbar-brand'>ElectroKart</h2>
+          <div
+            className="navbar-brand"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
+            <div className="navbar-brand">
+              <img
+                src="/favicon.png"
+                alt="ElectroKart Logo"
+                className="navbar-logo"
+              />
+              <span className="brand-name">ElectroKart</span>
+            </div>
 
-          <ul className='nav-menu'>
-            <li>Shop</li>
-            <li>About Us</li>
+          </div>
+
+          <ul className="nav-menu">
+            <li onClick={() => navigate("/shop")}>Shop</li>
+            <li onClick={() => navigate("/about")}>About Us</li>
           </ul>
         </div>
 
-        {/* CENTER SECTION */}
+        {/* CENTER */}
         <div className="nav-center">
           <div className="searchbar">
-            <input type="text" placeholder="Search..." />
+            <input
+              type="text"
+              placeholder="Search products..."
+              aria-label="Search"
+            />
           </div>
         </div>
 
-        {/* RIGHT SECTION */}
+        {/* RIGHT */}
         <div className="nav-right">
           <ul className="nav-icons">
-            <li>
-              <img
-                src={shoppingCartIcon}
-                alt="Cart"
-                // onClick={() => {
-                //   isLoggedIn ? navigate("/cart") : navigate("/login");
-                // }}
-                onClick={() => navigate("/cart")}
-              />
+            <li onClick={() => navigate("/cart")}>
+              <img src={shoppingCartIcon} alt="Cart" />
             </li>
-            <li>
-              <img
-                src={wishlistIcon}
-                alt="Wishlist"
-                // onClick={() => {
-                //   isLoggedIn ? navigate("/wishlist") : navigate("/login");
-                // }}
-                onClick={() => navigate("/wishlist")}
-                style={{ cursor: "pointer" }}
-              />
+
+            <li onClick={() => navigate("/wishlist")}>
+              <img src={wishlistIcon} alt="Wishlist" />
             </li>
           </ul>
 
-          {/* CONDITIONAL RENDERING */}
+          {/* AUTH SECTION */}
           {isLoggedIn ? (
-            <div 
+            <div
               className="profile-wrapper"
-              onClick={() => setOpenMenu(!openMenu)}
+              onClick={() => setOpenMenu((prev) => !prev)}
             >
               <div className="profile-circle">
-                {/* Optional: Add user initial */}
-                {localStorage.getItem("email")
-                  ?.charAt(0)
-                  .toUpperCase()}
-
+                {userEmail?.charAt(0).toUpperCase() || "U"}
               </div>
 
               {openMenu && (
                 <div className="profile-dropdown">
-                  <p onClick={() => navigate("/profile")}>My Profile</p>
-                  <p onClick={() => navigate("/orders")}>My Orders</p>
-                  <p onClick={handleLogout}>Logout</p>
+                  <p onClick={() => handleNavigate("/profile")}>
+                    My Profile
+                  </p>
+                  <p onClick={() => handleNavigate("/orders")}>
+                    My Orders
+                  </p>
+                  <p onClick={handleLogout}>
+                    Logout
+                  </p>
                 </div>
               )}
             </div>
           ) : (
-            <button className="login-btn" onClick={() => navigate("/login")}>
+            <button
+              className="login-btn"
+              onClick={() => navigate("/login")}
+            >
               Login
             </button>
           )}
-
         </div>
+
       </div>
     </nav>
   );

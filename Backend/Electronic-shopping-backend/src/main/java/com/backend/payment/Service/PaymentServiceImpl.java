@@ -1,16 +1,26 @@
 package com.backend.payment.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.backend.common.Enums.OrderStatus;
+import com.backend.common.Enums.PaymentMode;
+import com.backend.common.Enums.PaymentStatus;
 import com.backend.order.Repository.OrderRepository;
 import com.backend.order.entites.Orders;
 import com.backend.order.entites.Payment;
+import com.backend.payment.DTO.RazorpayVerifyRequest;
 import com.backend.payment.DTO.SetPaymentModeRequest;
 import com.backend.payment.Repository.PaymentRepository;
+import com.backend.payment.Util.RazorPaySignatureUtil;
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
+
+
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +30,17 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+	@Value("${razorpay.key.id}")
+	private String keyId;
+
+	@Value("${razorpay.key.secret}")
+	private String keySecret;
+
 
 	private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final RazorpayClient razorpayClient;
+
 
     @Override
     public Object setPaymentMode(Long orderId, SetPaymentModeRequest request) {
@@ -63,5 +81,57 @@ public class PaymentServiceImpl implements PaymentService {
                 "message", "Payment mode set successfully"
         );
     }
+
+	@Override
+	public Map<String, Object> createRazorpayOrder(Long orderId) throws Exception {
+		
+	    Payment payment = paymentRepository.findByOrder_Id(orderId)
+	            .orElseThrow(() -> new RuntimeException("Payment not found for order"));
+	    
+		BigDecimal amount = payment.getAmount();
+
+        Map<String, Object> options = new HashMap<>();
+        options.put("amount", amount.multiply(BigDecimal.valueOf(100))); 
+        options.put("currency", "INR");
+        options.put("receipt", "order_" + orderId);
+
+        Order order = razorpayClient.orders.create(
+                new org.json.JSONObject(options)
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderId", order.get("id"));
+        response.put("amount", order.get("amount"));
+        response.put("currency", order.get("currency"));
+        response.put("key", keyId);
+
+        return response;
+	}
+	
+
+	@Override
+	public String verifyRazorpayPayment(Long orderId, RazorpayVerifyRequest request)
+			throws Exception {
+		boolean isValid = RazorPaySignatureUtil.verify(
+	            request.getRazorpayOrderId(),
+	            request.getRazorpayPaymentId(),
+	            request.getRazorpaySignature(),
+	            keySecret
+	    );
+
+	    if (!isValid) {
+	        throw new RuntimeException("Invalid Razorpay signature");
+	    }
+
+	    Payment payment = paymentRepository.findByOrder_Id(orderId)
+	            .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+	    payment.setStatus(PaymentStatus.SUCCESS);
+	    payment.setMode(PaymentMode.RAZORPAY);
+	    paymentRepository.save(payment);
+
+	    return "Payment verified successfully";
+	}
+
 
 }

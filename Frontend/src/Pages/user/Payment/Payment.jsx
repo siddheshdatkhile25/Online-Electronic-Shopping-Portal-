@@ -12,13 +12,21 @@ export default function Payment() {
   const [orderId, setOrderId] = useState(null);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
+  const [order, setOrder] = useState(null);
+
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadCart();
     fetchOrderId();
   }, []);
+
+  useEffect(() => {
+    if (orderId) {
+      loadOrderDetails(orderId);
+    }
+  }, [orderId]);
+
 
   const fetchOrderId = () => {
     try {
@@ -32,14 +40,20 @@ export default function Payment() {
     }
   };
 
-  const loadCart = async () => {
+
+
+  const loadOrderDetails = async (orderId) => {
     try {
-      const res = await api.get("/api/users/cart");
-      setCart(res.data);
-    } finally {
-      setLoading(false);
-    }
+      const res = await api.get(`/api/orders/${orderId}`);
+      setOrder(res.data);
+    } catch (err) {
+      console.error("Failed to load order details", err);
+      setError("Unable to load order details");
+    }finally {
+    setLoading(false); 
+  }
   };
+
 
   const handleCOD = async () => {
     if (!orderId) {
@@ -70,79 +84,79 @@ export default function Payment() {
   };
 
   const handleRazorpayPayment = async () => {
-  if (!orderId) {
-    setError("Order not found. Please go back and try again.");
-    return;
-  }
-
-  try {
-    setPaying(true);
-    setError("");
-
-    // Load Razorpay SDK
-    const loaded = await loadRazorpayScript();
-    if (!loaded) {
-      setError("Failed to load Razorpay. Please try again.");
+    if (!orderId) {
+      setError("Order not found. Please go back and try again.");
       return;
     }
 
-    //Create Razorpay order (Backend)
-    const orderRes = await api.post(
-      `/api/payments/${orderId}/razorpay/order`
-    );
+    try {
+      setPaying(true);
+      setError("");
 
-    const { orderId: razorpayOrderId, amount, currency, key } = orderRes.data;
+      // Load Razorpay SDK
+      const loaded = await loadRazorpayScript();
+      if (!loaded) {
+        setError("Failed to load Razorpay. Please try again.");
+        return;
+      }
 
-    // Razorpay options
-    const options = {
-      key: key,
-      amount: amount,
-      currency: currency,
-      name: "ElectroKart",
-      description: "Order Payment",
-      order_id: razorpayOrderId,
+      //Create Razorpay order (Backend)
+      const orderRes = await api.post(
+        `/api/payments/${orderId}/razorpay/order`
+      );
 
-      handler: async function (response) {
-        try {
-          // Verify payment (Backend)
-          await api.post(
-            `/api/payments/${orderId}/razorpay/verify`,
-            {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            }
-          );
+      const { orderId: razorpayOrderId, amount, currency, key } = orderRes.data;
 
-          navigate("/orders"); // SUCCESS
-        } catch (err) {
-          console.error(err);
-          setError("Payment verification failed.");
-        }
-      },
+      // Razorpay options
+      const options = {
+        key: key,
+        amount: amount,
+        currency: currency,
+        name: "ElectroKart",
+        description: "Order Payment",
+        order_id: razorpayOrderId,
 
-      prefill: {
-        name: "Customer",
-        email: "test@example.com",
-        contact: "9999999999",
-      },
+        handler: async function (response) {
+          try {
+            // Verify payment (Backend)
+            await api.post(
+              `/api/payments/${orderId}/razorpay/verify`,
+              {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              }
+            );
 
-      theme: {
-        color: "#3399cc",
-      },
-    };
+            navigate("/orders"); // SUCCESS
+          } catch (err) {
+            console.error(err);
+            setError("Payment verification failed.");
+          }
+        },
 
-    // Open Razorpay popup
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
+        prefill: {
+          name: "Customer",
+          email: "test@example.com",
+          contact: "9999999999",
+        },
 
-  } catch (err) {
-    console.error(err);
-    setError("Unable to initiate payment. Please try again.");
-  } finally {
-    setPaying(false);
-  }
-};
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      // Open Razorpay popup
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+    } catch (err) {
+      console.error(err);
+      setError("Unable to initiate payment. Please try again.");
+    } finally {
+      setPaying(false);
+    }
+  };
 
 
   if (loading) return <h2 style={{ padding: 40 }}>Loading payment…</h2>;
@@ -163,7 +177,7 @@ export default function Payment() {
 
           {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
 
-  
+
 
           {/* QUICK PAY */}
           <div className="card-section">
@@ -171,7 +185,7 @@ export default function Payment() {
 
             <div className="quick-pay">
               <button className="razorpay-btn" onClick={handleRazorpayPayment}
-              disabled={paying}>
+                disabled={paying}>
                 {paying ? "Processing..." : "Pay with Razorpay"}
               </button>
               <button className="upi-btn" onClick={handleCOD}>
@@ -218,9 +232,9 @@ export default function Payment() {
         <div className="payment-right">
           <h2 className="order-title">Your Order</h2>
 
-          {cart.items.map(item => (
-            <div key={item.cartItemId} className="order-item">
-              <img src={item.imageUrl} alt={item.productName} />
+          {order?.items?.map(item => (
+            <div key={item.orderItemId} className="order-item">
+              <img src={item.productImage} alt={item.productName} />
 
               <div className="order-info">
                 <p className="product-name">{item.productName}</p>
@@ -228,7 +242,7 @@ export default function Payment() {
               </div>
 
               <div className="order-price">
-                ₹{item.totalPrice.toLocaleString()}
+                ₹{(item.price * item.quantity).toLocaleString()}
               </div>
             </div>
           ))}
@@ -236,15 +250,17 @@ export default function Payment() {
           <div className="summary">
             <div className="summary-line">
               <span>Subtotal</span>
-              <span>₹{cart.cartTotal.toLocaleString()}</span>
+              <span>₹{order?.amount.toLocaleString()}</span>
+
             </div>
 
             <div className="summary-line total">
               <span>Total</span>
-              <span>₹{cart.cartTotal.toLocaleString()}</span>
+              <span>₹{order?.amount.toLocaleString()}</span>
             </div>
           </div>
         </div>
+
 
       </div>
     </div>

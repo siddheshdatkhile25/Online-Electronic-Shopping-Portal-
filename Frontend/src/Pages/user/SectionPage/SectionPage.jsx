@@ -3,7 +3,7 @@ import "./SectionPage.css";
 import api from "../../../api/axiosInstance";
 import { useParams, useNavigate } from "react-router-dom";
 
-const LatestProducts = () => {
+const SectionPage = () => {
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
@@ -11,39 +11,34 @@ const LatestProducts = () => {
   const [products, setProducts] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState("");
 
-  // Fetch brands (top)
+  // Fetch brands
   useEffect(() => {
     api
       .get(`/products/category/${categoryId}/brands`)
-      .then((res) => {
-        setBrands(res.data.data);
-      })
+      .then((res) => setBrands(res.data.data || []))
       .catch((err) => console.error(err));
-  }, []);
+  }, [categoryId]);
 
   // Fetch products by category
   useEffect(() => {
     api
       .get(`/products/category/${categoryId}`)
-      .then((res) => {
-        setProducts(res.data.data);
-      })
+      .then((res) => setProducts(res.data.data || []))
       .catch((err) => console.error(err));
   }, [categoryId]);
 
-  // Filter by brand
+  // Filter products by brand
   const filteredProducts = selectedBrand
     ? products.filter((p) => p.brand === selectedBrand)
     : products;
 
   return (
     <div className="latest-container">
-
       <div className="latest-header">
         <h2>Products</h2>
       </div>
 
-
+      {/* FILTER BAR */}
       <div className="filter-bar">
         <div className="filter-left">
           <h3>Top Brands</h3>
@@ -73,26 +68,30 @@ const LatestProducts = () => {
         </div>
       </div>
 
-
+      {/* PRODUCT GRID */}
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
             <div className="product-box" key={item.id}>
-              <img src={item.imgUrl} alt={item.name} />
+              <img
+                src={item.imageUrls?.[0] || "/placeholder.png"}
+                alt={item.name}
+              />
 
               <h4>{item.name}</h4>
 
               <p className="price">
                 {item.discountPercentage > 0 ? (
                   <>
-                    <span className="old-price">₹{item.price}</span>{" "}
-                    <span className="new-price">₹{item.discountedPrice}</span>
+                    <span className="old-price">₹{item.price}</span>
+                    <span className="new-price">
+                      ₹{item.discountedPrice}
+                    </span>
                   </>
                 ) : (
                   <span>₹{item.price}</span>
                 )}
               </p>
-
 
               <button
                 className="view-btn"
@@ -110,4 +109,4 @@ const LatestProducts = () => {
   );
 };
 
-export default LatestProducts;
+export default SectionPage;

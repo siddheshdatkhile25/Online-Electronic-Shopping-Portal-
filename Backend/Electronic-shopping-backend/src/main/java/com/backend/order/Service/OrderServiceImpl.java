@@ -58,108 +58,95 @@ public class OrderServiceImpl implements OrderService {
     
 	@Override
 	public Object placeOrder(Long addressId , Long userId) {
-		
-		//logged-in user
-		User user = userRepository.findById(userId).orElseThrow( () -> new RuntimeException("User Not Found"));
-		
-		
-		//fetch cart
-		Cart cart = cartRepository.findByUser(user).orElseThrow( () -> new RuntimeException("Cart Not Found"));
-		
-		List<CartItem> cartItems = cartItemRepository.findByCart_CartId(cart.getCartId());
-		
-		if(cartItems.isEmpty()) {
-			throw new RuntimeException("Cart has no items");
-			
-		}
-		
-		//create Order
-		Orders order = new Orders();
-		order.setUser(user);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.PLACED);
-		
-		UserAddress selectedAddress = userAddressRepository
-				.findByIdAndUser_Id(addressId, userId)
-				.orElseThrow(()-> new RuntimeException("Address not found"));
-		
-		OrderAddress orderAddress = new OrderAddress();
-		orderAddress.setFullName(user.getFirstname() + " "+user.getLastname());
-		orderAddress.setPhone(user.getPhone());
-		orderAddress.setAddressLine1(selectedAddress.getAddressLine1());
-		orderAddress.setAddressLine2(selectedAddress.getAddressLine2());
-		orderAddress.setCity(selectedAddress.getCity());
-		orderAddress.setState(selectedAddress.getState());
-		orderAddress.setPincode(selectedAddress.getPincode());
-		
-		order.setDeliveryAddress(orderAddress);
-		
-		Orders savedOrder = orderRepository.save(order);
-		
-		//create OrderItems
-		BigDecimal totalAmount = BigDecimal.ZERO;
-		
-		for(CartItem cartItem : cartItems) {
-			
-			Product product = cartItem.getProduct();
-			
-			//check Stock
-			if(product.getStock() < cartItem.getQuantity()) {
-				throw new RuntimeException(
-						"Insufficent stock for product : " + product.getName()
-						);
-			}
-			
-			//Deduct Stock
-			product.setStock(
-					product.getStock() - cartItem.getQuantity()
-					);
-			
-			productRepository.save(product);
-			
-			
-			//Create OrderItems
-			OrderItem orderItem = new OrderItem();
-			
-			orderItem.setOrder(savedOrder);
-			orderItem.setProduct(cartItem.getProduct());
-			orderItem.setQuantity(cartItem.getQuantity());
-			orderItem.setPrice(cartItem.getProduct().getDiscountedPrice());
-			
-			totalAmount = totalAmount.add(
-					cartItem.getProduct().getDiscountedPrice()
-					.multiply(BigDecimal.valueOf(cartItem.getQuantity()))
-			);
-			
-			
-	
-			orderItemRepository.save(orderItem);
-			
-		}
-		
-		//create payment (Pending , Mode == null)
-		
-		Payment payment = new Payment();
-		payment.setOrder(savedOrder);
-        payment.setAmount(totalAmount);
-        payment.setStatus(PaymentStatus.PENDING);
-        payment.setMode(null);
-        
-        
-        paymentRepository.save(payment);
-        
-        
-        //clear cart 
-        cartItemRepository.deleteByCart_CartId(cart.getCartId());
-        
-        return Map.of(
-        			"orderId" , savedOrder.getId(),
-        			"orderStatus", savedOrder.getStatus(),
-        			"paymentStatus", payment.getStatus(),
-        			"ammount", totalAmount
-        		);
-		
+
+	    // logged-in user
+	    User user = userRepository.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+	    // fetch cart
+	    Cart cart = cartRepository.findByUser(user)
+	            .orElseThrow(() -> new RuntimeException("Cart Not Found"));
+
+	    List<CartItem> cartItems = cartItemRepository
+	            .findByCart_CartId(cart.getCartId());
+
+	    if (cartItems.isEmpty()) {
+	        throw new RuntimeException("Cart has no items");
+	    }
+
+	    // create Order
+	    Orders order = new Orders();
+	    order.setUser(user);
+	    order.setOrderDateTime(LocalDateTime.now());
+	    order.setStatus(OrderStatus.CREATED);
+
+	    UserAddress selectedAddress = userAddressRepository
+	            .findByIdAndUser_Id(addressId, userId)
+	            .orElseThrow(() -> new RuntimeException("Address not found"));
+
+	    OrderAddress orderAddress = new OrderAddress();
+	    orderAddress.setFullName(user.getFirstname() + " " + user.getLastname());
+	    orderAddress.setPhone(user.getPhone());
+	    orderAddress.setAddressLine1(selectedAddress.getAddressLine1());
+	    orderAddress.setAddressLine2(selectedAddress.getAddressLine2());
+	    orderAddress.setCity(selectedAddress.getCity());
+	    orderAddress.setState(selectedAddress.getState());
+	    orderAddress.setPincode(selectedAddress.getPincode());
+
+	    order.setDeliveryAddress(orderAddress);
+
+	    Orders savedOrder = orderRepository.save(order);
+
+	    // create OrderItems
+	    BigDecimal totalAmount = BigDecimal.ZERO;
+
+	    for (CartItem cartItem : cartItems) {
+
+	        Product product = cartItem.getProduct();
+
+	        //  Stock Check Only — No Deduction 
+	        if (product.getStock() < cartItem.getQuantity()) {
+	            throw new RuntimeException(
+	                    "Insufficient stock for product: " + product.getName()
+	            );
+	        }
+
+
+	        // Create OrderItem
+	        OrderItem orderItem = new OrderItem();
+	        orderItem.setOrder(savedOrder);
+	        orderItem.setProduct(product);
+	        orderItem.setQuantity(cartItem.getQuantity());
+	        orderItem.setPrice(product.getDiscountedPrice());
+
+	        totalAmount = totalAmount.add(
+	                product.getDiscountedPrice()
+	                        .multiply(BigDecimal.valueOf(cartItem.getQuantity()))
+	        );
+
+	        orderItemRepository.save(orderItem);
+	    }
+
+	    // Create Payment (Pending)
+	    Payment payment = new Payment();
+	    payment.setOrder(savedOrder);
+	    payment.setAmount(totalAmount);
+	    payment.setStatus(PaymentStatus.PENDING);
+	    payment.setMode(null);
+
+	    paymentRepository.save(payment);
+
+	    // clear cart
+	    cartItemRepository.deleteByCart_CartId(cart.getCartId());
+
+	    return Map.of(
+	            "orderId", savedOrder.getId(),
+	            "orderStatus", savedOrder.getStatus(),
+	            "paymentStatus", payment.getStatus(),
+	            "ammount", totalAmount
+	    );
 	}
+
 	
 	@Override
     public List<MyOrderResponse> getMyOrders(Long userId) {
@@ -322,14 +309,13 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private boolean isValidTransition(OrderStatus current, OrderStatus next) {
-
 	    return switch (current) {
-	        case PLACED -> next == OrderStatus.CONFIRMED;
 	        case CONFIRMED -> next == OrderStatus.SHIPPED;
 	        case SHIPPED -> next == OrderStatus.DELIVERED;
 	        default -> false;
 	    };
 	}
+
 
 	
 	@Override

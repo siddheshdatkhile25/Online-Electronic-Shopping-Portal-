@@ -16,5 +16,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     // Optional: bulk delete when order is cancelled
     void deleteByOrderId(Long orderId);
+    
+    //check if user has ordered product before he can add review
+	boolean existsByOrder_User_IdAndProduct_Id(Long userId, Long productId);
 }
 

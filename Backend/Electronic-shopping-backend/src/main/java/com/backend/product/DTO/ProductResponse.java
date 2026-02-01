@@ -22,6 +22,7 @@ public class ProductResponse {
     private BigDecimal discountedPrice;
     
     private Integer stock;
+    private String stockMessage;
 
     private Long categoryId;
     private String categoryName;

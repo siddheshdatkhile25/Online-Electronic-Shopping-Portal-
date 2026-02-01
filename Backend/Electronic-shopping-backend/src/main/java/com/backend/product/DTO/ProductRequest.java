@@ -31,4 +31,7 @@ public class ProductRequest {
 	private String brand;
 	//MultipartFile is used to receive image files sent via multipart/form-data
 	private MultipartFile image;
+	
+	// Used to add stock to an existing product without overwriting current stock
+    private Integer addStock;
 }

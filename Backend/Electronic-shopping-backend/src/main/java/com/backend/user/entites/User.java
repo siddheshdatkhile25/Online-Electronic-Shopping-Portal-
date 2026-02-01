@@ -16,6 +16,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -24,7 +25,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+indexes = {
+        @Index(name = "idx_user_email", columnList = "email")
+    })
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @NoArgsConstructor
 @Getter

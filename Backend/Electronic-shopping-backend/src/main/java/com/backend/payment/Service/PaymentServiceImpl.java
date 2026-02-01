@@ -156,7 +156,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 	    // Update payment
 	    payment.setStatus(PaymentStatus.SUCCESS);
-	    payment.setMode(PaymentMode.RAZORPAY);
+	    payment.setMode(PaymentMode.ONLINE);
 	    paymentRepository.save(payment);
 
 	    //  Update order status

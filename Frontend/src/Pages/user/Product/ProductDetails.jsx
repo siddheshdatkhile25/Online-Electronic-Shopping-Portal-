@@ -31,7 +31,6 @@ export default function ProductDetails() {
       });
   }, [id, navigate]);
 
-  // ✅ ONLY NEW LOGIC (NECESSARY)
   const addToCart = async () => {
     try {
       await api.post("/api/users/cart/add", null, {
@@ -103,7 +102,7 @@ export default function ProductDetails() {
         </p>
 
         <div className="pd-actions">
-          {/* ✅ ONLY CHANGE HERE */}
+          
           <button className="pd-btn pd-cart-btn" onClick={addToCart}>
             🛒 Add to Cart
           </button>

@@ -78,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
 	    Orders order = new Orders();
 	    order.setUser(user);
 	    order.setOrderDateTime(LocalDateTime.now());
-	    order.setStatus(OrderStatus.CREATED);
+	    order.setStatus(OrderStatus.PLACED);
 
 	    UserAddress selectedAddress = userAddressRepository
 	            .findByIdAndUser_Id(addressId, userId)

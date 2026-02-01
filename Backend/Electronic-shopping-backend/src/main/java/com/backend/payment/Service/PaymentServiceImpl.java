@@ -55,7 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         // Validate order state
-        if (!OrderStatus.CREATED.equals(order.getStatus())) {
+        if (!OrderStatus.PLACED.equals(order.getStatus())) {
             throw new RuntimeException("Payment mode cannot be changed");
         }
         

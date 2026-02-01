@@ -22,74 +22,55 @@ public class CustomerProductController {
         this.customerProductService = customerProductService;
     }
 
-   //All Active Products
+    // Get all active products
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CustomerProductResponse>>> getAllActiveProducts() {
-
-        List<CustomerProductResponse> products =
-                customerProductService.getAllActiveProducts();
-
+    public ResponseEntity<ApiResponse<List<CustomerProductResponse>>> getAllProducts() {
         return ResponseEntity.ok(
-                new ApiResponse<>("Products fetched successfully", products)
+                new ApiResponse<>("Products fetched successfully", customerProductService.getAllProducts())
         );
     }
 
-    //Product by id
+    // Get product by ID
     @GetMapping("/id/{productId}")
     public ResponseEntity<ApiResponse<CustomerProductResponse>> getProductById(
             @PathVariable Long productId) {
-
-        CustomerProductResponse product =
-                customerProductService.getActiveProductById(productId);
-
         return ResponseEntity.ok(
-                new ApiResponse<>("Product fetched successfully", product)
+                new ApiResponse<>("Product fetched successfully", customerProductService.getProductById(productId))
         );
     }
 
-   //All Products by category
+    // Get products by category
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<ApiResponse<List<CustomerProductResponse>>> getByCategory(
             @PathVariable Long categoryId) {
-
-        List<CustomerProductResponse> products =
-                customerProductService.getProductsByCategory(categoryId);
-
         return ResponseEntity.ok(
-                new ApiResponse<>("Products fetched successfully", products)
+                new ApiResponse<>("Products fetched successfully", customerProductService.getProductsByCategory(categoryId))
         );
     }
 
-   //All products by brand
+    // Get products by brand
     @GetMapping("/brand/{brand}")
     public ResponseEntity<ApiResponse<List<CustomerProductResponse>>> getByBrand(
             @PathVariable String brand) {
-
-        List<CustomerProductResponse> products =
-                customerProductService.getProductsByBrand(brand);
-
         return ResponseEntity.ok(
-                new ApiResponse<>("Products fetched successfully", products)
+                new ApiResponse<>("Products fetched successfully", customerProductService.getProductsByBrand(brand))
         );
     }
-    
-    //All brands
+
+    // Get all brands
     @GetMapping("/brands")
     public ResponseEntity<ApiResponse<List<String>>> getAllBrands() {
         return ResponseEntity.ok(
-            new ApiResponse<>("All brands", customerProductService.getAllActiveBrands())
+                new ApiResponse<>("All brands", customerProductService.getAllBrands())
         );
     }
-    
+
+    // Get brands by category
     @GetMapping("/category/{categoryId}/brands")
     public ResponseEntity<ApiResponse<List<String>>> getBrandsByCategory(
             @PathVariable Long categoryId) {
-
         return ResponseEntity.ok(
-            new ApiResponse<>("Brands fetched", 
-                customerProductService.getBrandsByCategory(categoryId))
+                new ApiResponse<>("Brands fetched", customerProductService.getBrandsByCategory(categoryId))
         );
     }
-
-    
 }

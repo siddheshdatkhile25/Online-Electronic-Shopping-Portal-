@@ -11,10 +11,10 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ⭐ Reviews
+  // Reviews
   const [reviews, setReviews] = useState([]);
 
-  // ⭐ Edit Modal States
+  // Edit Modal States
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editReview, setEditReview] = useState(null);
   const [editRating, setEditRating] = useState("");
@@ -70,7 +70,7 @@ export default function ProductDetails() {
     }
   };
 
-  //  OPEN EDIT MODAL
+  // OPEN EDIT MODAL
   const openEditModal = (rev) => {
     setEditReview(rev);
     setEditRating(rev.rating);
@@ -81,12 +81,12 @@ export default function ProductDetails() {
   // UPDATE REVIEW API
   const updateReview = async () => {
     try {
-     await api.put(`/api/reviews/update`, {
-  userId: loggedUserId,
-  productId: id,
-  rating: editRating,
-  comment: editComment,
-});
+      await api.put(`/api/reviews/update`, {
+        userId: loggedUserId,
+        productId: id,
+        rating: editRating,
+        comment: editComment,
+      });
 
       toast.success("Review updated!");
 
@@ -99,7 +99,7 @@ export default function ProductDetails() {
     }
   };
 
-  // delete review
+  // DELETE REVIEW
   const deleteReview = async (reviewId) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
 
@@ -120,6 +120,12 @@ export default function ProductDetails() {
       {/* LEFT */}
       <div className="pd-left">
         <div className="pd-main-img">
+
+          {/* ⭐ ONLY THIS IS ADDED (no code changed) */}
+          {product.stock === 0 && (
+            <span className="unavailable-badge">Unavailable</span>
+          )}
+
           <img src={product.imgUrl} alt={product.name} />
         </div>
       </div>
@@ -167,9 +173,10 @@ export default function ProductDetails() {
           </button>
         </div>
 
-        <p className="pd-footer">Free shipping • <span>Free Returns</span></p>
+        <p className="pd-footer">
+          Free shipping • <span>Free Returns</span>
+        </p>
 
-       
         <div style={{ marginTop: "40px" }}>
           <h2 style={{ marginBottom: "15px" }}>Customer Reviews</h2>
 
@@ -177,22 +184,29 @@ export default function ProductDetails() {
             <p>No reviews yet. Be the first to review this product!</p>
           ) : (
             reviews.map((rev, index) => (
-              <div
-                key={index}
-                className="review-card"
-              >
+              <div key={index} className="review-card">
                 <p className="review-rating">{rev.rating} ⭐</p>
                 <p className="review-comment">{rev.comment}</p>
 
                 <p className="review-user">
-                  – {rev.userName || "Anonymous"} • {rev.createdAt?.substring(0, 10)}
+                  – {rev.userName || "Anonymous"} •{" "}
+                  {rev.createdAt?.substring(0, 10)}
                 </p>
 
-               
                 {rev.userId === loggedUserId && (
                   <div className="review-actions">
-                    <button className="edit-btn" onClick={() => openEditModal(rev)}> Edit</button>
-                    <button className="delete-btn" onClick={() => deleteReview(rev.id)}>Delete</button>
+                    <button
+                      className="edit-btn"
+                      onClick={() => openEditModal(rev)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => deleteReview(rev.id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 )}
               </div>
@@ -200,6 +214,7 @@ export default function ProductDetails() {
           )}
         </div>
       </div>
+
       {editModalOpen && (
         <div className="modal-overlay">
           <div className="modal-box">
@@ -222,13 +237,19 @@ export default function ProductDetails() {
             />
 
             <div className="modal-actions">
-              <button className="save-btn" onClick={updateReview}>Save</button>
-              <button className="close-btn" onClick={() => setEditModalOpen(false)}>Cancel</button>
+              <button className="save-btn" onClick={updateReview}>
+                Save
+              </button>
+              <button
+                className="close-btn"
+                onClick={() => setEditModalOpen(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

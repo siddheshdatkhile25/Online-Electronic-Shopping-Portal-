@@ -22,4 +22,8 @@ public interface ProductService {
 
 	void deleteProduct(Long productId);
 
+	ProductResponse toggleProductStatus(Long productId);
+
+	ProductResponse addProductStock(Long productId, Integer quantity);
+
 }

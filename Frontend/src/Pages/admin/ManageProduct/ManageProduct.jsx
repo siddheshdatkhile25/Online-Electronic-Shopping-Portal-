@@ -83,12 +83,11 @@ const ManageProduct = () => {
         .delete(`/admin/categories/${selectedCategoryId}`)
         .then(() => {
           toast.success("Category deleted successfully");
-          // Update categories dropdown
           setCategoriesList((prev) =>
             prev.filter((c) => c.id !== Number(selectedCategoryId))
           );
           setSelectedCategoryId("");
-          fetchProducts(); // refresh products in case category affects them
+          fetchProducts();
         })
         .catch((err) => {
           console.error(err);
@@ -107,7 +106,32 @@ const ManageProduct = () => {
     navigate(`/admin/apply-discount/${id}`);
   };
 
-  // CATEGORY FILTER OPTIONS FOR SEARCH
+ // RESTOCK PRODUCT
+const handleRestock = (id) => {
+  // Ask admin for quantity
+  const quantity = parseInt(prompt("Enter quantity to restock"), 10);
+
+  // Validate input
+  if (!quantity || quantity <= 0) {
+    toast.warning("Please enter a valid quantity greater than 0");
+    return;
+  }
+
+  // Call backend PUT endpoint
+  api
+    .put(`/admin/products/${id}/add-stock?quantity=${quantity}`)
+    .then((res) => {
+      toast.success("Stock updated successfully");
+      fetchProducts(); // Refresh product list
+    })
+    .catch((err) => {
+      console.error("Restock error:", err);
+      toast.error("Failed to update stock");
+    });
+};
+
+
+  // CATEGORY FILTER OPTIONS
   const categoriesForFilter = ["All", ...new Set(products.map((p) => p.categoryName))];
 
   // FILTER PRODUCTS
@@ -212,8 +236,6 @@ const ManageProduct = () => {
                     <td>{p.name}</td>
                     <td>{p.stock || 0}</td>
                     <td>{p.categoryName}</td>
-
-                    {/* Original price */}
                     <td>
                       {p.discountPercentage > 0 ? (
                         <span style={{ textDecoration: "line-through", color: "gray" }}>
@@ -223,36 +245,37 @@ const ManageProduct = () => {
                         `₹${p.price.toLocaleString()}`
                       )}
                     </td>
-
-                    
                     <td>{p.discountPercentage ?? 0}%</td>
-
-                    
+                    <td>₹{(p.discountedPrice ?? p.price).toLocaleString()}</td>
                     <td>
-                      ₹{(p.discountedPrice ?? p.price).toLocaleString()}
-                    </td>
-
-                    <td >
-                     <div className="action-button">
-                         <button
-                        onClick={() => handleEdit(p.id)}
-                        className="btn btn-edit"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="btn btn-delete"
-                      >
-                        Delete
-                      </button>
-                      {/* <button
-                        onClick={() => handleApplyDiscount(p.id)}
-                        className="btn btn-discount"
-                      >
-                        Discount
-                      </button> */}
-                     </div>
+                      <div className="action-button">
+                        <button
+                          onClick={() => handleEdit(p.id)}
+                          className="btn btn-edit"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="btn btn-delete"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => handleApplyDiscount(p.id)}
+                          className="btn btn-discount"
+                        >
+                          Discount
+                        </button>
+                        {p.stock <= 0 && (
+                          <button
+                            onClick={() => handleRestock(p.id)}
+                            className="btn btn-restock"
+                          >
+                            Restock
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))

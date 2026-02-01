@@ -15,27 +15,31 @@ const Carousal = ({ title, products }) => {
         <h2 className="product-title">{title}</h2>
 
         <div className="card-container">
-            {products.map((item, index) => (
-              <div key={item.id} className="card"
+          {products.map((item, index) => (
+            <div
+              key={item.id}
+              className="card"
               onClick={() => navigate(`/product/${item.category}/${item.id}`)}
-              >
-                <div className="image">
-                  <img src={item.images[0]} alt={item.name} />
-                </div>
+            >
+              <div className="image">
+                {/* FIXED → use imageUrl instead of images[0] */}
+                <img src={item.imageUrl} alt={item.name} />
+              </div>
 
-                <div className="data">
-                  <div className="productname">{item.name}</div>
-                  <div className="price">₹{item.price}</div>
-                </div>
+              <div className="data">
+                <div className="productname">{item.name}</div>
+                <div className="price">₹{item.price}</div>
+              </div>
 
-                <div className="review">
-                  <div className="rating">
-                    ⭐ {item.rating} ({item.ratingCount})
-                  </div>
+              <div className="review">
+                <div className="rating">
+                  ⭐ {item.rating} ({item.ratingCount})
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
         </div>
+
       </div>
     </div>
   );

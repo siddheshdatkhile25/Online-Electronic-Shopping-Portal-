@@ -42,7 +42,6 @@ const SectionPage = () => {
       <div className="filter-bar">
         <div className="filter-left">
           <h3>Top Brands</h3>
-
           <div className="brand-filters">
             <button
               className={!selectedBrand ? "active" : ""}
@@ -50,7 +49,6 @@ const SectionPage = () => {
             >
               All
             </button>
-
             {brands.map((brand) => (
               <button
                 key={brand}
@@ -83,13 +81,15 @@ const SectionPage = () => {
               <p className="price">
                 {item.discountPercentage > 0 ? (
                   <>
-                    <span className="old-price">₹{item.price}</span>
+                    <span className="old-price">
+                      ₹{item.price.toLocaleString()}
+                    </span>{" "}
                     <span className="new-price">
-                      ₹{item.discountedPrice}
+                      ₹{item.discountedPrice.toLocaleString()}
                     </span>
                   </>
                 ) : (
-                  <span>₹{item.price}</span>
+                  <span>₹{item.price.toLocaleString()}</span>
                 )}
               </p>
 

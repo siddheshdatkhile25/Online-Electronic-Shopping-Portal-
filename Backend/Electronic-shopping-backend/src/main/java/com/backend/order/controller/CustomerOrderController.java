@@ -33,6 +33,10 @@ public class CustomerOrderController {
     	return ResponseEntity.ok(orderService.getMyOrders(userId));
     }
     
+    @GetMapping("/{orderId}")
+    public ResponseEntity<?> getOrderDetails(@PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.getOrderDetails(orderId));
+    }
    
     
     

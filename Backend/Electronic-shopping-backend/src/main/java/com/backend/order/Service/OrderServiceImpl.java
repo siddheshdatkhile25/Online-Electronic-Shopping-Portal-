@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
                         "Insufficient stock for product: " + product.getName());
             }
 
-            product.setStock(product.getStock() - cartItem.getQuantity());
+            product.setStock(product.getStock() - cartItem.getQuantity()); // update: deduct stock at order placement
             productRepository.save(product);
 
             OrderItem orderItem = new OrderItem();
@@ -162,7 +162,7 @@ public class OrderServiceImpl implements OrderService {
                                         item.getProduct().getImages().isEmpty()
                                                 ? null
                                                 : item.getProduct().getImages().get(0).getImageUrl()
-                                );
+                                ); // update: resolve primary product image
 
                         OrderItemResponse dto = new OrderItemResponse();
                         dto.setProductId(item.getProduct().getId());
@@ -272,7 +272,7 @@ public class OrderServiceImpl implements OrderService {
                         + newStatus + ".\n"
                         + "Thank you for shopping with us!";
 
-        mailService.sendEmail(email, subject, body);
+        mailService.sendEmail(email, subject, body); // update: notify user on status change
     }
 
     private boolean isValidTransition(OrderStatus current, OrderStatus next) {
@@ -284,4 +284,75 @@ public class OrderServiceImpl implements OrderService {
             default -> false;
         };
     }
+
+    // update: enhanced to support multiple product images
+    @Override
+    public MyOrderResponse getOrderDetails(Long orderId) {
+
+        // Fetch order
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Fetch payment
+        Payment payment = paymentRepository
+                .findByOrder_Id(order.getId())
+                .orElse(null);
+
+        // Fetch order items
+        List<OrderItem> orderItems =
+                orderItemRepository.findByOrderId(order.getId());
+
+        // Map OrderItem → OrderItemResponse
+        List<OrderItemResponse> itemResponses =
+                orderItems.stream().map(item -> {
+
+                    // update: resolve primary product image from ProductImage list
+                    String productImage = item.getProduct()
+                            .getImages()
+                            .stream()
+                            .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                            .findFirst()
+                            .map(ProductImage::getImageUrl)
+                            .orElse(
+                                    item.getProduct().getImages().isEmpty()
+                                            ? null
+                                            : item.getProduct().getImages().get(0).getImageUrl()
+                            );
+
+                    OrderItemResponse dto = new OrderItemResponse();
+                    dto.setProductId(item.getProduct().getId());
+                    dto.setProductName(item.getProduct().getName());
+                    dto.setQuantity(item.getQuantity());
+                    dto.setPrice(item.getPrice());
+                    dto.setProductImage(productImage); // update: primary image
+                    return dto;
+                }).toList();
+
+        // Compute total amount (safe fallback if payment is null)
+        BigDecimal totalAmount;
+        if (payment != null) {
+            totalAmount = payment.getAmount();
+        } else {
+            totalAmount = orderItems.stream()
+                    .map(item ->
+                            item.getPrice()
+                                    .multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+
+        // Build response
+        MyOrderResponse response = new MyOrderResponse();
+        response.setOrderId(order.getId());
+        response.setOrderDateTime(order.getOrderDateTime());
+        response.setOrderStatus(order.getStatus());
+        response.setPaymentStatus(
+                payment != null ? payment.getStatus() : PaymentStatus.PENDING
+        );
+        response.setAmount(totalAmount);
+        response.setItems(itemResponses);
+
+        return response;
+    }
+
+
 }

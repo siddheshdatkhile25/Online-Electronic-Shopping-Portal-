@@ -23,55 +23,49 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         this.productRepository = productRepository;
     }
 
-    // Get single active product
+    // Get single product by ID (must be active)
     @Override
-    public CustomerProductResponse getActiveProductById(Long productId) {
-
-        Product product = productRepository
-                .findByIdAndActiveTrue(productId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found"));
+    public CustomerProductResponse getProductById(Long productId) {
+        Product product = productRepository.findByIdAndActiveTrue(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         return toCustomerResponse(product);
     }
 
-    // Get all active products
+    // Get all active products (include stock=0)
     @Override
-    public List<CustomerProductResponse> getAllActiveProducts() {
-
+    public List<CustomerProductResponse> getAllProducts() {
         return productRepository.findByActiveTrue()
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Filter by category
+    // Filter by category (only active products)
     @Override
     public List<CustomerProductResponse> getProductsByCategory(Long categoryId) {
-
         return productRepository.findByCategory_IdAndActiveTrue(categoryId)
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Filter by brand
+    // Filter by brand (only active products)
     @Override
     public List<CustomerProductResponse> getProductsByBrand(String brand) {
-
         return productRepository.findByBrandIgnoreCaseAndActiveTrue(brand)
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Convert Product entity to CustomerProductResponse DTO
+    // Convert Product entity to CustomerProductResponse
     public CustomerProductResponse toCustomerResponse(Product product) {
 
         List<String> imageUrls = product.getImages()
                 .stream()
                 .map(ProductImage::getImageUrl)
-                .toList();
+                .toList(); // update: collect all product image URLs
 
         String primaryImageUrl = product.getImages()
                 .stream()
@@ -80,14 +74,12 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .map(ProductImage::getImageUrl)
                 .orElse(
                         imageUrls.isEmpty() ? null : imageUrls.get(0)
-                );
+                ); // update: fallback to first image if primary not marked
 
         return CustomerProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
-
-                // Original price
                 .price(product.getPrice())
 
                 // Discount info
@@ -107,15 +99,16 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
 
-                // ✅ NEW
+                // update: switched from single image to multi-image support
                 .primaryImageUrl(primaryImageUrl)
                 .imageUrls(imageUrls)
 
                 .build();
     }
 
+    // Get all brands (only active products)
     @Override
-    public List<String> getAllActiveBrands() {
+    public List<String> getAllBrands() {
         return productRepository.findAllBrands();
     }
 

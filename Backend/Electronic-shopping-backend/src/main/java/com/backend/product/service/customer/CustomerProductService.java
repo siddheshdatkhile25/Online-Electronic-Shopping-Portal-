@@ -6,16 +6,21 @@ import com.backend.product.DTO.CustomerProductResponse;
 
 public interface CustomerProductService {
 
-	List<CustomerProductResponse> getAllActiveProducts();
+    // Get all active products (include stock=0)
+    List<CustomerProductResponse> getAllProducts();
 
-	CustomerProductResponse getActiveProductById(Long productId);
+    // Get single active product by ID
+    CustomerProductResponse getProductById(Long productId);
 
-	List<CustomerProductResponse> getProductsByCategory(Long categoryId);
+    // Get products by category (active only)
+    List<CustomerProductResponse> getProductsByCategory(Long categoryId);
 
-	List<CustomerProductResponse> getProductsByBrand(String brand);
+    // Get products by brand (active only)
+    List<CustomerProductResponse> getProductsByBrand(String brand);
 
-	List<String> getAllActiveBrands();
+    // Get all brands (from active products only)
+    List<String> getAllBrands();
 
-	List<String> getBrandsByCategory(Long categoryId);
-
+    // Get brands per category (from active products only)
+    List<String> getBrandsByCategory(Long categoryId);
 }

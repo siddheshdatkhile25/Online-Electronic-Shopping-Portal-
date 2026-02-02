@@ -23,7 +23,6 @@ public class CustomerProductResponse {
     private String categoryName;
     private String brand;
 
-    
     private String primaryImageUrl;
     private List<String> imageUrls;
 }

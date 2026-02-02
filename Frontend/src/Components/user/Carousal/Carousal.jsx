@@ -21,7 +21,7 @@ const Carousal = ({ title, products }) => {
                 <img
                   src={
                     item.imageUrls && item.imageUrls.length > 0
-                      ? item.imageUrls[0] // ✅ first image
+                      ? item.imageUrls[0]
                       : "/placeholder.png"
                   }
                   alt={item.name}
@@ -35,7 +35,9 @@ const Carousal = ({ title, products }) => {
                   {item.discountPercentage > 0 ? (
                     <>
                       <span className="old-price">₹{item.price}</span>
-                      <span className="new-price">₹{item.discountedPrice}</span>
+                      <span className="new-price">
+                        ₹{item.discountedPrice}
+                      </span>
                     </>
                   ) : (
                     `₹${item.price}`

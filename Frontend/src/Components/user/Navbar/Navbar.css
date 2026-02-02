@@ -19,6 +19,28 @@
     color: white;
 }
 
+
+
+.navbar-brand {
+  display: flex;
+  align-items: center;   /* vertical center */
+  gap: 10px;             /* space between logo & text */
+}
+
+.navbar-logo {
+  width: 36px;           /* adjust as needed */
+  height: 36px;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1;        /* prevents text drop */
+}
+
+
 .nav-menu {
     display: flex;
     gap: 20px;

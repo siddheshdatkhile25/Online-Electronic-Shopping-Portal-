@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,7 +20,6 @@ import com.backend.product.DTO.ProductResponse;
 import com.backend.product.service.admin.ProductService;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin/products")
 public class ProductController {
 
@@ -32,7 +30,7 @@ public class ProductController {
     }
 
     // ✅ CREATE PRODUCT (MULTIPART AUTO-DETECTED)
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data") // update: explicitly define multipart support
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @ModelAttribute ProductRequest request) {
 
@@ -46,6 +44,7 @@ public class ProductController {
     // GET ALL PRODUCTS
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
+
         List<ProductResponse> response = productService.getAllProducts();
         return ResponseEntity.ok(new ApiResponse<>("All Products Available", response));
     }
@@ -56,17 +55,23 @@ public class ProductController {
             @PathVariable Long productId) {
 
         ProductResponse product = productService.getProductById(productId);
-        return ResponseEntity.ok(new ApiResponse<>("Product fetched successfully", product));
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Product fetched successfully", product)
+        );
     }
 
     // UPDATE PRODUCT
-    @PutMapping("/{productId}")
+    @PutMapping(value = "/{productId}", consumes = "multipart/form-data") // update: allow multipart updates
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long productId,
             @ModelAttribute ProductRequest request) {
 
         ProductResponse updated = productService.updateProduct(productId, request);
-        return ResponseEntity.ok(new ApiResponse<>("Product updated successfully", updated));
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Product updated successfully", updated)
+        );
     }
 
     // DELETE PRODUCT
@@ -75,7 +80,10 @@ public class ProductController {
             @PathVariable Long productId) {
 
         productService.deleteProduct(productId);
-        return ResponseEntity.ok(new ApiResponse<>("Product deleted successfully", null));
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Product deleted successfully", null)
+        );
     }
 
     // TOGGLE STATUS
@@ -84,7 +92,10 @@ public class ProductController {
             @PathVariable Long productId) {
 
         ProductResponse response = productService.toggleProductStatus(productId);
-        return ResponseEntity.ok(new ApiResponse<>("Product status updated successfully", response));
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Product status updated successfully", response)
+        );
     }
 
     // ADD STOCK
@@ -94,6 +105,9 @@ public class ProductController {
             @RequestParam Integer quantity) {
 
         ProductResponse response = productService.addProductStock(productId, quantity);
-        return ResponseEntity.ok(new ApiResponse<>("Stock added successfully", response));
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Stock added successfully", response)
+        );
     }
 }

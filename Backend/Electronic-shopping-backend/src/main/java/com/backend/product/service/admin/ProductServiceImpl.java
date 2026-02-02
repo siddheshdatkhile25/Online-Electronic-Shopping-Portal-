@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(request.getStock())
                 .category(category)
                 .brand(request.getBrand())
-                .active(true)
+                .active(true) // update: product is active by default when created
                 .build();
 
         // Apply discount
@@ -69,13 +69,13 @@ public class ProductServiceImpl implements ProductService {
 
             ProductImage image = new ProductImage();
             image.setImageUrl(url);
-            image.setIsPrimary(i == 0);
+            image.setIsPrimary(i == 0); // update: first image treated as primary
             image.setProduct(product);
 
             productImages.add(image);
         }
 
-        product.setImages(productImages);
+        product.setImages(productImages); // update: attach uploaded images to product
 
         return convertToResponse(productRepository.save(product));
     }
@@ -91,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
         List<String> imageUrls = product.getImages()
                 .stream()
                 .map(ProductImage::getImageUrl)
-                .toList();
+                .toList(); // update: map ProductImage entities to image URLs
 
         return ProductResponse.builder()
                 .id(product.getId())
@@ -128,17 +128,16 @@ public class ProductServiceImpl implements ProductService {
         return convertToResponse(product);
     }
 
-    // Update product
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
+        // Update basic fields if provided
         if (request.getName() != null) product.setName(request.getName());
         if (request.getDescription() != null) product.setDescription(request.getDescription());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
-        if (request.getStock() != null) product.setStock(request.getStock());
         if (request.getBrand() != null) product.setBrand(request.getBrand());
 
         if (request.getCategoryId() != null) {
@@ -147,6 +146,13 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
         }
 
+        // update: stock update also controls active status
+        if (request.getStock() != null) {
+            product.setStock(request.getStock());
+            product.setActive(product.getStock() > 0);
+        }
+
+        // Update discount
         if (request.getDiscountPercentage() != null) {
             applyDiscount(product, request.getDiscountPercentage());
         }
@@ -161,7 +167,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
 
-        product.setActive(false);
+        product.setActive(false); // update: soft delete by disabling product
         productRepository.save(product);
     }
 
@@ -191,7 +197,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(product.getStock() + quantity);
 
         if (product.getStock() > 0) {
-            product.setActive(true);
+            product.setActive(true); // update: reactivate product when stock is added
         }
 
         return convertToResponse(productRepository.save(product));

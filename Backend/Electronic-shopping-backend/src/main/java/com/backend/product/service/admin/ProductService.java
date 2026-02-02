@@ -27,7 +27,4 @@ public interface ProductService {
 
     // Add stock to existing product
     ProductResponse addProductStock(Long productId, Integer quantity);
-    
-
-
 }

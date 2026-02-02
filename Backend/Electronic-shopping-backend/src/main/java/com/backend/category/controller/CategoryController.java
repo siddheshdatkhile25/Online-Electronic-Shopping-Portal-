@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,7 +18,7 @@ import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.service.CategoryService;
 import com.backend.common.dtos.ApiResponse;
 
-@PreAuthorize("hasRole('ADMIN')")
+
 @RestController
 @RequestMapping("/admin/categories")
 

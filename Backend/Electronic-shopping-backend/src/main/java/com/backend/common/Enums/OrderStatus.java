@@ -1,8 +1,8 @@
 package com.backend.common.Enums;
 
 public enum OrderStatus {
-    PLACED,
-    CONFIRMED,
+    PLACED, //order created payment pending 
+    CONFIRMED,  //order confirmed payment success
     SHIPPED,
     DELIVERED,
     CANCELLED

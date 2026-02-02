@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.cart.service.CartService;
 import com.backend.product.entity.Product;
+import com.backend.product.entity.ProductImage;
 import com.backend.product.repository.ProductRepository;
 import com.backend.user.Repository.UserRepository;
 import com.backend.user.entites.User;
@@ -23,15 +24,17 @@ public class WishlistServiceImpl implements WishlistService {
     private final UserRepository userRepository;
     private final CartService cartService;
 
-    public WishlistServiceImpl(WishlistRepository wishlistRepository,
+    public WishlistServiceImpl(
+            WishlistRepository wishlistRepository,
             ProductRepository productRepository,
             UserRepository userRepository,
             CartService cartService) {
-		this.wishlistRepository = wishlistRepository;
-		this.productRepository = productRepository;
-		this.userRepository = userRepository;
-		this.cartService = cartService;
-		}
+
+        this.wishlistRepository = wishlistRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+        this.cartService = cartService;
+    }
 
     @Override
     public void addProductToWishlist(Long userId, Long productId) {
@@ -48,13 +51,12 @@ public class WishlistServiceImpl implements WishlistService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-     
         boolean alreadyExists = wishlist.getProducts()
                 .stream()
                 .anyMatch(p -> p.getId().equals(productId));
 
         if (alreadyExists) {
-            return; 
+            return;
         }
 
         wishlist.getProducts().add(product);
@@ -81,15 +83,29 @@ public class WishlistServiceImpl implements WishlistService {
 
         return wishlist.getProducts()
                 .stream()
-                .map(product -> new WishlistProductDTO(
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getImgUrl()   
-                ))
+                .map(product -> {
+
+                    String imageUrl = product.getImages()
+                            .stream()
+                            .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                            .findFirst()
+                            .map(ProductImage::getImageUrl)
+                            .orElse(
+                                    product.getImages().isEmpty()
+                                            ? null
+                                            : product.getImages().get(0).getImageUrl()
+                            );
+
+                    return new WishlistProductDTO(
+                            product.getId(),
+                            product.getName(),
+                            product.getPrice(),
+                            imageUrl
+                    );
+                })
                 .toList();
     }
-    
+
     @Override
     public void moveToCart(Long userId, Long productId) {
 
@@ -108,7 +124,6 @@ public class WishlistServiceImpl implements WishlistService {
         cartService.addItemToCart(user.getEmail(), productId, 1);
 
         wishlist.getProducts().remove(product);
-
         wishlistRepository.save(wishlist);
     }
 }

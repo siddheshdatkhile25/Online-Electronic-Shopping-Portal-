@@ -1,10 +1,7 @@
 package com.backend.order.Service;
 
-
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +13,6 @@ import com.backend.cart.repository.CartItemRepository;
 import com.backend.cart.repository.CartRepository;
 import com.backend.common.Enums.OrderStatus;
 import com.backend.common.Enums.PaymentStatus;
-import com.backend.common.service.OtpEmailService;
 import com.backend.notifications.MailService;
 import com.backend.order.DTO.AdminOrderItemResponse;
 import com.backend.order.DTO.AdminOrderResponse;
@@ -30,6 +26,7 @@ import com.backend.order.entites.Orders;
 import com.backend.order.entites.Payment;
 import com.backend.payment.Repository.PaymentRepository;
 import com.backend.product.entity.Product;
+import com.backend.product.entity.ProductImage;
 import com.backend.product.repository.ProductRepository;
 import com.backend.user.Repository.UserAddressRepository;
 import com.backend.user.Repository.UserRepository;
@@ -44,140 +41,137 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class OrderServiceImpl implements OrderService {
 
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
+    private final ProductRepository productRepository;
+    private final UserAddressRepository userAddressRepository;
+    private final MailService mailService;
 
-	private final CartRepository cartRepository;
-	private final CartItemRepository cartItemRepository;
-	private final OrderRepository orderRepository;
-	private final OrderItemRepository orderItemRepository;
-	private final UserRepository userRepository;
-	private final PaymentRepository paymentRepository;
-	private final ProductRepository productRepository;
-	private final UserAddressRepository userAddressRepository;
-	private final MailService mailService;
+    @Override
+    public Object placeOrder(Long addressId, Long userId) {
 
-    
-	@Override
-	public Object placeOrder(Long addressId , Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
 
-	    // logged-in user
-	    User user = userRepository.findById(userId)
-	            .orElseThrow(() -> new RuntimeException("User Not Found"));
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart Not Found"));
 
-	    // fetch cart
-	    Cart cart = cartRepository.findByUser(user)
-	            .orElseThrow(() -> new RuntimeException("Cart Not Found"));
+        List<CartItem> cartItems =
+                cartItemRepository.findByCart_CartId(cart.getCartId());
 
-	    List<CartItem> cartItems = cartItemRepository
-	            .findByCart_CartId(cart.getCartId());
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Cart has no items");
+        }
 
-	    if (cartItems.isEmpty()) {
-	        throw new RuntimeException("Cart has no items");
-	    }
+        Orders order = new Orders();
+        order.setUser(user);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setStatus(OrderStatus.PLACED);
 
-	    // create Order
-	    Orders order = new Orders();
-	    order.setUser(user);
-	    order.setOrderDateTime(LocalDateTime.now());
-	    order.setStatus(OrderStatus.PLACED);
+        UserAddress selectedAddress =
+                userAddressRepository.findByIdAndUser_Id(addressId, userId)
+                        .orElseThrow(() -> new RuntimeException("Address not found"));
 
-	    UserAddress selectedAddress = userAddressRepository
-	            .findByIdAndUser_Id(addressId, userId)
-	            .orElseThrow(() -> new RuntimeException("Address not found"));
+        OrderAddress orderAddress = new OrderAddress();
+        orderAddress.setFullName(user.getFirstname() + " " + user.getLastname());
+        orderAddress.setPhone(user.getPhone());
+        orderAddress.setAddressLine1(selectedAddress.getAddressLine1());
+        orderAddress.setAddressLine2(selectedAddress.getAddressLine2());
+        orderAddress.setCity(selectedAddress.getCity());
+        orderAddress.setState(selectedAddress.getState());
+        orderAddress.setPincode(selectedAddress.getPincode());
 
-	    OrderAddress orderAddress = new OrderAddress();
-	    orderAddress.setFullName(user.getFirstname() + " " + user.getLastname());
-	    orderAddress.setPhone(user.getPhone());
-	    orderAddress.setAddressLine1(selectedAddress.getAddressLine1());
-	    orderAddress.setAddressLine2(selectedAddress.getAddressLine2());
-	    orderAddress.setCity(selectedAddress.getCity());
-	    orderAddress.setState(selectedAddress.getState());
-	    orderAddress.setPincode(selectedAddress.getPincode());
+        order.setDeliveryAddress(orderAddress);
 
-	    order.setDeliveryAddress(orderAddress);
+        Orders savedOrder = orderRepository.save(order);
 
-	    Orders savedOrder = orderRepository.save(order);
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
-	    // create OrderItems
-	    BigDecimal totalAmount = BigDecimal.ZERO;
+        for (CartItem cartItem : cartItems) {
 
-	    for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
 
-	        Product product = cartItem.getProduct();
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new RuntimeException(
+                        "Insufficient stock for product: " + product.getName());
+            }
 
-	        //  Stock Check Only — No Deduction 
-	        if (product.getStock() < cartItem.getQuantity()) {
-	            throw new RuntimeException(
-	                    "Insufficient stock for product: " + product.getName()
-	            );
-	        }
+            product.setStock(product.getStock() - cartItem.getQuantity()); // update: deduct stock at order placement
+            productRepository.save(product);
 
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setPrice(product.getDiscountedPrice());
 
-	        // Create OrderItem
-	        OrderItem orderItem = new OrderItem();
-	        orderItem.setOrder(savedOrder);
-	        orderItem.setProduct(product);
-	        orderItem.setQuantity(cartItem.getQuantity());
-	        orderItem.setPrice(product.getDiscountedPrice());
+            totalAmount = totalAmount.add(
+                    product.getDiscountedPrice()
+                            .multiply(BigDecimal.valueOf(cartItem.getQuantity()))
+            );
 
-	        totalAmount = totalAmount.add(
-	                product.getDiscountedPrice()
-	                        .multiply(BigDecimal.valueOf(cartItem.getQuantity()))
-	        );
+            orderItemRepository.save(orderItem);
+        }
 
-	        orderItemRepository.save(orderItem);
-	    }
+        Payment payment = new Payment();
+        payment.setOrder(savedOrder);
+        payment.setAmount(totalAmount);
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setMode(null);
 
-	    // Create Payment (Pending)
-	    Payment payment = new Payment();
-	    payment.setOrder(savedOrder);
-	    payment.setAmount(totalAmount);
-	    payment.setStatus(PaymentStatus.PENDING);
-	    payment.setMode(null);
+        paymentRepository.save(payment);
 
-	    paymentRepository.save(payment);
+        cartItemRepository.deleteByCart_CartId(cart.getCartId());
 
-	    // clear cart
-	    cartItemRepository.deleteByCart_CartId(cart.getCartId());
+        return Map.of(
+                "orderId", savedOrder.getId(),
+                "orderStatus", savedOrder.getStatus(),
+                "paymentStatus", payment.getStatus(),
+                "amount", totalAmount
+        );
+    }
 
-	    return Map.of(
-	            "orderId", savedOrder.getId(),
-	            "orderStatus", savedOrder.getStatus(),
-	            "paymentStatus", payment.getStatus(),
-	            "ammount", totalAmount
-	    );
-	}
-
-	
-	@Override
+    @Override
     public List<MyOrderResponse> getMyOrders(Long userId) {
 
-        
-
-        // Fetch orders
         List<Orders> orders =
                 orderRepository.findByUserIdOrderByOrderDateTimeDesc(userId);
 
-        // Map to response DTO
         return orders.stream().map(order -> {
-        	
-        	Payment payment = paymentRepository
-                    .findByOrder_Id(order.getId())
-                    .orElse(null);
-        	
-            
-         // Order Items
+
+            Payment payment =
+                    paymentRepository.findByOrder_Id(order.getId()).orElse(null);
+
             List<OrderItem> orderItems =
                     orderItemRepository.findByOrderId(order.getId());
 
             List<OrderItemResponse> itemResponses =
                     orderItems.stream().map(item -> {
+
+                        String productImage = item.getProduct()
+                                .getImages()
+                                .stream()
+                                .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                                .findFirst()
+                                .map(ProductImage::getImageUrl)
+                                .orElse(
+                                        item.getProduct().getImages().isEmpty()
+                                                ? null
+                                                : item.getProduct().getImages().get(0).getImageUrl()
+                                ); // update: resolve primary product image
+
                         OrderItemResponse dto = new OrderItemResponse();
                         dto.setProductId(item.getProduct().getId());
                         dto.setProductName(item.getProduct().getName());
                         dto.setQuantity(item.getQuantity());
                         dto.setPrice(item.getPrice());
-                        dto.setProductImage(item.getProduct().getImgUrl());
+                        dto.setProductImage(productImage);
                         return dto;
+
                     }).toList();
 
             MyOrderResponse response = new MyOrderResponse();
@@ -187,193 +181,178 @@ public class OrderServiceImpl implements OrderService {
             response.setPaymentStatus(payment.getStatus());
             response.setAmount(payment.getAmount());
             response.setItems(itemResponses);
-            
-            
+
             return response;
-            
 
         }).toList();
-        
-        
     }
 
-	
-	
-	//Admin Side Orders Fetching
-	
-	@Override
-	public List<AdminOrderResponse> getAllOrdersForAdmin() {
+    @Override
+    public List<AdminOrderResponse> getAllOrdersForAdmin() {
 
-	    List<Orders> orders =
-	            orderRepository.findAllByOrderByOrderDateTimeDesc();
+        List<Orders> orders =
+                orderRepository.findAllByOrderByOrderDateTimeDesc();
 
-	    return orders.stream().map(order -> {
+        return orders.stream().map(order -> {
 
-	        // Fetch payment safely
-	        Payment payment = paymentRepository
-	                .findByOrder_Id(order.getId())
-	                .orElse(null);
+            Payment payment =
+                    paymentRepository.findByOrder_Id(order.getId()).orElse(null);
 
-	        // Fetch order items
-	        List<OrderItem> orderItems =
-	                orderItemRepository.findByOrderId(order.getId());
+            List<OrderItem> orderItems =
+                    orderItemRepository.findByOrderId(order.getId());
 
-	        List<AdminOrderItemResponse> itemResponses =
-	                orderItems.stream().map(item -> {
+            List<AdminOrderItemResponse> itemResponses =
+                    orderItems.stream().map(item -> {
 
-	                    AdminOrderItemResponse dto = new AdminOrderItemResponse();
-	                    dto.setProductId(item.getProduct().getId());
-	                    dto.setProductName(item.getProduct().getName());
-	                    dto.setQuantity(item.getQuantity());
-	                    dto.setPrice(item.getPrice());
-	                    dto.setTotalAmount(
-	                            item.getPrice().multiply(
-	                                    BigDecimal.valueOf(item.getQuantity()))
-	                    );
-	                    return dto;
+                        AdminOrderItemResponse dto = new AdminOrderItemResponse();
+                        dto.setProductId(item.getProduct().getId());
+                        dto.setProductName(item.getProduct().getName());
+                        dto.setQuantity(item.getQuantity());
+                        dto.setPrice(item.getPrice());
+                        dto.setTotalAmount(
+                                item.getPrice().multiply(
+                                        BigDecimal.valueOf(item.getQuantity()))
+                        );
+                        return dto;
 
-	                }).toList();
+                    }).toList();
 
-	        // get total ammount
-	        BigDecimal totalAmount = payment.getAmount();
-
-	        AdminOrderResponse response = new AdminOrderResponse();
-	        response.setOrderId(order.getId());
-	        response.setOrderDate(order.getOrderDateTime());
-
-	        // User info
-	        response.setUserName(order.getUser().getFirstname() + " " + order.getUser().getLastname());
-
-	        // Delivery address
-	        
-	        response.setDeliveryAddress(order.getDeliveryAddress());
-
-	        // Order status
-	        response.setOrderStatus(order.getStatus());
-
-	        // Payment info
-
+            AdminOrderResponse response = new AdminOrderResponse();
+            response.setOrderId(order.getId());
+            response.setOrderDate(order.getOrderDateTime());
+            response.setUserName(
+                    order.getUser().getFirstname() + " " + order.getUser().getLastname());
+            response.setDeliveryAddress(order.getDeliveryAddress());
+            response.setOrderStatus(order.getStatus());
             response.setPaymentStatus(payment.getStatus());
-            response.setPaymentMode(payment.getMode() != null ? payment.getMode() : null);
+            response.setPaymentMode(payment.getMode());
             response.setTotalAmount(payment.getAmount());
-	        
+            response.setItems(itemResponses);
 
-	        response.setItems(itemResponses);
-	        return response;
+            return response;
 
-	    }).toList();
-	}
+        }).toList();
+    }
 
-	@Override
-	public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
 
-	    Orders order = orderRepository.findById(orderId)
-	            .orElseThrow(() -> new RuntimeException("Order not found"));
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-	    OrderStatus currentStatus = order.getStatus();
+        OrderStatus currentStatus = order.getStatus();
 
-	    // Admin can go forward only
-	    if (!isValidTransition(currentStatus, newStatus)) {
-	        throw new RuntimeException(
-	                "Invalid order status transition: "
-	                        + currentStatus + " → " + newStatus);
-	    }
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new RuntimeException(
+                    "Invalid order status transition: "
+                            + currentStatus + " → " + newStatus);
+        }
 
-	    // Update order status
-	    order.setStatus(newStatus);
+        order.setStatus(newStatus);
 
-	    // Handle COD payment auto-success on delivery
-	    Payment payment = paymentRepository
-	            .findByOrder_Id(orderId)
-	            .orElse(null);
+        Payment payment =
+                paymentRepository.findByOrder_Id(orderId).orElse(null);
 
-	    if (newStatus == OrderStatus.DELIVERED
-	            && payment != null
-	            && payment.getMode() != null
-	            && payment.getMode().name().equals("COD")) {
+        if (newStatus == OrderStatus.DELIVERED
+                && payment != null
+                && payment.getMode() != null
+                && payment.getMode().name().equals("COD")) {
 
-	        payment.setStatus(PaymentStatus.SUCCESS);
-	        paymentRepository.save(payment);
-	    }
+            payment.setStatus(PaymentStatus.SUCCESS);
+            paymentRepository.save(payment);
+        }
 
-	    orderRepository.save(order);
-	    
-	    //after updating order status send email to customer
-	    String email=order.getUser().getEmail();
-	    String subject="Your order #" +orderId+ "status updated";
-	    String body="Hello " + order.getUser().getFirstname() + ",\n\n" +
-	              "Your order #" + orderId + " status has been updated to: " + newStatus + ".\n" +
-	              "Thank you for shopping with us!";
-	    
-	    mailService.sendEmail(email, subject, body);
-	}
+        orderRepository.save(order);
 
-	private boolean isValidTransition(OrderStatus current, OrderStatus next) {
-	    return switch (current) {
-	        case CONFIRMED -> next == OrderStatus.SHIPPED;
-	        case SHIPPED -> next == OrderStatus.DELIVERED;
-	        default -> false;
-	    };
-	}
+        String email = order.getUser().getEmail();
+        String subject = "Your order #" + orderId + " status updated";
+        String body =
+                "Hello " + order.getUser().getFirstname() + ",\n\n"
+                        + "Your order #" + orderId + " status has been updated to: "
+                        + newStatus + ".\n"
+                        + "Thank you for shopping with us!";
 
+        mailService.sendEmail(email, subject, body); // update: notify user on status change
+    }
 
-	
-	@Override
-	public MyOrderResponse getOrderDetails(Long orderId) {
+    private boolean isValidTransition(OrderStatus current, OrderStatus next) {
 
-	    // 1️⃣ Fetch order
-	    Orders order = orderRepository.findById(orderId)
-	            .orElseThrow(() -> new RuntimeException("Order not found"));
+        return switch (current) {
+            case PLACED -> next == OrderStatus.CONFIRMED;
+            case CONFIRMED -> next == OrderStatus.SHIPPED;
+            case SHIPPED -> next == OrderStatus.DELIVERED;
+            default -> false;
+        };
+    }
 
-	    // 2️⃣ Fetch payment
-	    Payment payment = paymentRepository
-	            .findByOrder_Id(order.getId())
-	            .orElse(null);
+    // update: enhanced to support multiple product images
+    @Override
+    public MyOrderResponse getOrderDetails(Long orderId) {
 
-	    // 3️⃣ Fetch order items
-	    List<OrderItem> orderItems =
-	            orderItemRepository.findByOrderId(order.getId());
+        // Fetch order
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-	    // 4️⃣ Map OrderItem → OrderItemResponse
-	    List<OrderItemResponse> itemResponses =
-	            orderItems.stream().map(item -> {
-	                OrderItemResponse dto = new OrderItemResponse();
-	                dto.setProductId(item.getProduct().getId());
-	                dto.setProductName(item.getProduct().getName());
-	                dto.setQuantity(item.getQuantity());
-	                dto.setPrice(item.getPrice());
-	                dto.setProductImage(item.getProduct().getImgUrl());
-	                return dto;
-	            }).toList();
+        // Fetch payment
+        Payment payment = paymentRepository
+                .findByOrder_Id(order.getId())
+                .orElse(null);
 
-	    // 5️⃣ Compute total amount (safe fallback if payment is null)
-	    BigDecimal totalAmount;
-	    if (payment != null) {
-	        totalAmount = payment.getAmount();
-	    } else {
-	        totalAmount = orderItems.stream()
-	                .map(item ->
-	                        item.getPrice()
-	                            .multiply(BigDecimal.valueOf(item.getQuantity())))
-	                .reduce(BigDecimal.ZERO, BigDecimal::add);
-	    }
+        // Fetch order items
+        List<OrderItem> orderItems =
+                orderItemRepository.findByOrderId(order.getId());
 
-	    // 6️⃣ Build response
-	    MyOrderResponse response = new MyOrderResponse();
-	    response.setOrderId(order.getId());
-	    response.setOrderDateTime(order.getOrderDateTime());
-	    response.setOrderStatus(order.getStatus());
-	    response.setPaymentStatus(
-	            payment != null ? payment.getStatus() : PaymentStatus.PENDING
-	    );
-	    response.setAmount(totalAmount);
-	    response.setItems(itemResponses);
+        // Map OrderItem → OrderItemResponse
+        List<OrderItemResponse> itemResponses =
+                orderItems.stream().map(item -> {
 
-	    return response;
-	}
+                    // update: resolve primary product image from ProductImage list
+                    String productImage = item.getProduct()
+                            .getImages()
+                            .stream()
+                            .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                            .findFirst()
+                            .map(ProductImage::getImageUrl)
+                            .orElse(
+                                    item.getProduct().getImages().isEmpty()
+                                            ? null
+                                            : item.getProduct().getImages().get(0).getImageUrl()
+                            );
 
+                    OrderItemResponse dto = new OrderItemResponse();
+                    dto.setProductId(item.getProduct().getId());
+                    dto.setProductName(item.getProduct().getName());
+                    dto.setQuantity(item.getQuantity());
+                    dto.setPrice(item.getPrice());
+                    dto.setProductImage(productImage); // update: primary image
+                    return dto;
+                }).toList();
 
+        // Compute total amount (safe fallback if payment is null)
+        BigDecimal totalAmount;
+        if (payment != null) {
+            totalAmount = payment.getAmount();
+        } else {
+            totalAmount = orderItems.stream()
+                    .map(item ->
+                            item.getPrice()
+                                    .multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
 
+        // Build response
+        MyOrderResponse response = new MyOrderResponse();
+        response.setOrderId(order.getId());
+        response.setOrderDateTime(order.getOrderDateTime());
+        response.setOrderStatus(order.getStatus());
+        response.setPaymentStatus(
+                payment != null ? payment.getStatus() : PaymentStatus.PENDING
+        );
+        response.setAmount(totalAmount);
+        response.setItems(itemResponses);
+
+        return response;
+    }
 
 
 }

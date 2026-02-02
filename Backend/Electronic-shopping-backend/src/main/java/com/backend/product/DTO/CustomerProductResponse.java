@@ -1,27 +1,28 @@
 package com.backend.product.DTO;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class CustomerProductResponse {
 
-	
-	    private Long id;
-	    private String name;
-	    private String description;
-	    private BigDecimal price;
-	    private BigDecimal discountedPrice;
-	    private double discountPercentage;
-	    private String categoryName;
-	    private String brand;
-	    private String imgUrl;
-	    private Integer stock; 
-	}
+    private Long id;
+    private String name;
+    private String description;
 
-	    
+    private BigDecimal price;
+    private Double discountPercentage;
+    private BigDecimal discountedPrice;
 
+    private String categoryName;
+    private String brand;
+
+    private String primaryImageUrl;
+    private List<String> imageUrls;
+}

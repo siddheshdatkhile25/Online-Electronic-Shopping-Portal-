@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../../../api/axiosInstance"; 
+import api from "../../../api/axiosInstance";
 import "./EditProduct.css";
 
 const EditProduct = () => {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -12,16 +12,15 @@ const EditProduct = () => {
     categoryId: "",
     stock: "",
     price: "",
-    discount: "",
-    image: null,      // for new file
-    preview: ""      
+    discountPercentage: "", // ✅ FIX
+    image: null,
+    preview: ""
   });
 
   const [categories, setCategories] = useState([]);
 
   // Fetch product & categories
   useEffect(() => {
-    //  Fetch product by id
     api.get(`/admin/products/${id}`)
       .then(res => {
         const product = res.data.data;
@@ -30,14 +29,13 @@ const EditProduct = () => {
           categoryId: product.categoryId,
           stock: product.stock,
           price: product.price,
-          discount: product.discount || 0,
+          discountPercentage: product.discountPercentage ?? 0, // ✅ FIX
           image: null,
           preview: product.imgUrl
         });
       })
       .catch(err => console.error(err));
 
-    // Fetch all categories
     api.get("/admin/categories")
       .then(res => {
         setCategories(res.data.data);
@@ -56,7 +54,7 @@ const EditProduct = () => {
       setFormData(prev => ({
         ...prev,
         image: file,
-        preview: URL.createObjectURL(file) 
+        preview: URL.createObjectURL(file)
       }));
     }
   };
@@ -69,10 +67,10 @@ const EditProduct = () => {
     data.append("categoryId", formData.categoryId);
     data.append("stock", formData.stock);
     data.append("price", formData.price);
-    data.append("discount", formData.discount);
+    data.append("discountPercentage", formData.discountPercentage); // ✅ FIX
 
     if (formData.image) {
-      data.append("image", formData.image); 
+      data.append("image", formData.image);
     }
 
     api.put(`/admin/products/${id}`, data, {
@@ -94,6 +92,7 @@ const EditProduct = () => {
 
         <div className="form-container">
           <form onSubmit={handleSubmit} encType="multipart/form-data">
+
             <div className="form-group">
               <label>Product Title *</label>
               <input
@@ -152,8 +151,8 @@ const EditProduct = () => {
               <label>Discount (%)</label>
               <input
                 type="number"
-                name="discount"
-                value={formData.discount}
+                name="discountPercentage" 
+                value={formData.discountPercentage}
                 onChange={handleChange}
                 className="form-input"
                 min="0"
@@ -182,10 +181,15 @@ const EditProduct = () => {
               <button type="submit" className="btn btn-save">
                 Update Product
               </button>
-              <button type="button" onClick={handleCancel} className="btn btn-cancel">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="btn btn-cancel"
+              >
                 Cancel
               </button>
             </div>
+
           </form>
         </div>
       </div>

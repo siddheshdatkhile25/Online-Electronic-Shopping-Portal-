@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import api from "../../../api/axiosInstance";
+import { toast } from "react-toastify";
 
 const AddProduct = () => {
+  const fileInputRef = useRef(null);
+
   const [categories, setCategories] = useState([]);
 
   const [product, setProduct] = useState({
@@ -12,61 +15,67 @@ const AddProduct = () => {
     brand: "",
     description: "",
     discountPercentage: "",
-    image: null,
+    images: [],
   });
 
-  // Fetch categories on component mount
+  const [previews, setPreviews] = useState([]);
+
+  // Fetch categories
   useEffect(() => {
     api
       .get("/admin/categories")
-      .then((response) => {
-        // If using ApiResponse wrapper: response.data.data
-        setCategories(response.data.data || []);
-        console.log("Categories fetched:", response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching categories", error);
-      });
+      .then((res) => setCategories(res.data.data || []))
+      .catch(() => toast.error("Failed to load categories"));
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+    setProduct((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
-    setProduct({ ...product, image: e.target.files[0] });
+    const files = Array.from(e.target.files);
+
+    if (files.length > 4) {
+      toast.error("You can upload a maximum of 4 images");
+      return;
+    }
+
+    setProduct((prev) => ({ ...prev, images: files }));
+    setPreviews(files.map((file) => URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (product.images.length === 0) {
+      toast.error("At least one product image is required");
+      return;
+    }
+
     try {
       const formData = new FormData();
+
       formData.append("name", product.name);
-      formData.append("categoryId", Number(product.categoryId));
+      formData.append("categoryId", product.categoryId);
       formData.append("price", product.price);
       formData.append("stock", product.stock);
       formData.append("brand", product.brand);
       formData.append("description", product.description);
 
-      // ✅ Apply ONLY discount percentage
       if (product.discountPercentage) {
         formData.append("discountPercentage", product.discountPercentage);
       }
 
-      if (product.image) {
-        formData.append("image", product.image);
-      }
-
-      const response = await api.post("/admin/products", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // ✅ append images correctly (VERY IMPORTANT)
+      product.images.forEach((file) => {
+        formData.append("images", file);
       });
 
-      console.log("Product created:", response.data);
-      alert("Product added successfully!");
+      // ✅ DO NOT SET HEADERS
+      await api.post("/admin/products", formData);
+
+      toast.success("Product added successfully!");
 
       // Reset form
       setProduct({
@@ -77,142 +86,132 @@ const AddProduct = () => {
         brand: "",
         description: "",
         discountPercentage: "",
-        image: null,
+        images: [],
       });
+
+      setPreviews([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
-      console.error("Error adding product", error);
-      alert("Failed to add product");
+      console.error(error);
+      toast.error("Failed to add product");
     }
   };
 
   return (
-    <div
-      className="d-flex justify-content-center align-items-center vh-100"
-      style={{ backgroundColor: "#f2f2f2" }}
-    >
+    <div className="d-flex justify-content-center align-items-center vh-100">
       <form
         className="border p-4 rounded shadow"
-        style={{ width: "520px" }}
+        style={{ width: 520 }}
         onSubmit={handleSubmit}
       >
         <h3 className="text-center mb-4">Add Product</h3>
 
-        {/* Product Name */}
-        <div className="mb-3">
-          <label className="form-label">Product Name</label>
-          <input
-            type="text"
-            name="name"
-            className="form-control"
-            value={product.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          name="name"
+          placeholder="Name"
+          value={product.name}
+          onChange={handleChange}
+          required
+        />
 
-        {/* Category */}
-        <div className="mb-3">
-          <label className="form-label">Category</label>
-          <select
-            name="categoryId"
-            className="form-select"
-            value={product.categoryId}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-            {Array.isArray(categories) && categories.length > 0 ? (
-              categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))
-            ) : (
-              <option disabled>No categories available</option>
-            )}
-          </select>
-        </div>
+        <select
+          className="form-select mb-2"
+          name="categoryId"
+          value={product.categoryId}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Category</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
 
-        {/* Price */}
-        <div className="mb-3">
-          <label className="form-label">Price</label>
-          <input
-            type="number"
-            name="price"
-            className="form-control"
-            value={product.price}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          name="price"
+          type="number"
+          placeholder="Price"
+          value={product.price}
+          onChange={handleChange}
+          required
+        />
 
-        {/* Stock */}
-        <div className="mb-3">
-          <label className="form-label">Stock</label>
-          <input
-            type="number"
-            name="stock"
-            className="form-control"
-            value={product.stock}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          name="stock"
+          type="number"
+          placeholder="Stock"
+          value={product.stock}
+          onChange={handleChange}
+          required
+        />
 
-        {/* Brand */}
-        <div className="mb-3">
-          <label className="form-label">Brand</label>
-          <input
-            type="text"
-            name="brand"
-            className="form-control"
-            value={product.brand}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          name="brand"
+          placeholder="Brand"
+          value={product.brand}
+          onChange={handleChange}
+          required
+        />
 
-        {/* Description */}
-        <div className="mb-3">
-          <label className="form-label">Description</label>
-          <textarea
-            name="description"
-            className="form-control"
-            rows="3"
-            value={product.description}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
+        <textarea
+          className="form-control mb-2"
+          name="description"
+          placeholder="Description"
+          value={product.description}
+          onChange={handleChange}
+          required
+        />
 
-        {/* Discount Percentage */}
-        <div className="mb-3">
-          <label className="form-label">Discount Percentage (%)</label>
-          <input
-            type="number"
-            name="discountPercentage"
-            className="form-control"
-            value={product.discountPercentage}
-            onChange={handleChange}
-            placeholder="e.g. 10"
-            min="0"
-            max="100"
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          name="discountPercentage"
+          type="number"
+          placeholder="Discount %"
+          value={product.discountPercentage}
+          onChange={handleChange}
+          min="0"
+          max="100"
+        />
 
-        {/* Product Image */}
-        <div className="mb-3">
-          <label className="form-label">Product Image</label>
-          <input
-            type="file"
-            className="form-control"
-            onChange={handleImageChange}
-            accept="image/*"
-            required
-          />
-        </div>
+        <label className="form-label">Product Images (Max 4)</label>
+        <input
+          ref={fileInputRef}
+          className="form-control mb-3"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+        />
 
-        <button type="submit" className="btn btn-dark w-100">
+        {/* IMAGE PREVIEW */}
+        {previews.length > 0 && (
+          <div className="d-flex gap-2 mb-3 flex-wrap">
+            {previews.map((src, idx) => (
+              <img
+                key={idx}
+                src={src}
+                alt="preview"
+                style={{
+                  width: 80,
+                  height: 80,
+                  objectFit: "cover",
+                  borderRadius: 6,
+                  border: "1px solid #ccc",
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        <button className="btn btn-dark w-100" type="submit">
           Add Product
         </button>
       </form>

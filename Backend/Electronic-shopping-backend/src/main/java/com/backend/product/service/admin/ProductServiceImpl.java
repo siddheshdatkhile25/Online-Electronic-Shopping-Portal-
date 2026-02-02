@@ -1,10 +1,13 @@
 package com.backend.product.service.admin;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.category.entity.Category;
 import com.backend.category.repository.CategoryRepository;
@@ -13,6 +16,7 @@ import com.backend.common.service.FileUploadService;
 import com.backend.product.DTO.ProductRequest;
 import com.backend.product.DTO.ProductResponse;
 import com.backend.product.entity.Product;
+import com.backend.product.entity.ProductImage;
 import com.backend.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,14 +34,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(ProductRequest request) {
 
-        if (request.getImage() == null || request.getImage().isEmpty()) {
+        List<MultipartFile> images = request.getImages();
+
+        if (images == null || images.isEmpty()) {
             throw new RuntimeException("Product image is required");
+        }
+
+        if (images.size() > 4) {
+            throw new RuntimeException("Maximum 4 images are allowed per product");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-
-        String url = fileUploadService.uploadFile(request.getImage(), "products");
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -46,17 +54,45 @@ public class ProductServiceImpl implements ProductService {
                 .stock(request.getStock())
                 .category(category)
                 .brand(request.getBrand())
-                .imgUrl(url)
-                .active(request.getStock() > 0)   // 👈 Available only if stock > 0
+                .active(true) // update: product is active by default when created
                 .build();
 
+        // Apply discount
         applyDiscount(product, request.getDiscountPercentage());
+
+        List<ProductImage> productImages = new ArrayList<>();
+
+        for (int i = 0; i < images.size(); i++) {
+            MultipartFile file = images.get(i);
+
+            String url = fileUploadService.uploadFile(file, "products");
+
+            ProductImage image = new ProductImage();
+            image.setImageUrl(url);
+            image.setIsPrimary(i == 0); // update: first image treated as primary
+            image.setProduct(product);
+
+            productImages.add(image);
+        }
+
+        product.setImages(productImages); // update: attach uploaded images to product
 
         return convertToResponse(productRepository.save(product));
     }
 
     // Convert Product entity to ProductResponse DTO
     private ProductResponse convertToResponse(Product product) {
+
+        String stockMessage = null;
+        if (product.getStock() != null && product.getStock() > 0 && product.getStock() <= 10) {
+            stockMessage = "Only " + product.getStock() + " available";
+        }
+
+        List<String> imageUrls = product.getImages()
+                .stream()
+                .map(ProductImage::getImageUrl)
+                .toList(); // update: map ProductImage entities to image URLs
+
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -65,16 +101,17 @@ public class ProductServiceImpl implements ProductService {
                 .discountPercentage(product.getDiscountPercentage())
                 .discountedPrice(product.getDiscountedPrice())
                 .stock(product.getStock())
+                .stockMessage(stockMessage)
                 .categoryId(product.getCategory().getId())
                 .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
-                .imgUrl(product.getImgUrl())
+                .imageUrls(imageUrls)
                 .active(product.getActive())
                 .createdAt(product.getCreatedAt())
                 .build();
     }
 
-    // Get all active products
+    // Get all products (ADMIN)
     @Override
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll()
@@ -103,35 +140,16 @@ public class ProductServiceImpl implements ProductService {
         if (request.getPrice() != null) product.setPrice(request.getPrice());
         if (request.getBrand() != null) product.setBrand(request.getBrand());
 
-        // Update category if provided
         if (request.getCategoryId() != null) {
             Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
             product.setCategory(category);
         }
 
-        // Update stock safely
+        // update: stock update also controls active status
         if (request.getStock() != null) {
             product.setStock(request.getStock());
-
-            // Only deactivate if stock is 0
-            if (product.getStock() <= 0 && product.getActive()) {
-                product.setActive(false);
-            }
-
-            // Reactivate if stock > 0 
-            if (product.getStock() > 0 && !product.getActive()) {
-                product.setActive(true);
-            }
-        }
-
-        // Update image if provided
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-            if (product.getImgUrl() != null) {
-                fileUploadService.deleteFile(product.getImgUrl());
-            }
-            String url = fileUploadService.uploadFile(request.getImage(), "products");
-            product.setImgUrl(url);
+            product.setActive(product.getStock() > 0);
         }
 
         // Update discount
@@ -139,11 +157,8 @@ public class ProductServiceImpl implements ProductService {
             applyDiscount(product, request.getDiscountPercentage());
         }
 
-        // Save and return updated product
-        Product updated = productRepository.save(product);
-        return convertToResponse(updated);
+        return convertToResponse(productRepository.save(product));
     }
-
 
     // Soft delete product
     @Override
@@ -152,37 +167,11 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
 
-        if (product.getImgUrl() != null) {
-            fileUploadService.deleteFile(product.getImgUrl());
-        }
-
-        product.setActive(false);
+        product.setActive(false); // update: soft delete by disabling product
         productRepository.save(product);
     }
 
-    // Discount calculator
-    private void applyDiscount(Product product, Double discountPercentage) {
-
-        BigDecimal price = product.getPrice();
-
-        if (discountPercentage != null && discountPercentage > 0) {
-
-            BigDecimal discount = price
-                    .multiply(BigDecimal.valueOf(discountPercentage))
-                    .divide(BigDecimal.valueOf(100));
-
-            BigDecimal discountedPrice = price.subtract(discount);
-
-            product.setDiscountPercentage(discountPercentage);
-            product.setDiscountedPrice(discountedPrice);
-
-        } else {
-            product.setDiscountPercentage(null);
-            product.setDiscountedPrice(price);
-        }
-    }
-
-    // Toggle product status
+    // Toggle product active/inactive status
     @Override
     public ProductResponse toggleProductStatus(Long productId) {
 
@@ -194,7 +183,7 @@ public class ProductServiceImpl implements ProductService {
         return convertToResponse(productRepository.save(product));
     }
 
-    // Admin Add Stock
+    // Add stock to existing product
     @Override
     public ProductResponse addProductStock(Long productId, Integer quantity) {
 
@@ -207,11 +196,36 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStock(product.getStock() + quantity);
 
-        //  If stock increased above 0, make product active again
         if (product.getStock() > 0) {
-            product.setActive(true);
+            product.setActive(true); // update: reactivate product when stock is added
         }
 
         return convertToResponse(productRepository.save(product));
+    }
+
+    // Accurate discount calculation
+    private void applyDiscount(Product product, Double discountPercentage) {
+
+        BigDecimal price = product.getPrice();
+
+        if (discountPercentage != null && discountPercentage > 0) {
+
+            BigDecimal discountPercent = BigDecimal
+                    .valueOf(discountPercentage)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            BigDecimal discountAmount = price
+                    .multiply(discountPercent)
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+            BigDecimal discountedPrice = price.subtract(discountAmount);
+
+            product.setDiscountPercentage(discountPercentage);
+            product.setDiscountedPrice(discountedPrice);
+
+        } else {
+            product.setDiscountPercentage(null);
+            product.setDiscountedPrice(price);
+        }
     }
 }

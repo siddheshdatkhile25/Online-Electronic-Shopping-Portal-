@@ -17,6 +17,7 @@ import Checkout from './pages/user/Checkout/Checkout'
 import AddAddress from './pages/user/AddAddress/AddAddress'
 import Payment from './pages/user/Payment/Payment'
 import ContactUs from './Pages/user/ContactUs/ContactUs'
+import AboutUs from './Pages/user/AboutUs/AboutUs'
 import Profile from './Pages/user/Profile/Profile'
 import OrderList from './Pages/user/Order/OrderList'
 import Wishlist from './pages/user/Wishlist/Wishlist';
@@ -65,6 +66,7 @@ function App() {
           <Route path='contact-us' element={<ContactUs />} />
           <Route path='profile' element={<Profile />} />
           <Route path='orders' element={<OrderList/>} />
+          <Route path='about' element={<AboutUs/>} />
           
         </Route>
 

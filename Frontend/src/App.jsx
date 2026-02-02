@@ -1,4 +1,3 @@
-
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 
@@ -19,7 +18,7 @@ import Payment from './pages/user/Payment/Payment'
 import ContactUs from './Pages/user/ContactUs/ContactUs'
 import Profile from './Pages/user/Profile/Profile'
 import OrderList from './Pages/user/Order/OrderList'
-import Wishlist from './pages/user/Wishlist/Wishlist';
+import Wishlist from './pages/user/Wishlist/Wishlist'
 
 import AddProduct from './Pages/admin/AddProduct/AddProduct'
 import AddCategory from './Pages/admin/AddCategory/AddCategory'
@@ -29,13 +28,11 @@ import EditProduct from './Pages/admin/EditProduct/EditProduct'
 import CustomerOrders from './Pages/admin/CustomerOrders/CustomerOrders'
 import ApplyDiscount from './Pages/admin/ApplyDiscount/ApplyDiscount'
 import AdminDashboard from './Pages/admin/AdminDashboard/AdminDashboard'
-
+import AdminUsers from './Pages/admin/AdminUsers/AdminUsers'
 
 import { ToastContainer } from 'react-toastify'
-import { Contact } from 'lucide-react'
 
 function App() {
-
   return (
     <div>
       <ToastContainer
@@ -64,22 +61,19 @@ function App() {
           <Route path='payment' element={<Payment />} />
           <Route path='contact-us' element={<ContactUs />} />
           <Route path='profile' element={<Profile />} />
-          <Route path='orders' element={<OrderList/>} />
-          
+          <Route path='orders' element={<OrderList />} />
         </Route>
 
         {/* ADMIN ROUTES */}
         <Route path='/admin' element={<AdminHome />}>
           <Route index element={<AdminDashboard />} />
+          <Route path='users' element={<AdminUsers />} />
           <Route path='add-category' element={<AddCategory />} />
           <Route path='add-product' element={<AddProduct />} />
           <Route path='view-product' element={<ManageProduct />} />
           <Route path='edit-product/:id' element={<EditProduct />} />
           <Route path='apply-discount/:id' element={<ApplyDiscount />} />
           <Route path='view-orders' element={<CustomerOrders />} />
-
-          {/* <Route path='manage-payment' element={<PaymentPage/>}/> */}
-
         </Route>
       </Routes>
     </div>

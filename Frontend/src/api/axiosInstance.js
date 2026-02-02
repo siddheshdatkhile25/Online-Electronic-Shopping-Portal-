@@ -11,7 +11,7 @@ delete axios.defaults.headers.put["Content-Type"];
 delete axios.defaults.headers.patch["Content-Type"];
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

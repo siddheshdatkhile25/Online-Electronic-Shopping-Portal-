@@ -8,8 +8,8 @@ import wishlistIcon from "../icons/wishlist.png";
 function Navbar() {
   const navigate = useNavigate();
 
-  const isLoggedIn = Boolean(localStorage.getItem("token"));
-  const userEmail = localStorage.getItem("email");
+  const isLoggedIn = Boolean(sessionStorage.getItem("token"));
+  const userEmail = sessionStorage.getItem("email");
 
   const [openMenu, setOpenMenu] = useState(false);
 
@@ -20,8 +20,8 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("email");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("email");
     setOpenMenu(false);
     navigate("/login");
   };

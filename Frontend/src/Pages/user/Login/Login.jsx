@@ -26,10 +26,10 @@ function Login() {
       });
 
       // Save JWT & role
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("email", res.data.email);
-      localStorage.setItem("userId" , res.data.id);
+      sessionStorage.setItem("token", res.data.token);
+      sessionStorage.setItem("role", res.data.role);
+      sessionStorage.setItem("email", res.data.email);
+      sessionStorage.setItem("userId" , res.data.id);
 
       toast.success("Login successful!");
 

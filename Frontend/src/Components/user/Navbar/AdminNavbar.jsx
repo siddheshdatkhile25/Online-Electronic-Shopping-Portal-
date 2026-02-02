@@ -5,10 +5,10 @@ function AdminNavbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("email");
-    localStorage.removeItem("userId");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("email");
+    sessionStorage.removeItem("userId");
     navigate("/login");
   };
 

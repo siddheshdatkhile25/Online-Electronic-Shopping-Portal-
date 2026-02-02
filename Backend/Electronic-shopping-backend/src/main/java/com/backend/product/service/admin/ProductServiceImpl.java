@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final FileUploadService fileUploadService;
 
-    // Create Product
+    // ================= CREATE PRODUCT =================
     @Override
     public ProductResponse createProduct(ProductRequest request) {
 
@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Product image is required");
         }
 
-        Category category = categoryRepository.findById(request.getCategoryId())
+        Category category = categoryRepository.findByIdAndActiveTrue(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         String url = fileUploadService.uploadFile(request.getImage(), "products");
@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(category)
                 .brand(request.getBrand())
                 .imgUrl(url)
-                .active(request.getStock() > 0)   // 👈 Available only if stock > 0
+                .active(request.getStock() > 0)   // active only if stock > 0
                 .build();
 
         applyDiscount(product, request.getDiscountPercentage());
@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         return convertToResponse(productRepository.save(product));
     }
 
-    // Convert Product entity to ProductResponse DTO
+    // ================= CONVERTER =================
     private ProductResponse convertToResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    // Get all active products
+    // ================= GET ALL (ADMIN) =================
     @Override
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll()
@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
-    // Get product by ID
+    // ================= GET BY ID =================
     @Override
     public ProductResponse getProductById(Long productId) {
         Product product = productRepository.findById(productId)
@@ -91,41 +91,36 @@ public class ProductServiceImpl implements ProductService {
         return convertToResponse(product);
     }
 
+    // ================= UPDATE PRODUCT =================
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        // Update basic fields if provided
         if (request.getName() != null) product.setName(request.getName());
         if (request.getDescription() != null) product.setDescription(request.getDescription());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
         if (request.getBrand() != null) product.setBrand(request.getBrand());
 
-        // Update category if provided
         if (request.getCategoryId() != null) {
-            Category category = categoryRepository.findById(request.getCategoryId())
+            Category category = categoryRepository.findByIdAndActiveTrue(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
             product.setCategory(category);
         }
 
-        // Update stock safely
+        // Update stock logic
         if (request.getStock() != null) {
             product.setStock(request.getStock());
 
-            // Only deactivate if stock is 0
-            if (product.getStock() <= 0 && product.getActive()) {
+            if (product.getStock() <= 0) {
                 product.setActive(false);
-            }
-
-            // Reactivate if stock > 0 
-            if (product.getStock() > 0 && !product.getActive()) {
+            } else {
                 product.setActive(true);
             }
         }
 
-        // Update image if provided
+        // Update image
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             if (product.getImgUrl() != null) {
                 fileUploadService.deleteFile(product.getImgUrl());
@@ -139,13 +134,15 @@ public class ProductServiceImpl implements ProductService {
             applyDiscount(product, request.getDiscountPercentage());
         }
 
-        // Save and return updated product
-        Product updated = productRepository.save(product);
-        return convertToResponse(updated);
+        // 🔒 SAFETY: product cannot be active if category is inactive
+        if (!product.getCategory().getActive()) {
+            product.setActive(false);
+        }
+
+        return convertToResponse(productRepository.save(product));
     }
 
-
-    // Soft delete product
+    // ================= SOFT DELETE PRODUCT =================
     @Override
     public void deleteProduct(Long productId) {
 
@@ -160,7 +157,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-    // Discount calculator
+    // ================= DISCOUNT =================
     private void applyDiscount(Product product, Double discountPercentage) {
 
         BigDecimal price = product.getPrice();
@@ -171,10 +168,8 @@ public class ProductServiceImpl implements ProductService {
                     .multiply(BigDecimal.valueOf(discountPercentage))
                     .divide(BigDecimal.valueOf(100));
 
-            BigDecimal discountedPrice = price.subtract(discount);
-
             product.setDiscountPercentage(discountPercentage);
-            product.setDiscountedPrice(discountedPrice);
+            product.setDiscountedPrice(price.subtract(discount));
 
         } else {
             product.setDiscountPercentage(null);
@@ -182,7 +177,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    // Toggle product status
+  
     @Override
     public ProductResponse toggleProductStatus(Long productId) {
 
@@ -191,10 +186,15 @@ public class ProductServiceImpl implements ProductService {
 
         product.setActive(!product.getActive());
 
+        // 🔒 Ensure category inactive → product inactive
+        if (!product.getCategory().getActive()) {
+            product.setActive(false);
+        }
+
         return convertToResponse(productRepository.save(product));
     }
 
-    // Admin Add Stock
+    
     @Override
     public ProductResponse addProductStock(Long productId, Integer quantity) {
 
@@ -207,8 +207,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStock(product.getStock() + quantity);
 
-        //  If stock increased above 0, make product active again
-        if (product.getStock() > 0) {
+        if (product.getStock() > 0 && product.getCategory().getActive()) {
             product.setActive(true);
         }
 

@@ -41,7 +41,7 @@ public class CartServiceImpl implements CartService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Cart cart = cartRepository.findByUserEmail(email)
+        Cart cart = cartRepository.findByUser_Email(email)
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUser(user);
@@ -79,7 +79,7 @@ public class CartServiceImpl implements CartService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Cart cart = cartRepository.findByUserEmail(email)
+        Cart cart = cartRepository.findByUser_Email(email)
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUser(user);
@@ -121,7 +121,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void clearCart(String email) {
 
-        Cart cart = cartRepository.findByUserEmail(email)
+        Cart cart = cartRepository.findByUser_Email(email)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         cart.getCartItems().clear();

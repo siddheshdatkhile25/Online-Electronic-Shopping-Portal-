@@ -2,6 +2,7 @@ package com.backend.category.service;
 
 import java.util.List;
 
+import com.backend.AdminAnalytics.DTO.CategorySalesDTO;
 import com.backend.category.DTO.CategoryRequest;
 import com.backend.category.DTO.CategoryResponse;
 
@@ -14,6 +15,14 @@ public interface CategoryService {
 
 		List<CategoryResponse> getAllCategories();
 
-		//void deleteCategory(Long id);
+		void deleteCategory(Long categoryId);
+
+		
+
+		
+
+	
+
+		
 }
 

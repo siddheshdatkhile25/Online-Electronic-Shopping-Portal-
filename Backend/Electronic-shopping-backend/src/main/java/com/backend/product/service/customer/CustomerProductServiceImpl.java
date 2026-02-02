@@ -22,67 +22,83 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         this.productRepository = productRepository;
     }
 
-    // Get single product by ID (must be active)
+    // Get single product by ID (product + category must be active)
     @Override
     public CustomerProductResponse getProductById(Long productId) {
-        Product product = productRepository.findByIdAndActiveTrue(productId)
+
+        Product product = productRepository
+                .findByIdAndActiveTrueAndCategory_ActiveTrue(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         return toCustomerResponse(product);
     }
 
-    // Get all active products (include stock=0)
+    // Get all products visible to customers
     @Override
     public List<CustomerProductResponse> getAllProducts() {
-        return productRepository.findByActiveTrue()
+
+        return productRepository.findByActiveTrueAndCategory_ActiveTrue()
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Filter by category (only active products)
+    // Get products by category (category must be active)
     @Override
     public List<CustomerProductResponse> getProductsByCategory(Long categoryId) {
-        return productRepository.findByCategory_IdAndActiveTrue(categoryId)
+
+        return productRepository
+                .findByCategory_IdAndActiveTrueAndCategory_ActiveTrue(categoryId)
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Filter by brand (only active products)
+    // Get products by brand
     @Override
     public List<CustomerProductResponse> getProductsByBrand(String brand) {
-        return productRepository.findByBrandIgnoreCaseAndActiveTrue(brand)
+
+        return productRepository
+                .findByBrandIgnoreCaseAndActiveTrueAndCategory_ActiveTrue(brand)
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
     // Convert Product entity to CustomerProductResponse
-    public CustomerProductResponse toCustomerResponse(Product product) {
+    private CustomerProductResponse toCustomerResponse(Product product) {
+
         return CustomerProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
-                .discountPercentage(product.getDiscountPercentage() != null ? product.getDiscountPercentage() : 0)
-                .discountedPrice(product.getDiscountedPrice() != null ? product.getDiscountedPrice() : product.getPrice())
+                .discountPercentage(
+                        product.getDiscountPercentage() != null
+                                ? product.getDiscountPercentage()
+                                : 0
+                )
+                .discountedPrice(
+                        product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice()
+                )
                 .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
                 .imgUrl(product.getImgUrl())
-                .stock(product.getStock()) 
+                .stock(product.getStock())
                 .build();
     }
 
-    // Get all brands (only active products)
+    // Get all brands visible to customers
     @Override
     public List<String> getAllBrands() {
-        return productRepository.findAllBrands();
+        return productRepository.findAllActiveBrands();
     }
 
-    // Get brands by category (only active products)
+    // Get brands by category (category must be active)
     @Override
     public List<String> getBrandsByCategory(Long categoryId) {
-        return productRepository.findBrandsByCategory(categoryId);
+        return productRepository.findActiveBrandsByCategory(categoryId);
     }
 }

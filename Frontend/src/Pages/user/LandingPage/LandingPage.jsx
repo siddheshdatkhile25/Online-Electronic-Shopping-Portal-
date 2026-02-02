@@ -55,10 +55,10 @@ function LandingPage() {
         </div>
 
         {/* CATEGORY SECTION */}
-        <div className="category-carousel">
-          <h2 className="section-title">Shop by Category</h2>
+        <section className="category-section">
+          <h2 className="category-title">Shop by Category</h2>
 
-          <div className="category-bar">
+          <div className="category-wrapper">
             {categories.map((cat) => (
               <div
                 key={cat.id}
@@ -68,11 +68,13 @@ function LandingPage() {
                 <div className="category-circle">
                   <img src={cat.imageUrl} alt={cat.name} />
                 </div>
-                <div className="category-title">{cat.name}</div>
+                <div className="category-title-sm">{cat.name}</div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
+
+
 
         {/* ✅ PRODUCTS FROM BACKEND */}
         {Object.entries(groupedProducts).map(([category, list]) => (

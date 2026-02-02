@@ -160,7 +160,7 @@ public class PaymentServiceImpl implements PaymentService {
 	    paymentRepository.save(payment);
 
 	    //  Update order status
-	    order.setStatus(OrderStatus.CONFIRMED);
+	    order.setStatus(OrderStatus.PLACED);
 	    orderRepository.save(order);
 
 	    return "Payment verified successfully";

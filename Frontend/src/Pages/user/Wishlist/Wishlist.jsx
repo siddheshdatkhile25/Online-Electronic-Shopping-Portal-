@@ -9,13 +9,13 @@ export default function Wishlist() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  //load wishlist items
+  // Load wishlist items
   const loadWishlist = async () => {
     try {
       setLoading(true);
       const res = await api.get("/api/users/wishlist");
-      setWishlist(res.data);
-    } catch {
+      setWishlist(res.data || []);
+    } catch (error) {
       setWishlist([]);
     } finally {
       setLoading(false);
@@ -26,24 +26,24 @@ export default function Wishlist() {
     loadWishlist();
   }, []);
 
-  // remove from wishlist
+  // Remove from wishlist
   const removeFromWishlist = async (productId) => {
     try {
       await api.delete(`/api/users/wishlist/remove/${productId}`);
       toast.success("Removed from wishlist");
       loadWishlist();
-    } catch {
+    } catch (error) {
       toast.error("Failed to remove item");
     }
   };
 
-  // move to cart
+  // Move to cart
   const moveToCart = async (productId) => {
     try {
       await api.post(`/api/users/wishlist/move-to-cart/${productId}`);
       toast.success("Moved to cart");
       loadWishlist();
-    } catch {
+    } catch (error) {
       toast.error("Failed to move item");
     }
   };
@@ -71,9 +71,9 @@ export default function Wishlist() {
       ) : (
         <div className="wishlist-grid">
           {wishlist.map((item) => (
-            <div key={item.id} className="wishlist-card">
+            <div key={item.productId} className="wishlist-card">
               <img
-                src={item.imgUrl}
+                src={item.imageUrl || "/placeholder.png"}
                 alt={item.name}
                 className="wishlist-img"
               />
@@ -86,14 +86,14 @@ export default function Wishlist() {
               <div className="wishlist-actions">
                 <button
                   className="cart-btn"
-                  onClick={() => moveToCart(item.id)}
+                  onClick={() => moveToCart(item.productId)}
                 >
                   Move to Cart
                 </button>
 
                 <button
                   className="remove-btn"
-                  onClick={() => removeFromWishlist(item.id)}
+                  onClick={() => removeFromWishlist(item.productId)}
                 >
                   Remove
                 </button>

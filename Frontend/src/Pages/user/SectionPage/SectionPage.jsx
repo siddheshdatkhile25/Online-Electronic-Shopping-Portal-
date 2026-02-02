@@ -71,10 +71,13 @@ const SectionPage = () => {
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
             <div className="product-box" key={item.id}>
-              <img
-                src={item.imageUrls?.[0] || "/placeholder.png"}
-                alt={item.name}
-              />
+              <div className="img-wrapper">
+                <img
+                  src={item.imageUrls?.[0] || "/placeholder.png"}
+                  alt={item.name}
+                />
+              </div>
+
 
               <h4>{item.name}</h4>
 

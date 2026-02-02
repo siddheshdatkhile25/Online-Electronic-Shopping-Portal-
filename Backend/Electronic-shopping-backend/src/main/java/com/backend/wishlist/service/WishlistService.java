@@ -5,11 +5,13 @@ import com.backend.wishlist.dto.WishlistProductDTO;
 
 public interface WishlistService {
 
-    void addProductToWishlist(Long userId, Long productId);
+    void addProductToWishlistByEmail(String email, Long productId);
 
-    void removeProductFromWishlist(Long userId, Long productId);
+    void removeProductFromWishlistByEmail(String email, Long productId);
 
-    List<WishlistProductDTO> getWishlistByUser(Long userId);
+
+    List<WishlistProductDTO> getWishlistByUserByEmail(String email);
     
-    void moveToCart(Long userId, Long productId);
+    void moveToCartByEmail(String email, Long productId);
+
 }

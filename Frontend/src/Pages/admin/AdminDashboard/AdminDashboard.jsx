@@ -45,14 +45,15 @@ const DataAnalysisDashboard = () => {
       const orders = ordersRes.data;
       const totalUsers = usersRes.data.data.totalElements;
 
-      const successfulOrders = orders.filter(
-        (order) => order.paymentStatus === "SUCCESS"
-      );
+      let totalRevenue = 0;
 
-      const totalRevenue = successfulOrders.reduce(
-        (sum, order) => sum + Number(order.totalAmount),
-        0
-      );
+      orders.forEach((order) => {
+        if (order.paymentStatus === "SUCCESS") {
+          order.items.forEach((item) => {
+            totalRevenue += Number(item.totalAmount);
+          });
+        }
+      });
 
       setStats((prev) => ({
         ...prev,

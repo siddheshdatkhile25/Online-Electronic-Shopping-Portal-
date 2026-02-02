@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final FileUploadService fileUploadService;
 
-    // Create Product
+    // ================= CREATE PRODUCT =================
     @Override
     public ProductResponse createProduct(ProductRequest request) {
 
@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
         return convertToResponse(productRepository.save(product));
     }
 
-    // Convert Product entity to ProductResponse DTO
+    // ================= CONVERTER =================
     private ProductResponse convertToResponse(Product product) {
 
         String stockMessage = null;
@@ -120,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
-    // Get product by ID
+    // ================= GET BY ID =================
     @Override
     public ProductResponse getProductById(Long productId) {
         Product product = productRepository.findById(productId)
@@ -128,20 +128,20 @@ public class ProductServiceImpl implements ProductService {
         return convertToResponse(product);
     }
 
+    // ================= UPDATE PRODUCT =================
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        // Update basic fields if provided
         if (request.getName() != null) product.setName(request.getName());
         if (request.getDescription() != null) product.setDescription(request.getDescription());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
         if (request.getBrand() != null) product.setBrand(request.getBrand());
 
         if (request.getCategoryId() != null) {
-            Category category = categoryRepository.findById(request.getCategoryId())
+            Category category = categoryRepository.findByIdAndActiveTrue(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
             product.setCategory(category);
         }
@@ -179,6 +179,11 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         product.setActive(!product.getActive());
+
+        // 🔒 Ensure category inactive → product inactive
+        if (!product.getCategory().getActive()) {
+            product.setActive(false);
+        }
 
         return convertToResponse(productRepository.save(product));
     }

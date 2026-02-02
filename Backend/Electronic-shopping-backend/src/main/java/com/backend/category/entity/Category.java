@@ -42,5 +42,8 @@ public class Category {
 	
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
+	@Column(nullable = false)
+	private Boolean active = true;
+
 	
 }

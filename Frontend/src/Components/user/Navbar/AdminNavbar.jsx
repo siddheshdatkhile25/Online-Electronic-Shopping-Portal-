@@ -1,7 +1,17 @@
 import React from "react";
 import "./AdminNavbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 function AdminNavbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
+    localStorage.removeItem("userId");
+    navigate("/login");
+  };
+
   return (
     <nav className="navbar admin-navbar" data-bs-theme="dark">
       <div className="container-fluid">
@@ -37,7 +47,7 @@ function AdminNavbar() {
 
        
         <div className="nav-right">
-          <button className="logout-btn">Logout</button>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
 
       </div>

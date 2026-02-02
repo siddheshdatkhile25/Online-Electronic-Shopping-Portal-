@@ -16,6 +16,7 @@ import {
 } from "recharts";
 
 import { DollarSign, Package, CreditCard, BarChart2 } from "lucide-react";
+import api from "../../../api/axiosInstance";
 import "./AdminDashboard.css";
 
 const DataAnalysisDashboard = () => {
@@ -26,13 +27,43 @@ const DataAnalysisDashboard = () => {
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
-    avgOrderValue: 0,
+    totalUsers: 0,
     conversionRate: 0,
   });
 
   useEffect(() => {
     fetchAnalyticsData();
+    fetchDashboardStats();
   }, []);
+
+  // fetch ONLY total revenue, orders and users
+  const fetchDashboardStats = async () => {
+    try {
+      const ordersRes = await api.get("/admin/orders");
+      const usersRes = await api.get("/api/users/getUser?page=0&size=1");
+
+      const orders = ordersRes.data;
+      const totalUsers = usersRes.data.data.totalElements;
+
+      const successfulOrders = orders.filter(
+        (order) => order.paymentStatus === "SUCCESS"
+      );
+
+      const totalRevenue = successfulOrders.reduce(
+        (sum, order) => sum + Number(order.totalAmount),
+        0
+      );
+
+      setStats((prev) => ({
+        ...prev,
+        totalRevenue,
+        totalOrders: orders.length,
+        totalUsers,
+      }));
+    } catch (error) {
+      console.error("Dashboard stats error", error);
+    }
+  };
 
   const fetchAnalyticsData = () => {
     setSalesData([
@@ -71,13 +102,6 @@ const DataAnalysisDashboard = () => {
       { product: "Sony Headphones", sold: 312, revenue: 9356880, rating: 4.5 },
       { product: "iPad Pro", sold: 198, revenue: 15840000, rating: 4.7 },
     ]);
-
-    setStats({
-      totalRevenue: 8450000,
-      totalOrders: 2847,
-      avgOrderValue: 2968,
-      conversionRate: 3.42,
-    });
   };
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -89,7 +113,6 @@ const DataAnalysisDashboard = () => {
         <p className="dashboard-subtitle">Comprehensive analytics and insights</p>
       </div>
 
-     
       <div className="metrics-grid">
         <div className="metric-card metric-blue">
           <div className="metric-icon">
@@ -118,9 +141,9 @@ const DataAnalysisDashboard = () => {
             <CreditCard size={28} />
           </div>
           <div className="metric-content">
-            <h3>₹{stats.avgOrderValue.toLocaleString()}</h3>
-            <p>Avg Order Value</p>
-            <span className="metric-change positive">+5.2% vs last month</span>
+            <h3>{stats.totalUsers.toLocaleString()}</h3>
+            <p>Total Users</p>
+            <span className="metric-change positive">Active users</span>
           </div>
         </div>
 
@@ -161,7 +184,6 @@ const DataAnalysisDashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Category Chart */}
         <div className="chart-card">
           <div className="chart-header">
             <h2>Category Distribution</h2>
@@ -191,7 +213,6 @@ const DataAnalysisDashboard = () => {
         </div>
       </div>
 
-      {/* Revenue Target */}
       <div className="charts-grid">
         <div className="chart-card full-width">
           <div className="chart-header">
@@ -216,7 +237,6 @@ const DataAnalysisDashboard = () => {
         </div>
       </div>
 
-      {/* Product Table */}
       <div className="performance-card">
         <div className="chart-header">
           <h2>Top Product Performance</h2>
@@ -257,7 +277,6 @@ const DataAnalysisDashboard = () => {
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       </div>

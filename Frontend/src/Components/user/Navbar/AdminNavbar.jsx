@@ -1,14 +1,24 @@
 import React from "react";
 import "./AdminNavbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function AdminNavbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("email");
+    sessionStorage.removeItem("userId");
+    navigate("/login");
+  };
+
   return (
     <nav className="navbar admin-navbar" data-bs-theme="dark">
       <div className="container-fluid">
 
         <div className="nav-left">
-          <h2 className="navbar-brand">ElectroKart </h2>
+          <h2 className="navbar-brand">ElectroKart</h2>
         </div>
 
         <div className="nav-center">
@@ -49,7 +59,6 @@ function AdminNavbar() {
               </Link>
             </li>
 
-            {/* Users Tab */}
             <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/admin/users">
                 Users
@@ -59,7 +68,9 @@ function AdminNavbar() {
         </div>
 
         <div className="nav-right">
-          <button className="logout-btn">Logout</button>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
 
       </div>

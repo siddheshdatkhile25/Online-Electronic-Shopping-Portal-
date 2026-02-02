@@ -11,4 +11,6 @@ import com.backend.wishlist.entity.Wishlist;
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
     Optional<Wishlist> findByUserId(Long userId);
+    
+    Optional<Wishlist> findByUserEmail(String email);
 }

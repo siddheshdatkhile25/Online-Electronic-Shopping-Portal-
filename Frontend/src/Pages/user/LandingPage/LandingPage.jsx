@@ -56,23 +56,27 @@ function LandingPage() {
 
         {/* CATEGORY SECTION */}
         <section className="category-section">
-          <h2 className="category-title">Shop by Category</h2>
+          <h2 className="section-title">Shop by Category</h2>
 
-          <div className="category-wrapper">
-            {categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="category"
-                onClick={() => navigate(`/product-listing/${cat.id}`)}
-              >
-                <div className="category-circle">
-                  <img src={cat.imageUrl} alt={cat.name} />
+          <div className="category-carousel">
+            <div className="category-bar">
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="category"
+                  onClick={() => navigate(`/product-listing/${cat.id}`)}
+                >
+                  <div className="category-circle">
+                    <img src={cat.imageUrl} alt={cat.name} />
+                  </div>
+                  <div className="category-title-sm">{cat.name}</div>
                 </div>
-                <div className="category-title-sm">{cat.name}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
+
+
 
 
 

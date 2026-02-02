@@ -78,6 +78,8 @@
 /* actual category list */
 .category-bar {
   display: flex;
+  flex-direction: row;     /* 🔥 force horizontal */
+  flex-wrap: nowrap; 
   justify-content: center; /* FIX */
   align-items: center;
   gap: 28px;

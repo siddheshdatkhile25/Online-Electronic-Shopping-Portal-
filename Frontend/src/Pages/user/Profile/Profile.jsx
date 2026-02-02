@@ -23,7 +23,7 @@ function Profile() {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        const userId = localStorage.getItem("userId");
+        const userId = sessionStorage.getItem("userId");
         if (!userId) {
           setError('User not logged in');
           setLoading(false);

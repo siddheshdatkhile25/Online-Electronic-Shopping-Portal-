@@ -321,20 +321,20 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public MyOrderResponse getOrderDetails(Long orderId) {
 
-	    // 1️⃣ Fetch order
+	    // Fetch order
 	    Orders order = orderRepository.findById(orderId)
 	            .orElseThrow(() -> new RuntimeException("Order not found"));
 
-	    // 2️⃣ Fetch payment
+	    // Fetch payment
 	    Payment payment = paymentRepository
 	            .findByOrder_Id(order.getId())
 	            .orElse(null);
 
-	    // 3️⃣ Fetch order items
+	    //  Fetch order items
 	    List<OrderItem> orderItems =
 	            orderItemRepository.findByOrderId(order.getId());
 
-	    // 4️⃣ Map OrderItem → OrderItemResponse
+	    // Map OrderItem → OrderItemResponse
 	    List<OrderItemResponse> itemResponses =
 	            orderItems.stream().map(item -> {
 	                OrderItemResponse dto = new OrderItemResponse();
@@ -346,7 +346,7 @@ public class OrderServiceImpl implements OrderService {
 	                return dto;
 	            }).toList();
 
-	    // 5️⃣ Compute total amount (safe fallback if payment is null)
+	    //  Compute total amount (safe fallback if payment is null)
 	    BigDecimal totalAmount;
 	    if (payment != null) {
 	        totalAmount = payment.getAmount();
@@ -358,7 +358,7 @@ public class OrderServiceImpl implements OrderService {
 	                .reduce(BigDecimal.ZERO, BigDecimal::add);
 	    }
 
-	    // 6️⃣ Build response
+	    //  Build response
 	    MyOrderResponse response = new MyOrderResponse();
 	    response.setOrderId(order.getId());
 	    response.setOrderDateTime(order.getOrderDateTime());

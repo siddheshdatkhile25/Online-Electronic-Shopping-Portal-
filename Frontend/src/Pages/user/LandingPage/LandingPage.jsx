@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./LandingPage.css";
 import api from "../../../api/axiosInstance";
-import Carousal from "../../../Components/user/Carousal/Carousal";
+import Carousal from "../../../components/user/Carousal/Carousal";
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
@@ -17,14 +17,14 @@ function LandingPage() {
       .catch(() => setCategories([]));
   }, []);
 
-  // ✅ Fetch products added by admin
+  // Fetch products added by admin
   useEffect(() => {
     api.get("/products")
       .then((res) => setProducts(res.data.data || []))
       .catch(() => setProducts([]));
   }, []);
 
-  // ✅ Group products by category name
+  // Group products by category name
   const groupedProducts = products.reduce((acc, product) => {
     const category = product.categoryName || "Other";
     if (!acc[category]) acc[category] = [];

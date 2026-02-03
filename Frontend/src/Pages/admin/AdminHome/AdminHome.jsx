@@ -1,7 +1,7 @@
 import React from 'react'
-import AdminNavbar from '../../../Components/user/Navbar/AdminNavbar'
+import AdminNavbar from '../../../components/user/Navbar/AdminNavbar'
 import { Outlet } from 'react-router-dom'
-import Navbar from '../../../Components/user/Navbar/Navbar'
+import Navbar from '../../../components/user/Navbar/Navbar'
 const AdminHome = () => {
   return (
     <div>

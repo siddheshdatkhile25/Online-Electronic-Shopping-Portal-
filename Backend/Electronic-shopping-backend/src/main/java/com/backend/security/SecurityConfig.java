@@ -2,6 +2,7 @@ package com.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -55,6 +56,8 @@ public class SecurityConfig {
                 			"/api/users/forgot-password",
                 			"/api/users/verify-otp",
                 			"/api/users/reset-password").permitAll()
+                .requestMatchers(HttpMethod.GET , "/admin/categories").permitAll()
+                .requestMatchers(HttpMethod.GET , "/products").permitAll()
                 .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

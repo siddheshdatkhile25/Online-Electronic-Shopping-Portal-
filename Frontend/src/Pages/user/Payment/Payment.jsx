@@ -31,7 +31,7 @@ export default function Payment() {
   const fetchOrderId = () => {
     try {
       // Get orderId from localStorage (set during checkout)
-      const storedOrderId = localStorage.getItem("orderId");
+      const storedOrderId = sessionStorage.getItem("orderId");
       if (storedOrderId) {
         setOrderId(storedOrderId);
       }

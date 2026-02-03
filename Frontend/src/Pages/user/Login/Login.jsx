@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { logActivity } from "../../../services/logService";
 import "./Login.css";
 
 function Login() {
@@ -26,12 +27,19 @@ function Login() {
       });
 
       // Save JWT & role
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("email", res.data.email);
-      localStorage.setItem("userId" , res.data.id);
+      sessionStorage.setItem("token", res.data.token);
+      sessionStorage.setItem("role", res.data.role);
+      sessionStorage.setItem("email", res.data.email);
+      sessionStorage.setItem("userId" , res.data.id);
 
       toast.success("Login successful!");
+
+      //LOG LOGIN SUCCESS (FILE LOGGING)
+      logActivity({
+        userId: res.data.id,
+        action: "LOGIN_SUCCESS"
+      });
+      console.log("logger called")
 
       // Role-based redirect
       if (res.data.role === "ADMIN") {

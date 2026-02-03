@@ -23,7 +23,7 @@ export default function Checkout() {
   const fetchUserId = async () => {
     try {
       // Get userId from localStorage (set during login)
-      const storedUserId = localStorage.getItem("userId");
+      const storedUserId = sessionStorage.getItem("userId");
       if (storedUserId) {
         setUserId(storedUserId);
       }
@@ -73,7 +73,7 @@ export default function Checkout() {
       console.log("Order placed:", response.data);
       // Save orderId to localStorage for Payment page
       if (response.data.orderId) {
-        localStorage.setItem("orderId", response.data.orderId);
+        sessionStorage.setItem("orderId", response.data.orderId);
       }
       toast.success("Order Placed")
       navigate("/payment");

@@ -15,7 +15,7 @@ export default function OrderList() {
   const [message, setMessage] = useState(null); // ✅ For success/failure messages
   const navigate = useNavigate();
 
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
 
   // Helper function to construct full image URL
   const getImageUrl = (imagePath) => {

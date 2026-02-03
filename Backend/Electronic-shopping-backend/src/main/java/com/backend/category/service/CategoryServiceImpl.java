@@ -5,11 +5,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.backend.AdminAnalytics.DTO.CategorySalesDTO;
 import com.backend.category.DTO.CategoryRequest;
 import com.backend.category.DTO.CategoryResponse;
 import com.backend.category.entity.Category;
 import com.backend.category.repository.CategoryRepository;
+import com.backend.common.Enums.OrderStatus;
 import com.backend.common.exception.DuplicateResourceException;
+import com.backend.common.exception.ResourceNotFoundException;
 import com.backend.common.service.FileUploadService;
 import com.backend.product.repository.ProductRepository;
 
@@ -29,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService{
 	@Override
 	public CategoryResponse addCategory(CategoryRequest request) {
 		
-		if (categoryRepository.existsByName(request.getName())) {
+		if (categoryRepository.existsByNameAndActiveTrue(request.getName())) {
 	        throw new DuplicateResourceException("Category already exists");
 	    }
 		
@@ -59,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService{
 	@Override
 	public List<CategoryResponse> getAllCategories() {
 
-		return categoryRepository.findAll()
+		return categoryRepository.findByActiveTrue()
 		.stream()
 		.map(Category->CategoryResponse.builder()
 				.id(Category.getId())
@@ -70,7 +73,19 @@ public class CategoryServiceImpl implements CategoryService{
 				
 				}
 
+	
 
+	@Override
+	public void deleteCategory(Long id) {
 
+	    Category category = categoryRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+	    category.setActive(false);
+
+	    categoryRepository.save(category);
+	}
+
+	
 
 }

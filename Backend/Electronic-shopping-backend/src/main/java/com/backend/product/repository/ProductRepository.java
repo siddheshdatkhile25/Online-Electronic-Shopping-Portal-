@@ -12,27 +12,35 @@ import com.backend.product.entity.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Find product by ID and active
-    Optional<Product> findByIdAndActiveTrue(Long productId);
 
-    // Find products by category ID (active only)
-    List<Product> findByCategory_IdAndActiveTrue(Long categoryId);
+    Optional<Product> findByIdAndActiveTrueAndCategory_ActiveTrue(Long id);
 
-    // Find products by brand (active only)
-    Optional<Product> findByBrandIgnoreCaseAndActiveTrue(String brand);
 
-    // All active products
-    List<Product> findByActiveTrue();
+    // All active products whose category is also active
+    List<Product> findByActiveTrueAndCategory_ActiveTrue();
 
-    // All brands from active products
-    @Query("SELECT DISTINCT p.brand FROM Product p WHERE p.active = true")
-    List<String> findAllBrands();
+    // Products by category (only if product + category both active)
+    List<Product> findByCategory_IdAndActiveTrueAndCategory_ActiveTrue(Long categoryId);
 
-    // Brands by category from active products
+    // Products by brand (only if product + category both active)
+    List<Product> findByBrandIgnoreCaseAndActiveTrueAndCategory_ActiveTrue(String brand);
+
+   
+
     @Query("""
         SELECT DISTINCT p.brand
         FROM Product p
-        WHERE p.active = true AND p.category.id = :categoryId
-        """)
-    List<String> findBrandsByCategory(Long categoryId);
+        WHERE p.active = true
+          AND p.category.active = true
+    """)
+    List<String> findAllActiveBrands();
+
+    @Query("""
+        SELECT DISTINCT p.brand
+        FROM Product p
+        WHERE p.active = true
+          AND p.category.active = true
+          AND p.category.id = :categoryId
+    """)
+    List<String> findActiveBrandsByCategory(Long categoryId);
 }

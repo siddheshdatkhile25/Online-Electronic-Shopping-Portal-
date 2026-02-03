@@ -23,37 +23,44 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         this.productRepository = productRepository;
     }
 
-    // Get single product by ID (must be active)
+    // Get single product by ID (product + category must be active)
     @Override
     public CustomerProductResponse getProductById(Long productId) {
-        Product product = productRepository.findByIdAndActiveTrue(productId)
+
+        Product product = productRepository
+                .findByIdAndActiveTrueAndCategory_ActiveTrue(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         return toCustomerResponse(product);
     }
 
-    // Get all active products (include stock=0)
+    // Get all products visible to customers
     @Override
     public List<CustomerProductResponse> getAllProducts() {
-        return productRepository.findByActiveTrue()
+
+        return productRepository.findByActiveTrueAndCategory_ActiveTrue()
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Filter by category (only active products)
+    // Get products by category (category must be active)
     @Override
     public List<CustomerProductResponse> getProductsByCategory(Long categoryId) {
-        return productRepository.findByCategory_IdAndActiveTrue(categoryId)
+
+        return productRepository
+                .findByCategory_IdAndActiveTrueAndCategory_ActiveTrue(categoryId)
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
     }
 
-    // Filter by brand (only active products)
+    // Get products by brand
     @Override
     public List<CustomerProductResponse> getProductsByBrand(String brand) {
-        return productRepository.findByBrandIgnoreCaseAndActiveTrue(brand)
+
+        return productRepository
+                .findByBrandIgnoreCaseAndActiveTrueAndCategory_ActiveTrue(brand)
                 .stream()
                 .map(this::toCustomerResponse)
                 .collect(Collectors.toList());
@@ -106,15 +113,15 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .build();
     }
 
-    // Get all brands (only active products)
+    // Get all brands visible to customers
     @Override
     public List<String> getAllBrands() {
-        return productRepository.findAllBrands();
+        return productRepository.findAllActiveBrands();
     }
 
     // brands per category
     @Override
     public List<String> getBrandsByCategory(Long categoryId) {
-        return productRepository.findBrandsByCategory(categoryId);
+        return productRepository.findActiveBrandsByCategory(categoryId);
     }
 }

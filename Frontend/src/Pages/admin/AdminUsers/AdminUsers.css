@@ -1,0 +1,75 @@
+.admin-users-container {
+  padding: 40px;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+.admin-users-title {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.admin-users-table-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 15px;
+  word-wrap: break-word;
+}
+
+.admin-users-table th {
+  background-color: #000;
+  color: white;
+  font-weight: 600;
+}
+
+.admin-users-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.status-active {
+  color: #198754;
+  font-weight: 600;
+}
+
+.status-inactive {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.pagination button {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

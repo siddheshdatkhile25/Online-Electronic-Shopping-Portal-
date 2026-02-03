@@ -4,8 +4,10 @@ package com.backend.order.Repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.backend.AdminAnalytics.DTO.MonthlyRevenueDTO;
 import com.backend.order.entites.OrderItem;
 
 @Repository
@@ -19,5 +21,24 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     
     //check if user has ordered product before he can add review
 	boolean existsByOrder_User_IdAndProduct_Id(Long userId, Long productId);
-}
+	
+	
+
+	    @Query("""
+	    SELECT new com.backend.AdminAnalytics.DTO.MonthlyRevenueDTO(
+	        MONTH(o.orderDateTime),
+	        SUM(oi.quantity * oi.price)
+	    )
+	    FROM OrderItem oi
+	    JOIN oi.order o
+	    WHERE o.status = com.backend.common.Enums.OrderStatus.DELIVERED
+	    GROUP BY MONTH(o.orderDateTime)
+	    ORDER BY MONTH(o.orderDateTime)
+	    """)
+	    List<MonthlyRevenueDTO> getMonthlyRevenue();
+	}
+
+
+
+
 

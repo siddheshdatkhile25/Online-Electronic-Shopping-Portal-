@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../../api/axiosInstance";
-import "./productDetails.css";
+import "./ProductDetails.css";
 import { toast } from "react-toastify";
 
 export default function ProductDetails() {

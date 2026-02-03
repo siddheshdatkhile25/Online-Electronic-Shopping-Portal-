@@ -1,4 +1,4 @@
-import "./checkout.css";
+import "./Checkout.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/axiosInstance";

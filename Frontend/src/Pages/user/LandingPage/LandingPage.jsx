@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./LandingPage.css";
 import api from "../../../api/axiosInstance";
-import Carousal from "../../../Components/user/Carousal/Carousal";
+import Carousal from "../../../components/user/Carousal/Carousal";
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {

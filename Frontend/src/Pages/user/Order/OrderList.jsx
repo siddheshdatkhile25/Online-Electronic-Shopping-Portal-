@@ -27,7 +27,7 @@ export default function OrderList() {
       console.log("Full URL image:", imagePath);
       return imagePath;
     }
-    const fullUrl = `http://localhost:8080${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
+    const fullUrl = `http://13.200.137.111:8080${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
     console.log("Constructed image URL:", fullUrl, "from:", imagePath);
     return fullUrl;
   };

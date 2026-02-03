@@ -20,7 +20,7 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:8080/api/users/login", {
+      const res = await axios.post("/api/users/login", {
         email,
         password,
       });

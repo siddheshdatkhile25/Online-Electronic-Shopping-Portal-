@@ -63,6 +63,7 @@ export default function AddAddress() {
         pincode: form.zipcode,
       };
       await api.post("/api/users/addresses", payload);
+      navigate("/checkout");
       await fetchAddresses(); // Refresh list
       // Optionally clear form
       setForm({
@@ -77,6 +78,7 @@ export default function AddAddress() {
         optional: "",
         saveInfo: false,
       });
+      
     } catch {
       setError("Failed to add address");
     } finally {

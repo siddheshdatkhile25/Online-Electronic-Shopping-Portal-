@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { logActivity } from "../../../services/logService";
+import { config } from "../../../services/config";
+//import { logActivity } from "../../../services/logService";
 import "./Login.css";
 
 function Login() {
@@ -21,7 +22,8 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post("/api/users/login", {
+      const url = `${config.server}/api/users/login`;
+      const res = await axios.post(url, {
         email,
         password,
       });
@@ -35,11 +37,11 @@ function Login() {
       toast.success("Login successful!");
 
       //LOG LOGIN SUCCESS (FILE LOGGING)
-      logActivity({
-        userId: res.data.id,
-        action: "LOGIN_SUCCESS"
-      });
-      console.log("logger called")
+      // logActivity({
+      //   userId: res.data.id,
+      //   action: "LOGIN_SUCCESS"
+      // });
+      // console.log("logger called")
 
       // Role-based redirect
       if (res.data.role === "ADMIN") {

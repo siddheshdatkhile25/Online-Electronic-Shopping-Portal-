@@ -15,8 +15,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import java.util.List;
 
 @Configuration
@@ -35,6 +33,7 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ✅ Authentication Manager
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http)
             throws Exception {
@@ -49,18 +48,28 @@ public class SecurityConfig {
         return authBuilder.build();
     }
 
+    // ✅ Security Filter Chain (NO withDefaults)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors(withDefaults())
+                // Explicit CORS config
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Disable CSRF (JWT based)
                 .csrf(csrf -> csrf.disable())
+
+                // Stateless session
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authorizeHttpRequests(auth -> auth
 
                         // CORS preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // PUBLIC / AUTH ENDPOINTS
+                        // PUBLIC / AUTH APIs
                         .requestMatchers(
                                 "/",
                                 "/swagger-ui/**",
@@ -73,34 +82,43 @@ public class SecurityConfig {
                                 "/api/users/reset-password"
                         ).permitAll()
 
-                        // PUBLIC PRODUCT / CATEGORY APIS
-                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/categories").permitAll()
+                        // PUBLIC DATA APIs
+                        .requestMatchers(HttpMethod.GET,
+                                "/products/**",
+                                "/admin/categories/**"
+                        ).permitAll()
 
-                        // ROLE-BASED ACCESS
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // USER APIs
+                        .requestMatchers("/api/users/**")
+                        .hasAnyRole("USER", "ADMIN")
+
+                        // ADMIN APIs
+                        .requestMatchers("/admin/**")
+                        .hasRole("ADMIN")
 
                         // EVERYTHING ELSE
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+
+                // JWT filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // ✅ CORS Configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
 
+        // Allow all origins (use specific origin in production)
         config.setAllowedOriginPatterns(List.of("*"));
+
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
+
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

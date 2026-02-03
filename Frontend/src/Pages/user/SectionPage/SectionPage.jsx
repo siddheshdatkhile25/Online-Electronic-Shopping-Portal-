@@ -3,7 +3,7 @@ import "./SectionPage.css";
 import api from "../../../api/axiosInstance";
 import { useParams, useNavigate } from "react-router-dom";
 
-const LatestProducts = () => {
+const SectionPage = () => {
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
@@ -11,13 +11,11 @@ const LatestProducts = () => {
   const [products, setProducts] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState("");
 
-  // Fetch brands for filter
+  // Fetch brands
   useEffect(() => {
     api
       .get(`/products/category/${categoryId}/brands`)
-      .then((res) => {
-        setBrands(res.data.data);
-      })
+      .then((res) => setBrands(res.data.data || []))
       .catch((err) => console.error(err));
   }, [categoryId]);
 
@@ -25,9 +23,7 @@ const LatestProducts = () => {
   useEffect(() => {
     api
       .get(`/products/category/${categoryId}`)
-      .then((res) => {
-        setProducts(res.data.data); // include stock=0 products
-      })
+      .then((res) => setProducts(res.data.data || []))
       .catch((err) => console.error(err));
   }, [categoryId]);
 
@@ -38,7 +34,6 @@ const LatestProducts = () => {
 
   return (
     <div className="latest-container">
-      {/* HEADER */}
       <div className="latest-header">
         <h2>Products</h2>
       </div>
@@ -76,17 +71,13 @@ const LatestProducts = () => {
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
             <div className="product-box" key={item.id}>
-              {/* IMAGE WITH OVERLAY */}
               <div className="img-wrapper">
                 <img
-                  src={item.imgUrl}
+                  src={item.imageUrls?.[0] || "/placeholder.png"}
                   alt={item.name}
-                  className={item.stock === 0 ? "grayscale" : ""}
                 />
-                {item.stock === 0 && (
-                  <div className="not-available-overlay">Not Available</div>
-                )}
               </div>
+
 
               <h4>{item.name}</h4>
 
@@ -108,9 +99,8 @@ const LatestProducts = () => {
               <button
                 className="view-btn"
                 onClick={() => navigate(`/product/${item.id}`)}
-                disabled={item.stock === 0}
               >
-                {item.stock === 0 ? "Out of Stock" : "View Details"}
+                View Details
               </button>
             </div>
           ))
@@ -122,4 +112,4 @@ const LatestProducts = () => {
   );
 };
 
-export default LatestProducts;
+export default SectionPage;

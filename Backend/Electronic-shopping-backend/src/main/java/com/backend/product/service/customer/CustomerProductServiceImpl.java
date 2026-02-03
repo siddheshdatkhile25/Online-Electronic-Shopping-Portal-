@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.backend.common.exception.ResourceNotFoundException;
 import com.backend.product.DTO.CustomerProductResponse;
 import com.backend.product.entity.Product;
+import com.backend.product.entity.ProductImage;
 import com.backend.product.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
@@ -66,27 +67,49 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     // Convert Product entity to CustomerProductResponse
-    private CustomerProductResponse toCustomerResponse(Product product) {
+    public CustomerProductResponse toCustomerResponse(Product product) {
+
+        List<String> imageUrls = product.getImages()
+                .stream()
+                .map(ProductImage::getImageUrl)
+                .toList(); // update: collect all product image URLs
+
+        String primaryImageUrl = product.getImages()
+                .stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                .findFirst()
+                .map(ProductImage::getImageUrl)
+                .orElse(
+                        imageUrls.isEmpty() ? null : imageUrls.get(0)
+                ); // update: fallback to first image if primary not marked
 
         return CustomerProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
+
+                // Discount info
                 .discountPercentage(
                         product.getDiscountPercentage() != null
                                 ? product.getDiscountPercentage()
                                 : 0
                 )
+
+                // Final price (never null)
                 .discountedPrice(
                         product.getDiscountedPrice() != null
                                 ? product.getDiscountedPrice()
                                 : product.getPrice()
                 )
+
                 .categoryName(product.getCategory().getName())
                 .brand(product.getBrand())
-                .imgUrl(product.getImgUrl())
-                .stock(product.getStock())
+
+                // update: switched from single image to multi-image support
+                .primaryImageUrl(primaryImageUrl)
+                .imageUrls(imageUrls)
+
                 .build();
     }
 
@@ -96,7 +119,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return productRepository.findAllActiveBrands();
     }
 
-    // Get brands by category (category must be active)
+    // brands per category
     @Override
     public List<String> getBrandsByCategory(Long categoryId) {
         return productRepository.findActiveBrandsByCategory(categoryId);

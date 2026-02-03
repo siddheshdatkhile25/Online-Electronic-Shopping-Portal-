@@ -9,6 +9,7 @@ export default function ProductDetails() {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
+  const [mainImage, setMainImage] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Reviews
@@ -26,7 +27,13 @@ export default function ProductDetails() {
     api
       .get(`/products/id/${id}`)
       .then((res) => {
-        setProduct(res.data.data);
+        const data = res.data.data;
+        setProduct(data);
+
+        if (data.imageUrls && data.imageUrls.length > 0) {
+          setMainImage(data.imageUrls[0]);
+        }
+
         setLoading(false);
       })
       .catch(() => {
@@ -53,9 +60,10 @@ export default function ProductDetails() {
           quantity: 1,
         },
       });
-      toast.success("Added to cart!");
+      toast.success("Added to cart");
       navigate("/cart");
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to add to cart");
     }
   };
@@ -117,39 +125,48 @@ export default function ProductDetails() {
 
   return (
     <div className="pd-container">
-      {/* LEFT */}
+      {/* LEFT SIDE */}
       <div className="pd-left">
         <div className="pd-main-img">
-
-          {/* ⭐ ONLY THIS IS ADDED (no code changed) */}
           {product.stock === 0 && (
             <span className="unavailable-badge">Unavailable</span>
           )}
 
-          <img src={product.imgUrl} alt={product.name} />
+          <img
+            src={mainImage || "/placeholder.png"}
+            alt={product.name}
+          />
         </div>
+
+        {product.imageUrls?.length > 1 && (
+          <div className="pd-thumbnails">
+            {product.imageUrls.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`product-${index}`}
+                className={`pd-thumb ${mainImage === img ? "active" : ""}`}
+                onClick={() => setMainImage(img)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* RIGHT */}
+      {/* RIGHT SIDE */}
       <div className="pd-right">
         <h1 className="pd-title">{product.name}</h1>
 
         <p className="pd-price">
           {product.discountPercentage > 0 ? (
             <>
-              <span
-                style={{
-                  textDecoration: "line-through",
-                  color: "gray",
-                  marginRight: "10px",
-                }}
-              >
+              <span style={{ textDecoration: "line-through", color: "gray" }}>
                 ₹{product.price}
               </span>
-              <span style={{ color: "green", fontWeight: "bold" }}>
+              <span style={{ color: "green", fontWeight: "bold", marginLeft: 10 }}>
                 ₹{product.discountedPrice}
               </span>
-              <span style={{ marginLeft: "10px", color: "red" }}>
+              <span style={{ color: "red", marginLeft: 10 }}>
                 ({product.discountPercentage}% OFF)
               </span>
             </>
@@ -159,6 +176,7 @@ export default function ProductDetails() {
         </p>
 
         <p className="pd-desc">{product.description}</p>
+
         <p>
           <strong>Brand:</strong> {product.brand}
         </p>
@@ -168,7 +186,10 @@ export default function ProductDetails() {
             🛒 Add to Cart
           </button>
 
-          <button className="pd-btn pd-wishlist-btn" onClick={addToWishlist}>
+          <button
+            className="pd-btn pd-wishlist-btn"
+            onClick={addToWishlist}
+          >
             ❤️ Add to Wishlist
           </button>
         </div>

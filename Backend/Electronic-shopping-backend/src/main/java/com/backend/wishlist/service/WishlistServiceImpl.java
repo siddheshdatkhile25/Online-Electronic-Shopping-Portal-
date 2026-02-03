@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.cart.service.CartService;
 import com.backend.product.entity.Product;
+import com.backend.product.entity.ProductImage;
 import com.backend.product.repository.ProductRepository;
 import com.backend.user.Repository.UserRepository;
 import com.backend.user.entites.User;
@@ -23,23 +24,26 @@ public class WishlistServiceImpl implements WishlistService {
     private final UserRepository userRepository;
     private final CartService cartService;
 
-    public WishlistServiceImpl(WishlistRepository wishlistRepository,
+    public WishlistServiceImpl(
+            WishlistRepository wishlistRepository,
             ProductRepository productRepository,
             UserRepository userRepository,
             CartService cartService) {
-		this.wishlistRepository = wishlistRepository;
-		this.productRepository = productRepository;
-		this.userRepository = userRepository;
-		this.cartService = cartService;
-		}
+
+        this.wishlistRepository = wishlistRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+        this.cartService = cartService;
+    }
 
     @Override
-    public void addProductToWishlist(Long userId, Long productId) {
+    public void addProductToWishlistByEmail(String email, Long productId) {
 
-        Wishlist wishlist = wishlistRepository.findByUserId(userId)
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Wishlist wishlist = wishlistRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
-                    User user = userRepository.findById(userId)
-                            .orElseThrow(() -> new RuntimeException("User not found"));
                     Wishlist w = new Wishlist();
                     w.setUser(user);
                     return wishlistRepository.save(w);
@@ -48,23 +52,24 @@ public class WishlistServiceImpl implements WishlistService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-     
-        boolean alreadyExists = wishlist.getProducts()
+        boolean exists = wishlist.getProducts()
                 .stream()
                 .anyMatch(p -> p.getId().equals(productId));
 
-        if (alreadyExists) {
-            return; 
+        if (!exists) {
+            wishlist.getProducts().add(product);
+            wishlistRepository.save(wishlist);
         }
-
-        wishlist.getProducts().add(product);
-        wishlistRepository.save(wishlist);
     }
 
-    @Override
-    public void removeProductFromWishlist(Long userId, Long productId) {
 
-        Wishlist wishlist = wishlistRepository.findByUserId(userId)
+    @Override
+    public void removeProductFromWishlistByEmail(String email, Long productId) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Wishlist wishlist = wishlistRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Wishlist not found"));
 
         wishlist.getProducts()
@@ -73,27 +78,47 @@ public class WishlistServiceImpl implements WishlistService {
         wishlistRepository.save(wishlist);
     }
 
-    @Override
-    public List<WishlistProductDTO> getWishlistByUser(Long userId) {
 
-        Wishlist wishlist = wishlistRepository.findByUserId(userId)
+    @Override
+    public List<WishlistProductDTO> getWishlistByUserByEmail(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Wishlist wishlist = wishlistRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Wishlist not found"));
 
         return wishlist.getProducts()
                 .stream()
-                .map(product -> new WishlistProductDTO(
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getImgUrl()   
-                ))
+                .map(product -> {
+                    String imageUrl = product.getImages()
+                            .stream()
+                            .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                            .findFirst()
+                            .map(ProductImage::getImageUrl)
+                            .orElse(
+                                    product.getImages().isEmpty()
+                                            ? null
+                                            : product.getImages().get(0).getImageUrl()
+                            );
+
+                    return new WishlistProductDTO(
+                            product.getId(),
+                            product.getName(),
+                            product.getPrice(),
+                            imageUrl
+                    );
+                })
                 .toList();
     }
     
     @Override
-    public void moveToCart(Long userId, Long productId) {
+    public void moveToCartByEmail(String email, Long productId) {
 
-        Wishlist wishlist = wishlistRepository.findByUserId(userId)
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Wishlist wishlist = wishlistRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Wishlist not found"));
 
         Product product = wishlist.getProducts()
@@ -102,13 +127,13 @@ public class WishlistServiceImpl implements WishlistService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Product not in wishlist"));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
         cartService.addItemToCart(user.getEmail(), productId, 1);
 
         wishlist.getProducts().remove(product);
-
         wishlistRepository.save(wishlist);
     }
+
+
+
+    
 }

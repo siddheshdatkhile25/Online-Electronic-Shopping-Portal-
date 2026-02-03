@@ -71,8 +71,8 @@ export const resetPassword = async (newPassword) => {
   try{
     const url = `${config.server}/api/users/reset-password`;
      console.log("Reset Password called ");
-    const email = localStorage.getItem("verify-email");
-    const otp = localStorage.getItem("verify-otp");
+    const email = sessionStorage.getItem("verify-email");
+    const otp = sessionStorage.getItem("verify-otp");
     console.log("Reset Password called with:", { email, otp, newPassword });
     const response = await axios.post(url, { email, otp, newPassword }, {
       headers: {
@@ -92,7 +92,7 @@ export const resetPassword = async (newPassword) => {
 
 export const getUserProfile = async (id) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       throw new Error("No token found");
     }
@@ -117,7 +117,7 @@ export const getUserProfile = async (id) => {
 
 export const addUserAddress = async (addressData) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       throw new Error("No token found");
     }

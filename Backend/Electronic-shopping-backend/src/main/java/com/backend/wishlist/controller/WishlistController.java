@@ -23,8 +23,8 @@ public class WishlistController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long productId) {
 
-        User user = (User) userDetails;
-        wishlistService.addProductToWishlist(user.getId(), productId);
+    	String email = userDetails.getUsername();
+        wishlistService.addProductToWishlistByEmail(email, productId);
         return ResponseEntity.ok("Product added to wishlist");
     }
 
@@ -33,29 +33,33 @@ public class WishlistController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long productId) {
 
-        User user = (User) userDetails;
-        wishlistService.removeProductFromWishlist(user.getId(), productId);
+        String email = userDetails.getUsername(); // SAFE
+        wishlistService.removeProductFromWishlistByEmail(email, productId);
+
         return ResponseEntity.ok("Product removed from wishlist");
     }
+
 
     @GetMapping
     public ResponseEntity<?> getWishlist(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = (User) userDetails;
+        String email = userDetails.getUsername();
         return ResponseEntity.ok(
-                wishlistService.getWishlistByUser(user.getId())
+                wishlistService.getWishlistByUserByEmail(email)
         );
     }
+
     
     @PostMapping("/move-to-cart/{productId}")
     public ResponseEntity<?> moveToCart(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long productId) {
 
-        User user = (User) userDetails;
-        wishlistService.moveToCart(user.getId(), productId);
+        String email = userDetails.getUsername(); // SAFE
+        wishlistService.moveToCartByEmail(email, productId);
 
         return ResponseEntity.ok("Moved product from wishlist to cart");
     }
+
 }

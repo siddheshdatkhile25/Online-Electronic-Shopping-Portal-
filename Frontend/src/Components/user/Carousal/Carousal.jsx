@@ -1,45 +1,58 @@
 import React from "react";
-import Slider from "react-slick";
-import { useNavigate } from "react-router-dom"
-import './Carousal.css'
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
+import { useNavigate } from "react-router-dom";
+import "./Carousal.css";
 
 const Carousal = ({ title, products }) => {
-
   const navigate = useNavigate();
+
   return (
     <div className="container">
       <div className="productCarousal">
         <h2 className="product-title">{title}</h2>
 
         <div className="card-container">
-          {products.map((item, index) => (
+          {products.map((item) => (
             <div
               key={item.id}
               className="card"
-              onClick={() => navigate(`/product/${item.category}/${item.id}`)}
+              onClick={() => navigate(`/product/${item.id}`)}
             >
               <div className="image">
-                {/* FIXED → use imageUrl instead of images[0] */}
-                <img src={item.imageUrl} alt={item.name} />
+                <img
+                  src={
+                    item.imageUrls && item.imageUrls.length > 0
+                      ? item.imageUrls[0]
+                      : "/placeholder.png"
+                  }
+                  alt={item.name}
+                />
               </div>
 
               <div className="data">
                 <div className="productname">{item.name}</div>
-                <div className="price">₹{item.price}</div>
+
+                <div className="price">
+                  {item.discountPercentage > 0 ? (
+                    <>
+                      <span className="old-price">₹{item.price}</span>
+                      <span className="new-price">
+                        ₹{item.discountedPrice}
+                      </span>
+                    </>
+                  ) : (
+                    `₹${item.price}`
+                  )}
+                </div>
               </div>
 
               <div className="review">
                 <div className="rating">
-                  ⭐ {item.rating} ({item.ratingCount})
+                  ⭐ {item.rating || 4.5}
                 </div>
               </div>
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );

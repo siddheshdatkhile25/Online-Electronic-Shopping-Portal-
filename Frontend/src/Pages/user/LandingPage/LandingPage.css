@@ -1,14 +1,18 @@
-
+/* =========================
+   HERO SECTION
+========================= */
 .heroSection {
-  height: 50vh;
+  min-height: 50vh; /* FIX: avoid pushing content */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   margin: 40px auto 0;
+  padding: 0 20px;
+
   color: #000;
   text-align: center;
-  padding: 0 20px;
 }
 
 .heroSection h2 {
@@ -29,12 +33,14 @@
 }
 
 .shopNowbtn {
-  margin-top: 10px;
+  margin-top: 14px;
   padding: 8px 16px;
+
   background-color: #fff;
   color: #000;
   border: 2px solid #d4d4d4;
   border-radius: 6px;
+
   font-size: 14px;
   cursor: pointer;
   transition: 0.3s ease;
@@ -46,61 +52,91 @@
   transform: translateY(-2px);
 }
 
+/* =========================
+   CATEGORY SECTION (FIXED)
+========================= */
 
+.category-section {
+  width: 100%;
+  margin: 60px 0;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+/* wrapper that controls layout */
 .category-carousel {
   width: 100%;
-  margin-top: 20px;
-  padding: 10px 0;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  background-color: #ffffff;
   display: flex;
   justify-content: center;
 }
 
-.category-carousel::-webkit-scrollbar {
+/* actual category list */
+.category-bar {
+  display: flex;
+  flex-direction: row;     /* 🔥 force horizontal */
+  flex-wrap: nowrap; 
+  justify-content: center; /* FIX */
+  align-items: center;
+  gap: 28px;
+
+  padding: 0 0px;
+  max-width: 100%;
+
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.category-bar::-webkit-scrollbar {
   display: none;
 }
 
-.category-bar {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 0 20px;
-  min-width: max-content;
-}
-
+/* individual category */
 .category {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   cursor: pointer;
 }
 
 .category-title {
   margin-top: 8px;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 600;
 }
 
+.category-title-sm {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
 
+/* circle */
 .category-circle {
   width: 70px;
   height: 70px;
+
   border-radius: 50%;
   background-color: #f0f0f0;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden; 
+
+  overflow: hidden;
   transition: 0.3s ease;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .category-circle img {
   width: 50px;
   height: 50px;
   object-fit: contain;
-  display: block;     
-  max-width: 100%;       
 }
 
 .category-circle:hover {
@@ -108,81 +144,86 @@
   background-color: #e8e8e8;
 }
 
+/* =========================
+   FOOTER
+========================= */
 .footer-section {
-    background: #f4f6f8;
-    padding: 60px 40px;
-    margin-top: 60px;
-    display: flex;
-    justify-content: space-between;
-    gap: 60px;
+  background: #f4f6f8;
+  padding: 60px 40px;
+  margin-top: 60px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 60px;
 }
 
 .footer-newsletter {
-    max-width: 380px;
+  max-width: 380px;
 }
 
 .footer-newsletter h2 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .footer-newsletter p {
-    color: #555;
-    font-size: 14px;
-    margin-bottom: 20px;
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 
 .newsletter-input {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .newsletter-input input {
-    padding: 10px 14px;
-    width: 220px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+  padding: 10px 14px;
+  width: 220px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 }
 
 .newsletter-input button {
-    padding: 10px 16px;
-    background: #111;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
+  padding: 10px 16px;
+  background: #111;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 .footer-links {
-    display: flex;
-    justify-content: space-between;
-    gap: 60px;
-    flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 60px;
+  flex: 1;
 }
 
 .footer-col h4 {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .footer-col ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .footer-col ul li {
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #555;
-    cursor: pointer;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
 }
 
-
-
+/* =========================
+   MOBILE FIXES
+========================= */
 @media (max-width: 480px) {
   .heroSection h2 {
     font-size: 26px;

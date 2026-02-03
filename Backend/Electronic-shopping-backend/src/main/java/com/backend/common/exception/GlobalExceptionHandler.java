@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse(ex.getMessage(), false));
     }
+    
     @ExceptionHandler(MailException.class)
     public ResponseEntity<?> handleMailException(MailException ex){
 		return ResponseEntity

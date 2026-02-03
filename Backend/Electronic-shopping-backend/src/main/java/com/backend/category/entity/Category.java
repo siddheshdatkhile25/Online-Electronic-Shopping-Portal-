@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,11 +40,20 @@ public class Category {
 	@CreationTimestamp
 	@Column(updatable=false)
 	private LocalDateTime createdAt;
-	
+
+	@Column(nullable = false)
+    private Boolean active;
+
+	@PrePersist
+    public void prePersist() {
+        this.active = true;
+    }
+
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
-	@Column(nullable = false)
-	private Boolean active = true;
+
+	// @Column(nullable = false)
+	// private Boolean active = true;
 
 	
 }

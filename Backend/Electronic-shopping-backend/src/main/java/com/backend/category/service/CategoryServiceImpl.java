@@ -35,6 +35,10 @@ public class CategoryServiceImpl implements CategoryService{
 		if (categoryRepository.existsByNameAndActiveTrue(request.getName())) {
 	        throw new DuplicateResourceException("Category already exists");
 	    }
+
+		if (request.getImage() == null || request.getImage().isEmpty()) {
+        throw new IllegalArgumentException("Category image is required");
+    	}
 		
 		String imgUrl = fileUploadService.uploadFile(request.getImage(), "categories");
 		 
@@ -78,8 +82,8 @@ public class CategoryServiceImpl implements CategoryService{
 	@Override
 	public void deleteCategory(Long id) {
 
-	    Category category = categoryRepository.findById(id)
-	            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+	    Category category = categoryRepository.findByIdAndActiveTrue(id)
+    		.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
 	    category.setActive(false);
 

@@ -33,7 +33,6 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ✅ Authentication Manager
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http)
             throws Exception {
@@ -48,22 +47,15 @@ public class SecurityConfig {
         return authBuilder.build();
     }
 
-    // ✅ Security Filter Chain (NO withDefaults)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                // Explicit CORS config
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // Disable CSRF (JWT based)
                 .csrf(csrf -> csrf.disable())
-
-                // Stateless session
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
 
                         // CORS preflight
@@ -82,49 +74,40 @@ public class SecurityConfig {
                                 "/api/users/reset-password"
                         ).permitAll()
 
-                        // PUBLIC DATA APIs
+                        // PUBLIC READ APIs
                         .requestMatchers(HttpMethod.GET,
                                 "/products/**",
                                 "/admin/categories/**"
                         ).permitAll()
 
+                        // ADMIN WRITE APIs
+                        .requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")
+
                         // USER APIs
                         .requestMatchers("/api/users/**")
                         .hasAnyRole("USER", "ADMIN")
 
-                        // ADMIN APIs
-                        .requestMatchers("/admin/**")
-                        .hasRole("ADMIN")
-
                         // EVERYTHING ELSE
                         .anyRequest().authenticated()
                 )
-
-                // JWT filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ CORS Configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
-
-        // Allow all origins (use specific origin in production)
         config.setAllowedOriginPatterns(List.of("*"));
-
-        config.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        ));
-
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
-
         source.registerCorsConfiguration("/**", config);
         return source;
     }
